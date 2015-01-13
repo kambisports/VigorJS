@@ -1,0 +1,31 @@
+.modularized__select-menu--large {
+	color: $select-text-color;
+	border: $select-border;
+	width: 150px;
+	@include box-shadow($select-box-shadow);
+	background: $select-background-color;
+	vertical-align: middle;
+	padding: 4px 0 4px 5px;
+	font-size: $font-size-deci;
+	cursor: pointer;
+
+	&.custom-skin {
+		@include appearance("none");
+		background: $select-background-color url('../../common/img/stake-dropdown.png') no-repeat right center;
+		background-size: 600px 40px;
+		height: 40px;
+		padding: 0 0 0 5px;
+	}
+
+	&:focus {
+		outline-color: $select-outline-color;
+	}
+
+	@include transition(opacity 0.2s ease-out);
+	@include mouse-hover-style {
+		opacity: 0.75;
+	}
+	@include mouse-down-style {
+		opacity: 0.88;
+	}
+}

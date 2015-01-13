@@ -1,0 +1,13 @@
+<h3 class="navigation-menu__section-header">{{getUpperCaseTranslation title}}</h3>
+
+<ul class="navigation-menu__section-links">
+	{{#each groups}}
+	<li class="navigation-menu__section-link">
+		<a href="#group/{{id}}" class="navigation-menu__section-link-anchor js-nav-link" data-group-id="{{id}}" data-tracking="Featured - {{groupPath}}" data-touch-feedback="true">
+			<span class="navigation-menu__section-link-event-label">{{toUpperCase name}}</span>
+			<span class="navigation-menu__section-link-event-path">{{eventPath}}</span>
+			<span class="navigation-menu__section-link-event-count" title="1004 markets in Football / England / The Championship">{{boCount}}</span>
+		</a>
+	</li>
+	{{/each}}
+</ul>

@@ -1,0 +1,11 @@
+define ->
+	MOST_POPULAR_EVENTS: 'most-popular-events'
+	EVENT: 'event'
+	BETOFFER: 'betoffer'
+	OUTCOME: 'outcome'
+	HELLO_WORLD_COUNT: 'hello-world-count'
+	GROUPS: 'groups'
+	GROUP: 'group'
+	HIGHLIGHTED_GROUPS: 'highlighted-groups'
+	EVENTS: 'events'
+	LIVE: 'live'
