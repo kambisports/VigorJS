@@ -9,23 +9,17 @@ define (require) ->
 		prefetchDataKey: 'prefetchedHighlight'
 
 		constructor: (GroupsRepository) ->
-			pollInterval = 1000 * 60 * 30
-
+			pollInterval = 1000 * 15
 			super GroupsRepository, pollInterval
-
-		bindRepositoryListeners: ->
-			super
-			@service.listenTo @repository, GroupsRepository.POLL_ONCE_HIGHLIGHTED, @pollOnce
-
-
-		unbindRepositoryListeners: ->
-			super
-			@service.stopListening @repository, GroupsRepository.POLL_ONCE_HIGHLIGHTED, @pollOnce
 
 		parse: (response) ->
 			super response
-			@repository.setHighlighted response.groups
+			@repository.set @_decorateGroups(response.groups), { remove: false }
 
+		_decorateGroups: (groups) ->
+			for group in groups
+				group.highlighted = true
+			return groups
 
 		NAME: 'GroupsHighlightedService'
 

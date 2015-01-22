@@ -38,12 +38,9 @@ define (require) ->
 			do @fetch
 
 		query: (key) ->
-			deferred = Q.defer()
-			# doing a fetch here seems to overwrites any unsaved changes
 			value = @get(key)
 			if value then value = JSON.parse(value)
-			deferred.resolve value
-			return deferred.promise
+			return value
 
 
 		queryBetslip: ->

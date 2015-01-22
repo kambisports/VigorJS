@@ -9,9 +9,7 @@ define (require) ->
 		model: BetofferModel
 
 		queryBetoffer: (options) ->
-			deferred = Q.defer()
-			deferred.resolve @findWhere('id': options.betofferId)
-			return deferred.promise
+			return @findWhere('id': options.betofferId)
 
 		makeTestInstance: ->
 			new BetoffersRepository()

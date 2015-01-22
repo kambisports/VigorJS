@@ -22,6 +22,7 @@ define (require) ->
 		subscribe: (key, callback, options) ->
 			return DataCommunicationManager.subscribe @id, key, callback, options
 
+		###
 		query: (key, options) ->
 			return DataCommunicationManager.query key, options
 
@@ -37,9 +38,10 @@ define (require) ->
 					deferred.reject error
 
 			return deferred.promise
+		###
 
-		unsubscribe: (subscriptionId) ->
-			return DataCommunicationManager.unsubscribe @id, subscriptionId
+		unsubscribe: (key) ->
+			return DataCommunicationManager.unsubscribe @id, key
 
 		unsubscribeAll: ->
 			return DataCommunicationManager.unsubscribeAll @id

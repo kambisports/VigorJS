@@ -37,7 +37,6 @@ define (require) ->
 
 				@outcomes.push outcome
 
-
 		_renderOutcomes: ->
 			for outcome in @outcomes
 				switch outcome.model.get('type')
@@ -49,6 +48,5 @@ define (require) ->
 
 					when OutcomeTypes.TYPE_TWO
 						@$_rightCol.append outcome.render().$el
-
 
 	return OneCrossTwoView

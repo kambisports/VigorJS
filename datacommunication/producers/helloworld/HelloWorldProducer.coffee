@@ -13,36 +13,63 @@ define (require) ->
 
 		constructor: ->
 			super
-			HelloWorldRepository.on 'change', @onChangeInRepository, @
+			HelloWorldRepository.on HelloWorldRepository.REPOSITORY_DIFF, @_onDiffInRepository, @
 
 		dispose: ->
-			HelloWorldRepository.off 'change', @onChangeInRepository, @
+			HelloWorldRepository.off HelloWorldRepository.REPOSITORY_DIFF, @_onDiffInRepository, @
 			HelloWorldRepository.notInterestedInUpdates @NAME
 			super
 
 		subscribe: (subscriptionKey, options) ->
 			HelloWorldRepository.interestedInUpdates @NAME
-
-		query: (queryKey, options) ->
-			deferred = Q.defer()
-			switch queryKey
-				when QueryKeys.HELLO_WORLD_COUNT
-					HelloWorldRepository.queryHelloWorldCount(options).then (data) =>
-						deferred.resolve @buildData(data)
-					return deferred.promise
+			switch subscriptionKey
+				when SubscriptionKeys.HELLO_WORLD_ADDED
+					models = HelloWorldRepository.queryHelloWorlds()
+					@_produceData subscriptionKey, models
+				# Removed items will not be present in repo
+				when SubscriptionKeys.HELLO_WORLD_REMOVED
+					return
+				when SubscriptionKeys.HELLO_WORLD_BY_ID
+					model = HelloWorldRepository.queryById options.id
+					@_produceData subscriptionKey, [model]
 				else
-					throw new Error("Unknown query queryKey: #{queryKey}")
+					throw new Error("Unknown query subscriptionKey: #{key}")
+
+		_produceData: (subscriptionKey, models = []) ->
+			unless models.length > 0 then return
+
+			models = _.without models, undefined
+			models = _.map models, (model) ->
+				return model.toJSON()
+
+			switch subscriptionKey
+				when SubscriptionKeys.HELLO_WORLD_ADDED
+					@produce subscriptionKey, models, ->
+
+				when SubscriptionKeys.HELLO_WORLD_REMOVED
+					@produce subscriptionKey, models, ->
+
+				when SubscriptionKeys.HELLO_WORLD_BY_ID
+					for model in models
+						@produce subscriptionKey, model, (componentOptions) ->
+							model.id is componentOptions.id
+				else
+					throw new Error("Unknown query subscriptionKey: #{key}")
 
 		# Handlers
-		onChangeInRepository: (helloWorldModel) =>
-			@produce SubscriptionKeys.NEW_HELLO_WORLD_COUNT, [helloWorldModel], ->
+		_onDiffInRepository: (dataDiff) =>
+			# the incomming data diff should be used to decide if we should produce or not
+			#console.log '_onDiffInRepository', dataDiff
+			if dataDiff.added.length > 0 then @_produceData SubscriptionKeys.HELLO_WORLD_ADDED, dataDiff.added
+			if dataDiff.removed.length > 0 then @_produceData SubscriptionKeys.HELLO_WORLD_REMOVED, dataDiff.removed
+			if dataDiff.changed.length > 0 then @_produceData SubscriptionKeys.HELLO_WORLD_BY_ID, dataDiff.changed
 
-		buildData: (data) ->
-			# Do some fancy data formatting here if needed
-			return data
 
-		SUBSCRIPTION_KEYS: [SubscriptionKeys.NEW_HELLO_WORLD_COUNT]
-		QUERY_KEYS: [QueryKeys.HELLO_WORLD_COUNT]
+		SUBSCRIPTION_KEYS: [
+			SubscriptionKeys.HELLO_WORLD_ADDED
+			SubscriptionKeys.HELLO_WORLD_REMOVED
+			SubscriptionKeys.HELLO_WORLD_BY_ID
+		]
 
 		NAME: 'HelloWorldProducer'
 

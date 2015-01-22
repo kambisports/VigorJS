@@ -7,10 +7,10 @@
 	<div class="modularized__popular-details-value">
 		<select class="modularized__select-menu--large modularized__stake-selector" data-touch-feedback="true">
 			{{#each stakes}}
-				<option value="{{value}}">{{{label}}}</option>
+				<option value="{{value}}">{{formatCurrencyWithSymbol label}}</option>
 			{{/each}}
 		</select>
-		<span class="modularized__popular-potential-payout">{{{potentialPayout}}}</span>
+		<span class="modularized__popular-potential-payout">{{formatCurrencyWithSymbol potentialPayout}}</span>
 	</div>
 {{/if}}
 

@@ -1,27 +1,123 @@
 define [
-	#'model/UserSettingsModel'
-	#'components/placeBetButton/PlaceBetButtonView'
+	'AppConstants',
+	'model/UserSettingsModel'
+	'model/Betslip'
+	'components/placeBetButton/PlaceBetButtonView'
 ], (
-	#UserSettingsModel
-	#PlaceBetButtonView
+	AppConstants
+	UserSettingsModel
+	BetslipModel
+	PlaceBetButtonView
 ) ->
 
 	"use strict"
 
-	describe 'PlaceBetButton View specification', ->
+	describe 'PlaceBetButtonView View specification', ->
 
-		#userSettingsModel = undefined
-		#placeBetButtonView = undefined
+		userSettingsModel = undefined
+		betslipModel = undefined
+		placeBetButtonView = undefined
+
 
 		beforeEach ->
-			#userSettingsModel = do UserSettingsModel.makeInstance
-			#placeBetButtonView = new PlaceBetButtonView userSettingsModel
+			betslipModel = _.extend {
+				hasLiveOutcomes: ->
+			}, Backbone.Events
+			userSettingsModel = do UserSettingsModel.makeInstance
+
+			placeBetButtonView = new PlaceBetButtonView
+				userSettingsModel: userSettingsModel
+				betslipModel: betslipModel
+				context: PlaceBetButtonView.CONTEXT_BETSLIP
 
 
-		describe 'Configuration', ->
+		renderView = (hasLiveOutcomes) ->
+			spyOn(betslipModel, 'hasLiveOutcomes').andReturn hasLiveOutcomes
 
-			it 'should be able to hide the menu', ->
-				expect(3).toBe 3
+			do placeBetButtonView.render
 
 
-			it 'show settings info box only the first time', ->
+		describe 'Should update the view when user settings change', ->
+
+			it ' - oddsChangeMenu visibility with live event', ->
+				renderView true
+
+				expect(placeBetButtonView._$openButton.css 'display').toBe 'none'
+
+				userSettingsModel.set 'showOddsChangeOptions', yes
+
+				expect(placeBetButtonView._$openButton.css 'display').not.toBe 'none'
+
+
+			it ' - oddsChangeAction visibility with live event', ->
+				renderView true
+
+				userSettingsModel.set 'showOddsChangeOptions', yes
+
+				expect(placeBetButtonView._$actionLabel.html()).toBe ''
+
+				userSettingsModel.set 'settingsOddsChangeAction', AppConstants.ODDS_CHANGE_APPROVE
+
+				expect(placeBetButtonView._$actionLabel.html()).not.toBe ''
+
+
+			it ' - oddsChangeMenu visibility without live event', ->
+				renderView false
+
+				expect(placeBetButtonView._$openButton.css 'display').toBe 'none'
+
+				userSettingsModel.set 'showOddsChangeOptions', yes
+
+				expect(placeBetButtonView._$openButton.css 'display').toBe 'none'
+
+		describe 'should update the view when the betslip items change', ->
+
+			it 'does not show odds change menu when no live events are present', ->
+
+				renderView false
+
+				userSettingsModel.set 'settingsOddsChangeAction', AppConstants.ODDS_CHANGE_APPROVE
+				userSettingsModel.set 'showOddsChangeOptions', yes
+
+				betslipModel.hasLiveOutcomes.andReturn true
+
+				expect(placeBetButtonView._$openButton.css 'display').toBe 'none'
+				expect(placeBetButtonView._$actionLabel.html()).toBe ''
+
+				betslipModel.trigger BetslipModel.EVENT_OUTCOME_ADDED
+
+				expect(placeBetButtonView._$openButton.css 'display').not.toBe 'none'
+				expect(placeBetButtonView._$actionLabel.html()).not.toBe ''
+
+			it 'does show odds change menu when live events are present', ->
+
+				renderView false
+
+				userSettingsModel.set 'settingsOddsChangeAction', AppConstants.ODDS_CHANGE_APPROVE
+				userSettingsModel.set 'showOddsChangeOptions', yes
+
+				expect(placeBetButtonView._$openButton.css 'display').toBe 'none'
+				expect(placeBetButtonView._$actionLabel.html()).toBe ''
+
+				betslipModel.trigger BetslipModel.EVENT_OUTCOME_ADDED
+
+				expect(placeBetButtonView._$openButton.css 'display').toBe 'none'
+				expect(placeBetButtonView._$actionLabel.html()).toBe ''
+
+			it 'does not show odds change menu when live events are removed', ->
+
+				renderView true
+
+				userSettingsModel.set 'settingsOddsChangeAction', AppConstants.ODDS_CHANGE_APPROVE
+				userSettingsModel.set 'showOddsChangeOptions', yes
+
+				betslipModel.trigger BetslipModel.EVENT_OUTCOME_REMOVED
+
+				expect(placeBetButtonView._$openButton.css 'display').not.toBe 'none'
+				expect(placeBetButtonView._$actionLabel.html()).not.toBe ''
+
+				betslipModel.hasLiveOutcomes.andReturn false
+				betslipModel.trigger BetslipModel.EVENT_OUTCOME_REMOVED
+
+				expect(placeBetButtonView._$openButton.css 'display').toBe 'none'
+				expect(placeBetButtonView._$actionLabel.html()).toBe ''

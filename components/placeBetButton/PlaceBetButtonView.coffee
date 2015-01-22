@@ -2,6 +2,7 @@ define [
 	'jquery'
 	'AppConstants'
 	'view/common/KambiBackboneView'
+	'model/Betslip'
 	'utils/UserSettingsUtil'
 	'utils/LocaleUtil'
 	'utils/StringUtil'
@@ -12,6 +13,7 @@ define [
 	$
 	AppConstants
 	KambiBackboneView
+	Betslip
 	UserSettingsUtil
 	LocaleUtil
 	StringUtil
@@ -22,6 +24,8 @@ define [
 
 
 	class PlaceBetButtonView extends KambiBackboneView
+
+		_betslipModel: undefined
 
 		_context: undefined
 		_disabled: no
@@ -41,28 +45,46 @@ define [
 
 		template: _.template PlaceBetButtonTemplate
 
+		events:
+			'click .settings-information__confirmation': '_onConfirmationLinkClick'
+			'click .placebet-container .placebet-container__open': '_onOpenMenuBtnClick'
+			'click .placebet-container .placebet-container__place': '_onPlaceBetBtnClick'
+			'click .settings-override__item-input' : '_onSettingItemClick'
 
-		constructor: (attr) ->
+		initialize: (attr) ->
 			@model = attr.userSettingsModel
-
+			@_betslipModel = attr.betslipModel
 			@_context = attr.context or PlaceBetButtonView.CONTEXT_BETSLIP
 
 			@model.on 'change:showOddsChangeOptions', @_updateOpenButton
 			@model.on 'change:oddsChangeAction', @_updateChecked
 			@model.on 'change:showConfirmationBox', @_updateInformationBox
+
+			@_betslipModel.on Betslip.EVENT_OUTCOME_ADDED + ' ' + Betslip.EVENT_OUTCOME_REMOVED, @_onBetslipItemsChanged, @
+
 			super
 
 
 		dispose: ->
-			@_$confirmationLink.off 'click', @_onConfirmationLinkClick
-			@_$openButton.off 'click', @_onOpenMenuBtnClick
-			@_$placeButton.off 'click', @_onPlaceBetBtnClick
-			@_$actionInputs.off 'click', @_onSettingItemClick
+			@_betslipModel.off null, null, @
+
+			$('body').off 'click', @_hideSettingsMenu
 
 			@model.off 'change:showOddsChangeOptions', @_updateOpenButton
 			@model.off 'change:oddsChangeAction', @_updateChecked
 			@model.off 'change:showConfirmationBox', @_updateInformationBox
-			do @model.clearOverrides
+
+			@_$settingsMenu = null
+			@_$actionInputs = null
+			@_$informationBox = null
+			@_$confirmationLink = null
+			@_$buttonContainer = null
+			@_$placeButton = null
+			@_$openButton = null
+			@_$actionLabel = null
+
+			@_betslipModel = null
+
 			super
 
 
@@ -84,19 +106,7 @@ define [
 			do @_updateOpenButton
 			do @_updateButtonState
 
-			$('body').on 'click', => do @_hideSettingsMenu
-
 			return @
-
-
-		_showSettingsMenu: ->
-			do @_$settingsMenu.show
-			@_$openButton.addClass 'menu-open'
-
-
-		_hideSettingsMenu: ->
-			do @_$settingsMenu.hide
-			@_$openButton.removeClass 'menu-open'
 
 
 		disable: ->
@@ -113,12 +123,20 @@ define [
 
 		############### Handler ###############
 
+		_onBetslipItemsChanged: =>
+			# this view may have been disposed by a previous callback listening to betslip item changes
+			# checking whether fields are null is the only way we can check whether this has happened
+			if @_betslipModel?
+				@_updateOpenButton()
+				@_updateButtonLabel()
+
+
 		_updateOpenButton: =>
-			if @model.get 'showOddsChangeOptions'
-				@_$buttonContainer.addClass 'has-options'
+			if @_shouldShowOddsChangeActions()
+				#@_$buttonContainer.addClass 'has-options'
 				@_$openButton.show()
 			else
-				@_$buttonContainer.removeClass 'has-options'
+				#@_$buttonContainer.removeClass 'has-options'
 				@_$openButton.hide()
 
 
@@ -137,8 +155,13 @@ define [
 				@_$openButton.removeClass 'placing'
 
 
+		_updateButtonLabel: =>
+			@_$actionLabel.html @_getOddsChangeButtonLabel()
+
+
 		_onPlaceBetBtnClick: (e) =>
 			do e.stopPropagation
+			do e.preventDefault
 			if not @_disabled
 				# odds change options are automatically enabled the first time punter approves odds changes
 				if @_context is PlaceBetButtonView.CONTEXT_BETSLIP_ODDS_CHANGE
@@ -181,15 +204,27 @@ define [
 			$radio = @$("input:radio[name='settings_override'][value='" + value + "']")
 			$radio.attr 'checked', 'checked' if $radio.length is 1
 
-			@_$actionLabel.html UserSettingsUtil.getActionLabel value
+			@_updateButtonLabel()
+
 
 		############### Private ###############
 
+		_shouldShowOddsChangeActions: ->
+			(@model.get 'showOddsChangeOptions') and @_betslipModel.hasLiveOutcomes()
+
+
 		_bindEvents: ->
-			@_$confirmationLink.on 'click', @_onConfirmationLinkClick
-			@_$openButton.on 'click', @_onOpenMenuBtnClick
-			@_$placeButton.on 'click', @_onPlaceBetBtnClick
-			@_$actionInputs.on 'click', @_onSettingItemClick
+			$('body').on 'click', @_hideSettingsMenu
+
+
+		_showSettingsMenu: ->
+			do @_$settingsMenu.show
+			@_$openButton.addClass 'menu-open'
+
+
+		_hideSettingsMenu: =>
+			do @_$settingsMenu.hide
+			@_$openButton.removeClass 'menu-open'
 
 
 		_getSelectedOddsChangeAction: ->
@@ -212,9 +247,9 @@ define [
 				confirmationLabel: 	LocaleUtil.getTranslation 'betslip.oddschange.information.accept'
 				defaultLabel: 		LocaleUtil.getTranslation 'settings.oddschange.default'
 				placeBetLabel: 		StringUtil.toUpperCase @_getPlaceBetLabel()
-				actionLabel: 		UserSettingsUtil.getActionLabel @model.getOddsChangeAction()
+				actionLabel: 		@_getOddsChangeButtonLabel()
 				options: 			@_getOptions()
-				id:					Math.round(Math.random() * 1000000)
+				id:					@_context + '-' + Math.round(Math.random() * 1000000)
 
 
 		_getOptions: ->
@@ -227,6 +262,12 @@ define [
 					value: option
 					label: UserSettingsUtil.getOptionLabel option
 					isDefault: option is defaultOption
+
+
+		_getOddsChangeButtonLabel: ->
+			switch @_shouldShowOddsChangeActions()
+				when true then UserSettingsUtil.getActionLabel @model.getOddsChangeAction()
+				else ''
 
 
 		@CONTEXT_BETSLIP = 'contextBetslip'

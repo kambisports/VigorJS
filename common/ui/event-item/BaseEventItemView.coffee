@@ -36,14 +36,11 @@ define (require) ->
 				@$el.find('.modularized__outcomes-container').remove()
 				@$el.append $el
 
+
 		dispose: ->
 			for betoffer in @betoffers
 				do betoffer.dispose
 			super
-
-		#----------------------------------------------
-		# Private methods
-		#----------------------------------------------
 
 		#----------------------------------------------
 		# Callbacks

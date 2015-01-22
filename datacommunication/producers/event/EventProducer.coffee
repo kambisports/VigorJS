@@ -1,9 +1,8 @@
 define (require) ->
 
-	Q = require 'lib/q'
+	_ = require 'lib/underscore'
 	Producer = require 'datacommunication/producers/Producer'
 
-	QueryKeys = require 'datacommunication/QueryKeys'
 	SubscriptionKeys = require 'datacommunication/SubscriptionKeys'
 
 	# Collections needed to build/produce data
@@ -11,36 +10,39 @@ define (require) ->
 
 	class EventProducer extends Producer
 
+		_debouncedOnRepositoryChange: undefined
+
 		constructor: ->
+			@_debouncedOnRepositoryChange = _.debounce @_onChangesInRepository, 0
+			EventsRepository.on 'change', @_debouncedOnRepositoryChange, @
+
+			EventsRepository.on 'reset', @_onResetInRepository, @
 			super
-			do @addRespositoryListeners
 
 		dispose: ->
-			do @removeRespositoryListeners
+			EventsRepository.off 'change', @_debouncedOnRepositoryChange, @
+			_debouncedOnRepositoryChange = undefined
+
+			EventsRepository.off 'reset', @_onResetInRepository, @
 			super
 
-		addRespositoryListeners: () ->
-			EventsRepository.on 'change', @onEventChangedInCollection, @
-
-		removeRespositoryListeners: () ->
-			EventsRepository.off 'change', @onEventChangedInCollection, @
-
-		query: (queryKey, options) ->
-			deferred = Q.defer()
-			switch queryKey
-				when QueryKeys.EVENT
-					EventsRepository.queryEvent(options).then (data) =>
-						deferred.resolve @buildData data
-					return deferred.promise
+		subscribe: (subscriptionKey, options) ->
+			switch subscriptionKey
+				when SubscriptionKeys.EVENT_CHANGE
+					eventModel = EventsRepository.queryEvent options
+					if eventModel
+						@_produceData eventModel
 				else
-					throw new Error("Unknown query queryKey: #{queryKey}")
+					throw new Error("Unknown subscription subscriptionKey: #{subscriptionKey}")
 
 		# Handlers
-		onEventChangedInCollection: (eventModel) =>
-			@produce SubscriptionKeys.EVENT_CHANGE, eventModel.toJSON(), (componentOptions) ->
-				eventModel.get('id') is componentOptions.eventId
+		_onResetInRepository: (collection) ->
+			window.console.log 'EventProducer:_onResetInRepository'
 
-		buildData: (data) ->
+		_onChangesInRepository: (eventModel) =>
+			@_produceData eventModel
+
+		_buildData: (data) ->
 			groupPath = _.pluck data.get('path'), 'name'
 
 			jsonData = do data.toJSON
@@ -51,8 +53,11 @@ define (require) ->
 
 			return jsonData
 
+		_produceData: (eventModel) ->
+			eventJson = @_buildData eventModel
+			@produce SubscriptionKeys.EVENT_CHANGE, eventJson, (componentOptions) ->
+				eventJson.id is componentOptions.eventId
 
 		SUBSCRIPTION_KEYS : [SubscriptionKeys.EVENT_CHANGE]
-		QUERY_KEYS: [QueryKeys.EVENT]
 
 		NAME : 'EventProducer'

@@ -27,11 +27,13 @@ define (require) ->
 			# add sub key so producer know what components to call produce for!
 			producer.addComponent subscriptionKey, componentIdentifier
 
+		###
 		query: (queryKey, options) ->
 			producerClass = @producerMapper.findProducerClassForQuery queryKey
 			producer = @_instansiateProducer producerClass
 			# returns a Q promise
 			producer.query queryKey, options
+		###
 
 		subscribe: (subscriptionKey, options) ->
 			producerClass = @producerMapper.findProducerClassForSubscription subscriptionKey

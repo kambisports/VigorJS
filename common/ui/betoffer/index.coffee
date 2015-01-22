@@ -22,7 +22,9 @@ define (require) ->
 		constructor: (@betofferId, @_outcomesAsRadioBtns = false) ->
 			super
 			@_viewModel = new BetofferModel @betofferId
-			@_viewModel.addSubscriptions().then @_onViewModelDataLoaded
+
+			@_viewModel.betoffer.on 'change', @_onViewModelDataLoaded, @
+			@_viewModel.addSubscriptions()
 
 		render: ->
 			return @renderDeferred.promise
@@ -75,8 +77,8 @@ define (require) ->
 
 			return BetofferView
 
-		_onViewModelDataLoaded: (betofferData) =>
-			@createBetoffer betofferData
+		_onViewModelDataLoaded: (betofferModel) =>
+			@createBetoffer betofferModel.toJSON()
 			do @_deferredRender
 
 		Betoffer.NAME = 'Betoffer'

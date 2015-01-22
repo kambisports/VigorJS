@@ -9,9 +9,7 @@ define (require) ->
 		model: EventModel
 
 		queryEvent: (options) ->
-			deferred = Q.defer()
-			deferred.resolve @findWhere {'id': options.eventId}
-			return deferred.promise
+			return @findWhere {'id': options.eventId}
 
 		makeTestInstance: ->
 			new EventsRepository()

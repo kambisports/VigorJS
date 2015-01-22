@@ -2,7 +2,6 @@ define (require) ->
 
 	Backbone = require 'lib/backbone'
 	ViewModel = require 'common/ViewModel'
-	QueryKeys = require 'datacommunication/QueryKeys'
 	SubscriptionKeys = require 'datacommunication/SubscriptionKeys'
 
 	class EventItemModel extends ViewModel
@@ -17,16 +16,7 @@ define (require) ->
 			do @addSubscriptions
 
 		addSubscriptions: ->
-			promise = @queryAndSubscribe QueryKeys.EVENT,
-				{ eventId: @eventId},
-				SubscriptionKeys.EVENT_CHANGE,
-				@onEventChange,
-				{ eventId: @eventId }
-
-			promise.then (event) =>
-				@event.set event
-
-			return promise
+			@subscribe SubscriptionKeys.EVENT_CHANGE, @onEventChange, {eventId: @eventId}
 
 		onEventChange: (event) =>
 			@event.set event

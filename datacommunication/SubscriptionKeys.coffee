@@ -7,4 +7,6 @@ define ->
 	HIGHLIGHTED_GROUPS_CHANGE: 'highlighted-groups-change'
 	LIVE_CHANGE: 'live-change'
 	EVENTS_CHANGE: 'events-change'
-	NEW_HELLO_WORLD_COUNT: 'new-hello-world-count'
+	HELLO_WORLD_ADDED: 'hello-world-added'
+	HELLO_WORLD_REMOVED: 'hello-world-removed'
+	HELLO_WORLD_BY_ID: 'hello-world-by-id'

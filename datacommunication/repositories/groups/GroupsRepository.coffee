@@ -14,41 +14,31 @@ define (require) ->
 		initialize: ->
 			super
 
-		setHighlighted: (highlightedArray) ->
-			@_highlightedIdsArray = _.pluck highlightedArray, (group) ->
-				return group.id
-
-			@set highlightedArray, remove: false
-			@trigger 'change:highlightedGroups', highlightedArray
-
 		queryGroups: ->
+			@models
+
+		querySportsGroups: ->
+			@getChildGroupsById 1
+
+		###
+		queryGroupById: (id) ->
 			deferred = Q.defer()
-			unless @isEmpty() then deferred.resolve @models
+			console.log '@getGroupById id', id, @getGroupById id
+			if @isEmpty()
+				@listenToOnce @, 'add', ->
+					deferred.resolve @getGroupById id
 
-			@trigger GroupsRepository::POLL_ONCE_GROUPS
-
-			@listenToOnce @, 'add', ->
-				deferred.resolve @models
+				@trigger GroupsRepository::POLL_ONCE_GROUPS
+			else
+				deferred.resolve @getGroupById id
 
 			return deferred.promise
+		###
 
 		queryHighlightedGroups: ->
-			deferred = Q.defer()
-			hasHighlightedIds = @_highlightedIdsArray.length > 0
+			groups = @_getHighlightedGroups() or []
+			return groups
 
-			if hasHighlightedIds then deferred.resolve @_getHighlightedGroups()
-
-			@trigger GroupsRepository::POLL_ONCE_HIGHLIGHTED
-
-			@listenToOnce @, 'change:highlightedGroups', ->
-				deferred.resolve @_getHighlightedGroups()
-
-			return deferred.promise
-
-		queryGroupById: (groupId) ->
-			deferred = Q.defer()
-			deferred.resolve { todoMicke: 'FIX_ME' }
-			return deferred.promise
 
 		#TODO: UNIT TEST THEESE METHODS
 		getChildTreeById: (id) ->
@@ -123,7 +113,7 @@ define (require) ->
 			return array
 
 		_getHighlightedGroups: ->
-			return @_filterById @_highlightedIdsArray
+			return @where 'highlighted': true
 
 		_filterById: (idArray) ->
 			return _.map idArray, (id) => return @get(id)

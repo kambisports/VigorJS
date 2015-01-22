@@ -50,11 +50,13 @@ define (require) ->
 
 		initialize: (options) ->
 			@_viewModel = options.viewModel
-			@_viewModel.addSubscriptions().then @_onViewModelDataLoaded
 			@_betoffers = []
 			@_eventItems = []
-			super
 
+			@listenTo @_viewModel.selectedOutcomes, 'reset', @_onViewModelDataLoaded
+			do @_viewModel.addSubscriptions
+
+			super
 
 		render: ->
 			@$el.html tmpl
@@ -69,6 +71,8 @@ define (require) ->
 			do @_showSpinner
 			do @_renderDetails
 			do @disableAddToBetslip
+
+			do @createEventItems
 
 			_.defer =>
 				do @renderDeferred.resolve
@@ -95,7 +99,13 @@ define (require) ->
 			super
 
 
-		createEventItems: (events) ->
+		createEventItems: ->
+			events = @_viewModel.events
+
+			unless events and events.length
+				@trigger MostPopularEvents.EMPTY
+				return
+
 			asRadioBtns = true
 			for event in events
 				eventItem = new EventItem(event.eventId)
@@ -159,7 +169,6 @@ define (require) ->
 			@_details = new MostPopularDetails
 				el: @$_details
 				viewModel: @_viewModel
-				uglyWorkarounds: @uglyWorkarounds
 
 			do @_details.render
 
@@ -181,11 +190,7 @@ define (require) ->
 		_onOutcomeClick: ->
 			do @_setBetoffersOutcomeState
 
-		_onViewModelDataLoaded: (mostPopularData) =>
-			events = mostPopularData.events
-			if events and events.length
-				@createEventItems events
-			else
-				@trigger MostPopularEvents.EMPTY
+		_onViewModelDataLoaded: =>
+			do @render
 
 	return MostPopularView

@@ -27,7 +27,7 @@ define (require) ->
 			@apiServices = new ApiServices()
 
 		# Public methods
-		subscribe: (componentId, subscriptionKey, subscriptionCb, subscriptionOptions) ->
+		subscribe: (componentId, subscriptionKey, subscriptionCb, subscriptionOptions = {}) ->
 			componentIdentifier = new ComponentIdentifier(componentId, subscriptionCb, subscriptionOptions)
 
 			if not @subscriptionsWithComponentIdentifiers.containsKey(subscriptionKey)
@@ -52,9 +52,10 @@ define (require) ->
 			while len--
 				@_removeComponentFromSubscription keys[len], componentId
 
-
+		###
 		query: (key, options) ->
 			@producerManager.query key, options
+		###
 
 
 		# Private methods

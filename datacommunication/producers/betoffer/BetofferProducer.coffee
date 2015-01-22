@@ -3,7 +3,6 @@ define (require) ->
 	Q = require 'lib/q'
 	Producer = require 'datacommunication/producers/Producer'
 
-	QueryKeys = require 'datacommunication/QueryKeys'
 	SubscriptionKeys = require 'datacommunication/SubscriptionKeys'
 
 	# Collections needed to build/produce data
@@ -12,68 +11,83 @@ define (require) ->
 
 	class BetofferProducer extends Producer
 
+		_debouncedOnOutcomeRepositoryAdd: undefined
+		_debouncedOnOutcomeRepositoryChange: undefined
+		_debouncedOnOutcomeRepositoryRemove: undefined
+
 		constructor: ->
-			do @addRespositoryListeners
+			@_debouncedOnOutcomeRepositoryAdd = _.debounce @_onChangesInOutcomeRepository, 0
+			@_debouncedOnOutcomeRepositoryChange = _.debounce @_onChangesInOutcomeRepository, 0
+			@_debouncedOnOutcomeRepositoryRemove = _.debounce @_onChangesInOutcomeRepository, 0
+
+			OutcomesRepository.on 'add', @_debouncedOnOutcomeRepositoryAdd, @
+			OutcomesRepository.on 'change', @_debouncedOnOutcomeRepositoryChange, @
+			OutcomesRepository.on 'remove', @_debouncedOnOutcomeRepositoryRemove, @
+
+			BetoffersRepository.on 'change', @_onChangesInBetofferRepository, @
 			super
 
 		dispose: ->
-			do @removeRespositoryListeners
+			BetoffersRepository.off 'change', @_onChangesInBetofferRepository, @
+
+			OutcomesRepository.off 'add', @_debouncedOnOutcomeRepositoryAdd, @
+			OutcomesRepository.off 'change', @_debouncedOnOutcomeRepositoryChange, @
+			OutcomesRepository.off 'remove', @_debouncedOnOutcomeRepositoryRemove, @
+
+			_debouncedOnOutcomeRepositoryAdd: undefined
+			_debouncedOnOutcomeRepositoryChange: undefined
+			_debouncedOnOutcomeRepositoryRemove: undefined
 			super
 
 		addRespositoryListeners: () ->
-			BetoffersRepository.on 'change', @onBetOfferRepositoryChange, @
+			BetoffersRepository.on 'change', @onChangesInBetofferRepository, @
 
 			OutcomesRepository.on 'add', @onOutcomeRepositoryAdd, @
 			OutcomesRepository.on 'change', @onOutcomeRepositoryChange, @
 			OutcomesRepository.on 'remove', @onOutcomeRepositoryRemove, @
 
 		removeRespositoryListeners: () ->
-			BetoffersRepository.off 'change', @onBetOfferRepositoryChange, @
+			BetoffersRepository.off 'change', @onChangesInBetofferRepository, @
 
 			OutcomesRepository.off 'add', @onOutcomeRepositoryAdd, @
 			OutcomesRepository.off 'change', @onOutcomeRepositoryChange, @
 			OutcomesRepository.off 'remove', @onOutcomeRepositoryRemove, @
 
-		query: (queryKey, options) ->
-			deferred = Q.defer()
-			# console.log 'BetofferProducer.query', queryKey, options
-			switch queryKey
-				when QueryKeys.BETOFFER
-					BetoffersRepository.queryBetoffer(options).then (data) =>
-						deferred.resolve @buildData data
-					return deferred.promise
+		subscribe: (subscriptionKey, options) ->
+			switch subscriptionKey
+				when SubscriptionKeys.BETOFFER_CHANGE
+					betofferModel = BetoffersRepository.queryBetoffer(options)
+					if betofferModel then @_produceDataFromBetoffer betofferModel
 				else
-					throw new Error("Unknown query queryKey: #{queryKey}")
+					throw new Error("Unknown subscription subscriptionKey: #{subscriptionKey}")
 
-		# Handlers
-		onBetOfferRepositoryChange: (betofferModel) ->
-			window.console.log 'onBetOfferRepositoryChange', betofferModel
-
-		onOutcomeRepositoryChange: (outcomeModel) ->
-			@generateBetofferChangeFromOutcome outcomeModel
-
-		onOutcomeRepositoryAdd: (outcomeModel) ->
-			@generateBetofferChangeFromOutcome outcomeModel
-
-		onOutcomeRepositoryRemove: (outcomeModel) ->
-			@generateBetofferChangeFromOutcome outcomeModel
+		_produceDataFromBetoffer: (betofferModel) ->
+			betofferData = @_buildData betofferModel
+			@produce SubscriptionKeys.BETOFFER_CHANGE, betofferData, (componentOptions) ->
+				betofferData.id is componentOptions.betofferId
 
 		# Any change, add, remove of outcome in outcome repository should generate the same bet offer changed subscription
-		generateBetofferChangeFromOutcome: (outcomeModel) ->
+		_produceDataFromOutcome: (outcomeModel) ->
 			boId = outcomeModel.get 'betofferId'
-			BetoffersRepository.queryBetoffer({ betofferId: boId }).then (betofferModel) =>
-				betofferData = @buildData betofferModel
-				@produce SubscriptionKeys.BETOFFER_CHANGE, betofferData, (componentOptions) ->
-					betofferData.id is componentOptions.betofferId
+			betofferModel = BetoffersRepository.queryBetoffer { betofferId: boId }
+
+			if betofferModel then @_produceDataFromBetoffer betofferModel
+
+		# Handlers
+		_onChangesInBetofferRepository: (betofferModel) ->
+			@_produceDataFromBetoffer betofferModel
+
+		_onChangesInOutcomeRepository: (outcomeModel) ->
+			@_produceDataFromOutcome outcomeModel
 
 		# Builders
 		# Dummy formatting, outcomesdata shuld come straight from the outcomes collection
-		buildData: (betofferModel) ->
+		_buildData: (betofferModel) ->
 			betofferData = betofferModel.toJSON()
-			betofferData.outcomes = @buildOutcomesData betofferData.id
+			betofferData.outcomes = @_buildOutcomesData betofferData.id
 			return betofferData
 
-		buildOutcomesData: (betofferId) ->
+		_buildOutcomesData: (betofferId) ->
 			outcomeObjs = []
 			outcomeModels = OutcomesRepository.findOutcomesByBetofferId betofferId
 
@@ -87,6 +101,5 @@ define (require) ->
 			return outcomeObjs
 
 		SUBSCRIPTION_KEYS: [SubscriptionKeys.BETOFFER_CHANGE]
-		QUERY_KEYS: [QueryKeys.BETOFFER]
 
 		NAME: 'BetofferProducer'

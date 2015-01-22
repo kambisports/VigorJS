@@ -10,7 +10,7 @@ define (require) ->
 		prefetchDataKey: 'prefetchedGroup'
 
 		constructor: (GroupsRepository) ->
-			pollInterval = 1000 * 60 * 30
+			pollInterval = 1000 * 60 * 10
 
 			super GroupsRepository, pollInterval
 

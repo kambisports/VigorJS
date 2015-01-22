@@ -36,6 +36,7 @@ define (require) ->
 
 			@pollerOptions = {
 				delay: pollInterval
+				delayed: false
 				continueOnError: true
 				autostart: false
 				prefetchDataKey: @prefetchDataKey
@@ -73,6 +74,7 @@ define (require) ->
 			do @_bindPollerListeners
 
 		_bindPollerListeners: () ->
+
 			###
 			@poller.on 'success',  ->
 				window.console.log 'Api service poller success'
@@ -96,6 +98,7 @@ define (require) ->
 			else
 				do @poller.stop
 
+		###
 		pollOnce: =>
 
 			# if the poller is active (we have a running subscription) we should stop poller and fire
@@ -108,6 +111,7 @@ define (require) ->
 			# by creating a new poller it will stop any exisiting poller for this service
 			@_createPoller {
 				delay: 0
+				delayed: true
 				continueOnError: true
 				autostart: false
 				prefetchDataKey: @prefetchDataKey
@@ -127,6 +131,7 @@ define (require) ->
 
 			# trigger poll once
 			do @poller.start
+		###
 
 		# Check xhr status in some generic way here?
 		# or use the backbone validate methdo in the models?

@@ -1,21 +1,15 @@
 define (require) ->
 
-	Q = require 'lib/q'
 	ServiceRepository = require 'datacommunication/repositories/ServiceRepository'
 
 	class HelloWorldRepository extends ServiceRepository
 
-		queryHelloWorldCount: ->
-			deferred = Q.defer()
+		queryHelloWorlds: ->
+			unless @isEmpty() then return @models
+			return []
 
-			unless @isEmpty() then deferred.resolve @models
-
-			@trigger ServiceRepository::POLL_ONCE
-
-			@listenToOnce @, 'all', ->
-				deferred.resolve @models
-
-			return deferred.promise
+		queryById: (id) ->
+			@get 'id': id
 
 		makeTestInstance: () ->
 			new HelloWorldRepository()

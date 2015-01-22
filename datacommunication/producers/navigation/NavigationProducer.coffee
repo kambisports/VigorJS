@@ -10,31 +10,54 @@ define (require) ->
 	class NavigationProducer extends Producer
 
 		constructor: ->
-			LocalStorageRepository.on 'change:key_punter_setting', @_onKeyPunterSettingChange
+			LocalStorageRepository.on 'change:key_punter_setting', @_onRepositoryChange
+			GroupsRepository.on GroupsRepository.REPOSITORY_DIFF, @_onRepositoryChange
+
 			super
+		# ------------------------------------------------------------------------------------------------
+		dispose: ->
+			GroupsRepository.notInterestedInUpdates @NAME
+			LocalStorageRepository.off 'change:key_punter_setting', @_onRepositoryChange
+			GroupsRepository.on GroupsRepository.REPOSITORY_DIFF, @_onRepositoryChange
+
 
 		# ------------------------------------------------------------------------------------------------
-		query: (queryKey, options) ->
-			deferred = Q.defer()
+		subscribe: (subscriptionKey, options) ->
+			GroupsRepository.interestedInUpdates @NAME
 
-			switch queryKey
-				when QueryKeys.HIGHLIGHTED_GROUPS
-					Q.all [
-						LocalStorageRepository.queryPunterSettings()
-						GroupsRepository.queryHighlightedGroups()
-					]
-					.then (results) =>
-						deferred.resolve @_buildHighlightedGroupsData(results)
+			#Check if data is fresh here?
+			@_produceData subscriptionKey
 
-					return deferred.promise
-
+		_produceData: (key) ->
+			switch key
+				when SubscriptionKeys.SPORTS_GROUPS_CHANGE
+					@produce key, @_buildSportsGroupsData()
+				when SubscriptionKeys.HIGHLIGHTED_GROUPS_CHANGE
+					@produce key, @_buildHighlightedGroupsData()
 				else
-					throw new Error("Unknown query queryKey: #{queryKey}")
-		# ------------------------------------------------------------------------------------------------
+					throw new Error("Unknown query subscriptionKey: #{key}")
 
-		_buildHighlightedGroupsData: (results) ->
-			groupsFromLocalStorage = results[0]?.navigation?.leagues or []
-			highlightedGroups = results[1]
+		# ------------------------------------------------------------------------------------------------
+		_buildSportsGroupsData: ->
+			groups = GroupsRepository.querySportsGroups()
+			modifiedData = []
+			reverse = true
+			separator = ' / '
+			skipFirst = true
+
+			for model in groups
+				model = model.toJSON()
+				eventPath = GroupsRepository.getLocalizedGroupPathById model.id, separator, reverse, skipFirst
+				model.eventPath = eventPath
+				modifiedData.push model
+
+			return modifiedData
+
+		# ------------------------------------------------------------------------------------------------
+		_buildHighlightedGroupsData: ->
+			punterSettings = LocalStorageRepository.queryPunterSettings()
+			highlightedGroups = GroupsRepository.queryHighlightedGroups()
+			groupsFromLocalStorage = punterSettings?.navigation?.leagues or []
 			modifiedData = []
 			reverse = true
 			separator = ' / '
@@ -54,31 +77,16 @@ define (require) ->
 			return modifiedData
 
 		# ------------------------------------------------------------------------------------------------
-		_onKeyPunterSettingChange: (localStorageModel) =>
-			@query(QueryKeys.HIGHLIGHTED_GROUPS).then (highlightedGroups) =>
-				@produce SubscriptionKeys.HIGHLIGHTED_GROUPS_CHANGE, highlightedGroups
+		_onGroupsChange: =>
+			@_produceData SubscriptionKeys.SPORTS_GROUPS_CHANGE
+
+		_onRepositoryChange: =>
+			@_produceData SubscriptionKeys.HIGHLIGHTED_GROUPS_CHANGE
+
 		# ------------------------------------------------------------------------------------------------
-
-
-	# ----------------------------------------------------------------------------------------------------
-	# Static class constants
-	# ----------------------------------------------------------------------------------------------------
-	Object.defineProperty NavigationProducer.prototype, 'SUBSCRIPTION_KEYS',
-		value: [
-			SubscriptionKeys.HIGHLIGHTED_GROUPS_CHANGE
+		SUBSCRIPTION_KEYS: [
+			SubscriptionKeys.HIGHLIGHTED_GROUPS_CHANGE,
+			SubscriptionKeys.SPORTS_GROUPS_CHANGE
 		]
 
-
-	Object.defineProperty NavigationProducer.prototype, 'QUERY_KEYS',
-		value: [
-			QueryKeys.HIGHLIGHTED_GROUPS
-		]
-
-
-	Object.defineProperty NavigationProducer.prototype, 'NAME',
-		value: 'NavigationProducer'
-
-
-	# ----------------------------------------------------------------------------------------------------
-	NavigationProducer
-
+		NAME: 'NavigationProducer'

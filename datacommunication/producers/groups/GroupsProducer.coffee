@@ -31,18 +31,21 @@ define (require) ->
 					GroupsRepository.queryGroups(options).then (data) ->
 						deferred.resolve data
 					return deferred.promise
-				when QueryKeys.GROUP
-					GroupsRepository.queryGroupById(options.groupId).then (data) ->
-						deferred.resolve data
-					return deferred.promise
 
 				else throw 'Unknown query queryKey: #{queryKey}'
+		###
+		when QueryKeys.GROUP
+			GroupsRepository.queryGroupById(options.groupId).then (data) ->
+				deferred.resolve data
+			return deferred.promise
+		###
 
 		# Handlers
 		onChangeInRepository: (groupsModel) =>
 			subscriptionKey = SubscriptionKeys.GROUPS_CHANGE
 			groupsModelJSON = groupsModel.toJSON()
-			filterFunction = () ->
+			filterFunction = (options) ->
+				console.log 'options', options
 				return
 
 			@produce subscriptionKey, groupsModelJSON, filterFunction

@@ -54,16 +54,15 @@ define (require) ->
 
 		# Update the collection related to his service
 		_buildMostPopularRepositoryModels: (response) ->
-			@repository.set _.map response.betoffers, (betoffer) ->
+			updateRepositoryMethod = if @repository.isEmpty() then 'reset' else 'set'
+
+			@repository[updateRepositoryMethod] _.map response.betoffers, (betoffer) ->
 				new MostPopopularModel
 					id: betoffer.eventId + betoffer.id # avoid removing / adding models on every poll
 					eventId: betoffer.eventId
 					betofferId: betoffer.id
 					outcomeId: (_.findWhere betoffer.outcomes, { popular: true }).id
 					outcomeOdds: (_.findWhere betoffer.outcomes, { popular: true }).odds
-
-			@repository.trigger 'added:models', @repository.models
-
 
 		# Unit testing of singleton
 		makeTestInstance: (defaultCollection = MostPopularRepository) ->

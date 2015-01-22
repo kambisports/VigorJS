@@ -5,27 +5,31 @@ define (require) ->
 	GroupItemView = require './GroupItemView'
 	GroupItemModel = require './GroupItemModel'
 
+	###
+		This ui component does not have its own Producer, so
+		it must be populated with data from parent component.
+	###
 	class GroupItem extends PackageBase
 
 		# private properties
 		_groupItemModel: undefined
 		_groupItemView: undefined
 
-		groupId: undefined
-
 		#----------------------------------------------
 		# Public methods
 		#----------------------------------------------
-		constructor: (@groupId) ->
+		constructor: (group) ->
 			super
 
-			@_groupItemModel = new GroupItemModel @groupId
+			@_groupItemModel = new GroupItemModel group
+						
 			@_groupItemView = new GroupItemView
 				viewModel: @_groupItemModel
 
+			@$el = @_groupItemView.$el
 
 		render: ->
-			@$el = @_groupItemView.render().$el
+			@_groupItemView.render()
 			_.defer =>
 				do @renderDeferred.resolve
 			return @
@@ -33,8 +37,9 @@ define (require) ->
 
 		dispose: ->
 			do @_groupItemView?.dispose
-			do @_groupItemModel?.dispose
 			@_groupItemView = undefined
+
+			do @_groupItemModel?.dispose
 			@_groupItemModel = undefined
 
 		GroupItem.NAME = 'GroupItem'

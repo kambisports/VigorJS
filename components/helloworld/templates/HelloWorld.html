@@ -1,1 +1,8 @@
-<p style="color: white; background: blue">{{message}} {{count}}</p>
+<div style="min-height: 20px; background: red">
+Hello World component!
+{{#each items}}
+	<p style="color: white; background: gray">
+		Item with id: {{id}}, message: {{message}}, and count: {{count}}
+	</p>
+{{/each}}
+</div>

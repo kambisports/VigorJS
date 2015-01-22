@@ -19,17 +19,8 @@ define (require) ->
 			@highlightedGroupsCollection = new Backbone.Collection()
 			super
 
-		getHighlighedGroups: ->
-			queryKey = QueryKeys.HIGHLIGHTED_GROUPS
-			subscriptionKey = SubscriptionKeys.HIGHLIGHTED_GROUPS_CHANGE
-			emptyObj = {}
-			promise = @queryAndSubscribe queryKey,
-				emptyObj,
-				subscriptionKey,
-				@_onHighlighedGroupsChange,
-				emptyObj
-
-			promise.then @_storeData
+		addSubscriptions: ->
+			@subscribe SubscriptionKeys.HIGHLIGHTED_GROUPS_CHANGE, @_onNewGroups, {}
 		# ------------------------------------------------------------------------------------------------
 
 
@@ -39,7 +30,7 @@ define (require) ->
 			@highlightedGroupsCollection.reset highlightedGroups
 		# ------------------------------------------------------------------------------------------------
 
-		_onHighlighedGroupsChange: (highlightedGroups) =>
-			@highlightedGroupsCollection.reset highlightedGroups
+		_onNewGroups: (groups) =>
+			@highlightedGroupsCollection.reset groups
 
 	BrowseHighlightedViewModel

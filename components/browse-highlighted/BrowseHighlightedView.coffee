@@ -14,7 +14,7 @@ define (require) ->
 		initialize: (options) ->
 			@_viewModel = options.viewModel
 			@listenTo @_viewModel.highlightedGroupsCollection, 'reset', @_onHighlighedGroupsChange
-			do @_viewModel.getHighlighedGroups
+			do @_viewModel.addSubscriptions
 
 		render: ->
 			templateData =

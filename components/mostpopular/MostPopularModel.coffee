@@ -2,7 +2,6 @@ define (require) ->
 
 	Backbone = require 'lib/backbone'
 	ViewModel = require 'common/ViewModel'
-	QueryKeys = require 'datacommunication/QueryKeys'
 	SubscriptionKeys = require 'datacommunication/SubscriptionKeys'
 
 	class MostPopularModel extends ViewModel
@@ -20,14 +19,7 @@ define (require) ->
 			super
 
 		addSubscriptions: ->
-			promise = @queryAndSubscribe QueryKeys.MOST_POPULAR_EVENTS,
-				{},
-				SubscriptionKeys.NEW_MOST_POPULAR_EVENTS,
-				@_onNewEvents,
-				{}
-
-			promise.then @_storeData
-			return promise
+			@subscribe SubscriptionKeys.NEW_MOST_POPULAR_EVENTS, @_onNewEvents, {}
 
 		calculateCombinedOdds: =>
 			combinedOdds = if @selectedOutcomes.length then 1 else 0

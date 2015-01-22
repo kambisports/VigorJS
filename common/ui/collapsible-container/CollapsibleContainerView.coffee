@@ -1,6 +1,7 @@
 define (require) ->
 
 	ComponentView = require 'common/ComponentView'
+	StringUtil = require 'utils/StringUtil'
 	tmpl = require 'hbs!./templates/CollapsibleContainer'
 
 	class CollapsibleContainerView extends ComponentView
@@ -22,9 +23,9 @@ define (require) ->
 			super
 
 
-		render: ->
+		renderStaticContent: ->
 			@$el.html tmpl
-				title: @_viewModel.title
+				breadcrumb: @getBreadCrumbsString()
 
 			@$collapsibleHeader = @$el.find '.collapsible-header'
 			@$collapsibleFooter = @$el.find '.collapsible-footer'
@@ -38,15 +39,18 @@ define (require) ->
 			@renderDeferred.resolve @
 			return @
 
+		addSubscriptions: ->
+			return
+
+		removeSubscriptions: ->
+			return
 
 		isExpanded: ->
 			@_isExpanded
 
 
-		###
 		getBreadCrumbsString: ->
-			@headerString
-		###
+			StringUtil.toUpperCase(@_viewModel.title)
 
 
 		setContent: (content) ->

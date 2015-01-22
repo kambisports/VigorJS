@@ -9,42 +9,42 @@ define (require) ->
 
 		title: undefined
 
-		_groupItemModel: undefined
-		_groupItemView: undefined
+		_containerModel: undefined
+		_containerView: undefined
 
 		constructor: (@title) ->
 			super
 
-			@_groupItemModel = new CollapsibleContainerModel
+			@_containerModel = new CollapsibleContainerModel
 				title: @title
 
-			ContainerClass = @_getContainerClass()
-			@_groupItemView = new ContainerClass
-				viewModel: @_groupItemModel
+			ViewClass = @_getViewClass()
+			@_containerView = new ViewClass
+				viewModel: @_containerModel
 
 
 		render: ->
-			@$el = @_groupItemView.render().$el
+			@$el = @_containerView.render().$el
 			_.defer =>
 				do @renderDeferred.resolve
 			return @
 
 
 		setContent: (content) ->
-			@_groupItemView.setContent content
+			@_containerView.setContent content
 
 
 		dispose: ->
-			do @_groupItemView.dispose
-			do @_groupItemModel.dispose
-			@_groupItemView = undefined
-			@_groupItemModel = undefined
+			do @_containerView.dispose
+			do @_containerModel.dispose
+			@_containerView = undefined
+			@_containerModel = undefined
 
 
-		_getContainerClass: ->
-			ContainerView = CollapsibleContainerView
+		_getViewClass: ->
+			ViewClass = CollapsibleContainerView
 			#TODO Logics for selecting collapsible container type
-			return ContainerView
+			return ViewClass
 
 
 		CollapsibleContainer.NAME = 'CollapsibleContainer'

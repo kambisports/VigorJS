@@ -17,13 +17,12 @@ define (require) ->
 		#----------------------------------------------
 		# Public methods
 		#----------------------------------------------
-		constructor: (uglyWorkarounds) ->
+		constructor: ->
 			super
 
 			@_viewModel = new MostPopularModel()
 			@_mostPopularView = new MostPopularView
 				viewModel: @_viewModel
-				uglyWorkarounds: uglyWorkarounds
 
 			@_mostPopularView.on MostPopularEvents.EMPTY, @_onEmpty
 

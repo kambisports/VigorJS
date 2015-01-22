@@ -8,28 +8,11 @@ define (require) ->
 	class GroupItemModel extends ViewModel
 
 		id: 'GroupItemModel'
-		groupId: undefined
 		group: undefined
 
-		constructor: (@groupId) ->
+		constructor: (group) ->
 			super
 			@group = new Backbone.Model()
-			do @addSubscriptions
-
-		addSubscriptions: ->
-
-			promise = @queryAndSubscribe QueryKeys.GROUP,
-				{ groupId: @groupId},
-				SubscriptionKeys.GROUPS_CHANGE,
-				@onGroupChange,
-				{ groupId: @groupId }
-
-			promise.then (groups) =>
-				@group.set groups
-
-			return promise
-
-		onGroupChange: (groups) ->
-			@group.set groups
+			@group.set group.toJSON()
 
 	return GroupItemModel

@@ -1,7 +1,8 @@
 define (require) ->
 
-	_ = require 'lib/underscore'
 	$ = require 'jquery'
+	_ = require 'lib/underscore'
+	Handlebars = require 'hbs/handlebars'
 	ComponentView = require 'common/ComponentView'
 	CapabilityUtil = require 'utils/CapabilityUtil'
 	StringUtil = require 'utils/StringUtil'
@@ -15,6 +16,7 @@ define (require) ->
 		$_potentialPayout: undefined
 		$_stakeSelector: undefined
 		$addToBetslipBtn: undefined
+		_potentialPayoutPartial: undefined
 
 
 		#----------------------------------------------
@@ -22,6 +24,7 @@ define (require) ->
 		#----------------------------------------------
 		initialize: (options) ->
 			@viewModel = options.viewModel
+			@_potentialPayoutPartial = Handlebars.compile("{{formatCurrencyWithSymbol potentialPayout}}")
 			@listenTo @viewModel.defaultStakes, 'change:stakes', @render
 			@listenTo @viewModel.selectedOutcomes, 'reset', @_onSelectedOutcomesChange
 			super
@@ -33,7 +36,7 @@ define (require) ->
 				potentialPayoutLabel: 'mostpopular.details.potentialpayout'
 				addToBetslipLabel: 'mostpopular.details.addtobetslip'
 				stakes: @_getFormattedStakes()
-				potentialPayout: @formatAsCurrency(0)
+				potentialPayout: 0
 				supportsSelect: CapabilityUtil.supportsSelect()
 
 			@$el.html tmpl(templateData)
@@ -62,15 +65,15 @@ define (require) ->
 
 		updatePotentialPayout: ->
 			potentialPayout = @viewModel.getPotentialPayout(@getStake())
-			@$_potentialPayout.html @formatAsCurrency(potentialPayout)
+			@$_potentialPayout.html @_potentialPayoutPartial({potentialPayout: potentialPayout})
 
 
 		#----------------------------------------------
 		# Private methods
 		#----------------------------------------------
 		_getFormattedStakes: ->
-			_.map @viewModel.defaultStakes.get('stakes'), (stake) =>
-				label: @formatAsCurrency(stake)
+			_.map @viewModel.defaultStakes.get('stakes'), (stake) ->
+				label: stake
 				value: stake
 
 		_hideStakeInput: ->
