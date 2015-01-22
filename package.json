@@ -1,0 +1,41 @@
+{
+  "name": "backbone.whateverwewanttocallit",
+  "version": "1.0.0",
+  "description": "",
+  "main": "backbone.whateverwewanttocallit.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://Jonwalstedt@bitbucket.org/Jonwalstedt/backbone.whateverwewanttocallit.git"
+  },
+  "author": "Jon Wålstedt <jon@walstedt.se> (http://www.jonwalstedt.se/)",
+  "license": "ISC",
+  "devDependencies": {
+    "backbone": "^1.1.2",
+    "browserify": "^8.1.1",
+    "coffeeify": "^1.0.0",
+    "gulp": "^3.8.10",
+    "gulp-if": "^1.2.5",
+    "gulp-livereload": "^3.4.0",
+    "gulp-rimraf": "^0.1.1",
+    "gulp-streamify": "0.0.5",
+    "gulp-uglify": "^1.1.0",
+    "jquery": "^2.1.3",
+    "minifyify": "^6.1.0",
+    "node-static": "^0.7.6",
+    "underscore": "^1.7.0",
+    "vinyl-source-stream": "^1.0.0",
+    "watchify": "^2.2.1"
+  },
+  "browserify": {
+    "transform": [
+      "coffeeify"
+    ]
+  }
+}
