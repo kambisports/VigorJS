@@ -9,7 +9,7 @@ isStaticResource = (url) ->
   , false
 
 # Start server and redirect to index.html
-gulp.task 'server', ['watch'], ->
+gulp.task 'server', ->
   file = new nodeStatic.Server('./', cache: 0)
   port = process.env.PORT || 7070
 

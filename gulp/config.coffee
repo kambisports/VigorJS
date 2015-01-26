@@ -1,15 +1,10 @@
 config =
-  bootstrap: 'bootstrap.coffee'
-  outputName: 'backbone.whateverwewanttocallit'
-  distTarget: './dist'
+  bootstrap: './src/bootstrap.coffee'
+  outputName: 'backbone.whateverwewanttocallit.js'
   serverTarget: './examples'
-  source: './src/'
+  dest: './dist'
+  src: './src/'
   fileTypes: ['.js', '.css', '.txt', '.ico', '.html', '.png']
   debug: false
-  externals: [
-    {require: 'jquery', expose: 'jquery'}
-    {require: 'backbone', expose: 'backbone'}
-    {require: 'underscore', expose: '_'}
-  ]
 
 module.exports = config

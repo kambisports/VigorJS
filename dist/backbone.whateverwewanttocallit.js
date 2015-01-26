@@ -1,18 +1,46 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function(root, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(['backbone', 'underscore'], function(Backbone, _) {
-      return factory(root, Backbone, _);
-    });
-  } else if (typeof exports === "object") {
-    module.exports = factory(root, Backbone, _);
-  } else {
-    root.returnExports = factory(root, root.Backbone, root._);
-  }
-})(this, function(root, Backbone, _) {
-  return {};
-});
+(function() {
+  (function(root, factory) {
+    var Backbone, _;
+    if (typeof define === "function" && define.amd) {
+      define(['backbone', 'underscore'], function(Backbone, _) {
+        return factory(root, Backbone, _);
+      });
+      console.log('amd');
+    } else if (typeof exports === "object") {
+      Backbone = require('backbone');
+      _ = require('underscore');
+      console.log('commonjs');
+      module.exports = factory(root, Backbone, _);
+    } else {
+      console.log('global');
+      root.Vigor = factory(root, root.Backbone, root._);
+    }
+  })(this, function(root, Backbone, _) {
+    var PackageBase, Vigor, previousVigor;
+    previousVigor = root.Vigor;
+    Vigor = Backbone.Vigor = {};
+    Vigor.noConflict = function() {
+      return root.Vigor = previousVigor;
+    };
+    PackageBase = (function() {
+      function PackageBase() {
+        _.extend(this, Backbone.Events);
+      }
 
+      PackageBase.prototype.render = function() {
+        throw 'PackageBase->render needs to be over-ridden';
+      };
 
+      PackageBase.prototype.dispose = function() {
+        throw 'PackageBase->dispose needs to be over-ridden';
+      };
 
-},{}]},{},[1]);
+      return PackageBase;
+
+    })();
+    Vigor.PackageBase = PackageBase;
+    console.log(Vigor);
+    return Vigor;
+  });
+
+}).call(this);
