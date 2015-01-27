@@ -37,8 +37,8 @@ define (require) ->
 			if @producersInterestedInUpdates.length > 0 then @trigger ServiceRepository::START_POLLING
 
 		notInterestedInUpdates: (name) ->
-			interestedProducerIndex = _.indexOf(@producersInterestedInUpdates, name) > -1
-			if interestedProducerIndex then @producersInterestedInUpdates.splice interestedProducerIndex, 1
+			interestedProducerIndex = _.indexOf(@producersInterestedInUpdates, name)
+			if interestedProducerIndex  > -1 then @producersInterestedInUpdates.splice interestedProducerIndex, 1
 
 			if @producersInterestedInUpdates.length is 0 then @trigger ServiceRepository::STOP_POLLING
 

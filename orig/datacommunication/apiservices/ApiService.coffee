@@ -60,12 +60,10 @@ define (require) ->
 		bindRepositoryListeners: () ->
 			@service.listenTo @repository, ServiceRepository::START_POLLING, @_startPolling
 			@service.listenTo @repository, ServiceRepository::STOP_POLLING, @_stopPolling
-			@service.listenTo @repository, ServiceRepository::POLL_ONCE, @pollOnce
 
 		unbindRepositoryListeners: () ->
 			@service.stopListening @repository, ServiceRepository::START_POLLING, @_startPolling
 			@service.stopListening @repository, ServiceRepository::STOP_POLLING, @_stopPolling
-			@service.stopListening @repository, ServiceRepository::POLL_ONCE, @pollOnce
 
 		_createPoller: (options) ->
 			@poller = Poller.get @service, options

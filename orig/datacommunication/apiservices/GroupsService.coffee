@@ -46,6 +46,8 @@ define (require) ->
 				# maybe be provided to identity several child-nodes.
 				indexName: 'groups,test'
 
+				startLevel: 1
+
 			flattenedResponse = responseFlattener.flatten groupModels, flatteningSpecs
 
 			return flattenedResponse
@@ -65,6 +67,17 @@ define (require) ->
 				groups = response.group.groups
 
 			return groups
+
+		###
+		getStartLevelFromResponse: (response) ->
+			# Some api responses (and unit test data) don't include the root node
+			if response?.group.id is GroupsRepository.EVENT_GROUP_ROOT_ID
+				startLevel = 0
+			else
+				startLevel = 1
+
+			return startLevel
+		###
 
 		NAME: 'GroupsService'
 

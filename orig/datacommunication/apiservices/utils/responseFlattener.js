@@ -14,7 +14,6 @@ define(function () {
 
 
 	responseFlattener.flatten = function (origArray, flattenSpecs) {
-
 		var
 			isBreadthFirst,
 			startLevel = flattenSpecs.startLevel || 0,
@@ -170,7 +169,7 @@ define(function () {
 			flattenedArray.push(flattenedNode);
 		}
 
-		if (currentLevel === 0) {
+		if (currentLevel === level) {
 			flattenedChildren = getStashedAllFlattened();
 			flattenedArray = flattenedArray.concat(flattenedChildren);
 		}

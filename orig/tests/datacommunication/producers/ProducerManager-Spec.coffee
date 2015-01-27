@@ -39,19 +39,4 @@ define (require) ->
 					producerManager.getProducer 'InvalidSubscriptionKey'
 				.toThrow()
 
-		describe 'given a query', ->
-
-			describe 'with valid query key', ->
-
-				it 'should run query on producer and give a promise in return', ->
-					promise = producerManager.query QueryKeys.MOST_POPULAR_EVENTS, {}
-					expect(promise).toBeDefined()
-
-			describe 'with invalid query key', ->
-
-				it 'should throw an exception', ->
-					expect ->
-						producerManager.query 'InvalidQueryKey', {}
-					.toThrow()
-
 

@@ -13,11 +13,8 @@ define (require) ->
 
 		_$showMore: undefined
 
-		_listItems: undefined
-
-		_showMoreClicked: no
-
-		_sortingMethod: undefined
+		# Array of all current GroupItem components
+		_groupItemList: undefined
 
 		#----------------------------------------------
 		# Public methods
@@ -29,8 +26,6 @@ define (require) ->
 
 		initialize: (options) ->
 			super
-			@_sortingMethod = options.sortingMethod
-
 			@listenTo @viewModel.state, 'change:expanded', @_renderExpandState
 			@listenTo @viewModel.groups, 'reset', @_onGroupsChange
 
@@ -60,59 +55,50 @@ define (require) ->
 			super
 
 		#----------------------------------------------
-		# Protected methods (override in subclass)
-		#----------------------------------------------
-
-		# Override this if data needs to be changed before render.
-		getGroups: ->
-			@viewModel.groups.models
-
-		#----------------------------------------------
 		# Private methods
 		#----------------------------------------------
 
 		# Call this when model has changed.
 		_renderDynamicContent: ->
 			@_clearDynamicContent()
-			@_renderGroups @getGroups()
+			@_renderGroups @viewModel.getGroups()
 
 		# Clears all dynamically rendered content
 		_clearDynamicContent: ->
 			@_disposeGroups()
 
-		_renderGroups: (groups, filter, sortAlphabetically) ->
-			###
-			# simulate changed data for first 3 groups
-			groups[0]?.set({name: ''+Math.random()}, {silent: true})
-			groups[1]?.set({name: ''+Math.random()}, {silent: true})
-			groups[2]?.set({name: ''+Math.random()}, {silent: true})
-			###
-
+		_renderGroups: (groups) ->
+			
+			# simulate changed data for third group
+			#groups[2]?.set({name: ''+Math.random()}, {silent: true})
+			
 			if groups and groups.length
 
+				#TODO Sort in Producer
 				#if @_sortingMethod is GroupListWidgetView2.SORTING_METHOD_HIGHLIGHTED_FIRST
 				#	groups = EventGroupSortUtil.sortLeafEventGroups(groups, sortAlphabetically)
 
 				eventGroupList = @$el.find '.event-groups__list'
 				frag = document.createDocumentFragment()
 
-				@_listItems = []
+				@_groupItemList = []
 
-				for item, index in groups
-					unless (filter and not filter(item))
-						view = new GroupItem item
-						@_listItems.push(view)
-						view.render()
-						view.$el.hide() if index >= @concatLimit unless @concatLimit is false
-						frag.appendChild view.$el[0]
+				for group, index in groups
+					view = new GroupItem group
+					@_groupItemList.push(view)
+					view.render()
+					view.$el.hide() if index >= @concatLimit unless @concatLimit is false
+					frag.appendChild view.$el[0]
 				
 				@$el.find('.event-groups__list').html frag
 
 				@_setExpandState groups.length
 
 		_setExpandState: (nrOfGroups = 0) =>
-			isBelowConcatLimit = nrOfGroups < @concatLimit
-			if @_showMoreClicked
+			isBelowConcatLimit = nrOfGroups <= @concatLimit
+			showMoreClicked = @viewModel.state.get 'showMoreClicked'
+
+			if showMoreClicked
 				expanded = yes
 				showMore = no
 			else if not @concatLimit or isBelowConcatLimit
@@ -127,7 +113,7 @@ define (require) ->
 				showMore: showMore,
 			silent: yes
 
-			# always render
+			# always render after set
 			@_renderExpandState()
 		
 		_renderExpandState: =>
@@ -140,20 +126,24 @@ define (require) ->
 				@_$showMore.hide()
 
 		_showAllGroups: ->
-			for item in @_listItems
-				item.$el.show()
+			for groupItem in @_groupItemList
+				groupItem.$el.show()
 
 		_disposeGroups: ->
-			_.each @_listItems, (view) ->
-				view.dispose()
-			@_listItems = undefined
+			_.each @_groupItemList, (groupItem) ->
+				groupItem.dispose()
+				groupItem = undefined
+			@_groupItemList = undefined
 
 		#----------------------------------------------
 		# Callback methods
 		#----------------------------------------------
 
 		_onShowMoreClick: =>
-			@_showMoreClicked = yes
+			@viewModel.state.set
+				showMoreClicked: yes,
+			silent: yes
+
 			@_setExpandState()
 
 		_onGroupsChange: =>

@@ -10,6 +10,16 @@ define (require) ->
 			return @get 'currency'
 
 		inRacingMode: ->
-			return @get 'racingMode'
+			return @_getBooleanSetting 'racingMode'
+
+		_getBooleanSetting: (settingName) ->
+			setting = @get  settingName
+
+			if not setting then setting = false
+			
+			if _.isString setting
+				setting = if (setting is 'true') then true else false
+			
+			setting
 
 	return new ApplicationSettingsModel()

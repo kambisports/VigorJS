@@ -16,6 +16,10 @@ define (require) ->
 			eventCount: undefined
 			secondsToNextEvent: undefined
 
+		hasSortOrder: ->
+			so = @get('sortOrder')
+			so and !_.isNaN(so)
+
 	Object.defineProperty GroupModel.prototype, 'MODEL_TYPE',
 		value: 'GroupModel'
 		writeable: false

@@ -13,6 +13,7 @@ define (require) ->
 			super helloWorldRepository, 5000
 
 			# simulated incomming from another service
+
 			setTimeout =>
 				response = [
 					{
@@ -33,7 +34,7 @@ define (require) ->
 				]
 
 				@parse response
-			, 10000
+			, 12500
 
 		parse: (response) ->
 			super response
@@ -41,6 +42,7 @@ define (require) ->
 				@repository.set response
 			else
 				@repository.set @_buildHelloWorldModels(response)
+
 
 		# Update the collection related to his service
 		_buildHelloWorldModels: (response) ->
