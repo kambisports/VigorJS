@@ -22,6 +22,7 @@ requireHelper 'datacommunication/apiservices/ApiService'
 
   # DATACOMMUNICATION
 requireHelper 'datacommunication/SubscriptionKeys'
+requireHelper 'datacommunication/EventKeys'
 requireHelper 'datacommunication/ComponentIdentifier'
 requireHelper 'datacommunication/DataCommunicationManager'
 

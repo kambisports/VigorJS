@@ -22,7 +22,7 @@
       root.Vigor = factory(root, root.Backbone, root._);
     }
   })(this, function(root, Backbone, _) {
-    var ComponentIdentifier, ComponentView, EventBus, EventRegistry, PackageBase, Producer, ProducerManager, ProducerMapper, Repository, ServiceRepository, ViewModel, Vigor, previousVigor;
+    var ApiService, ComponentIdentifier, ComponentView, DataCommunicationManager, EventBus, EventRegistry, PackageBase, Poller, Producer, ProducerManager, ProducerMapper, Repository, ServiceRepository, ViewModel, Vigor, previousVigor;
     previousVigor = root.Vigor;
     Vigor = Backbone.Vigor = {};
     Vigor.noConflict = function() {
@@ -37,11 +37,7 @@
 
     })();
     EventBus = (function() {
-      var EventKeys;
-
       function EventBus() {}
-
-      EventKeys = Vigor.EventKeys;
 
       EventBus.prototype.eventRegistry = new EventRegistry();
 
@@ -85,10 +81,11 @@
       EventBus.prototype._eventKeyExists = function(key) {
         var property, value;
         return __indexOf.call((function() {
-          var _results;
+          var _ref, _results;
+          _ref = Vigor.EventKeys;
           _results = [];
-          for (property in EventKeys) {
-            value = EventKeys[property];
+          for (property in _ref) {
+            value = _ref[property];
             _results.push(value);
           }
           return _results;
@@ -338,7 +335,144 @@
 
     })();
     Vigor.ProducerManager = ProducerManager;
-    Vigor.SubscriptionKeys = {};
+    Poller = function() {
+      return {
+        get: function() {
+          return {};
+        }
+      };
+    };
+
+    /*
+    	Base class for services interacting with the API (polling)
+    	Each service is bound to a repository and whenever that repository has a listener
+    	for data, the service will start polling. If the repository has no active listeners the
+    	service will stop polling for data.
+     */
+    ApiService = (function() {
+      var ServiceRepository;
+
+      ServiceRepository = Vigor.ServiceRepository;
+
+      ApiService.prototype.service = void 0;
+
+      ApiService.prototype.repository = void 0;
+
+      ApiService.prototype.poller = void 0;
+
+      ApiService.prototype.pollerOptions = void 0;
+
+      ApiService.prototype.shouldStop = false;
+
+      function ApiService(repository, pollInterval) {
+        this.repository = repository;
+        if (pollInterval == null) {
+          pollInterval = 10000;
+        }
+        this._stopPolling = __bind(this._stopPolling, this);
+        this._startPolling = __bind(this._startPolling, this);
+        this.parse = __bind(this.parse, this);
+        this.service = new Backbone.Model();
+        this.service.url = '';
+        this.service.parse = this.parse;
+        if (this.repository) {
+          this.bindRepositoryListeners();
+        }
+        this.pollerOptions = {
+          delay: pollInterval,
+          delayed: false,
+          continueOnError: true,
+          autostart: false
+        };
+        this._createPoller(this.pollerOptions);
+      }
+
+      ApiService.prototype.dispose = function() {
+        if (this.repository) {
+          this.unbindRepositoryListeners();
+        }
+        this._unbindPollerListeners();
+        this.service = void 0;
+        return this.poller = void 0;
+      };
+
+      ApiService.prototype.parse = function(response) {
+        this._validateResponse(response !== true);
+        if (this.shouldStop) {
+          return this.poller.stop();
+        }
+      };
+
+      ApiService.prototype.bindRepositoryListeners = function() {
+        this.service.listenTo(this.repository, ServiceRepository.prototype.START_POLLING, this._startPolling);
+        return this.service.listenTo(this.repository, ServiceRepository.prototype.STOP_POLLING, this._stopPolling);
+      };
+
+      ApiService.prototype.unbindRepositoryListeners = function() {
+        this.service.stopListening(this.repository, ServiceRepository.prototype.START_POLLING, this._startPolling);
+        return this.service.stopListening(this.repository, ServiceRepository.prototype.STOP_POLLING, this._stopPolling);
+      };
+
+      ApiService.prototype._createPoller = function(options) {
+        this.poller = Poller.get(this.service, options);
+        this._unbindPollerListeners();
+        return this._bindPollerListeners();
+      };
+
+      ApiService.prototype._bindPollerListeners = function() {
+
+        /*
+          		@poller.on 'success',  ->
+          			window.console.log 'Api service poller success'
+          
+          		@poller.on 'complete', ->
+          			window.console.log 'Api service poller complete'
+         */
+        return this.poller.on('error', function(e) {
+          return window.console.log('Api service poller error', arguments, this);
+        });
+      };
+
+      ApiService.prototype._unbindPollerListeners = function() {
+        var _ref;
+        return (_ref = this.poller) != null ? _ref.off() : void 0;
+      };
+
+      ApiService.prototype._startPolling = function() {
+        var _ref;
+        return (_ref = this.poller) != null ? _ref.start() : void 0;
+      };
+
+      ApiService.prototype._stopPolling = function() {
+        if (this.poller.active()) {
+          return this.shouldStop = true;
+        } else {
+          return this.poller.stop();
+        }
+      };
+
+      ApiService.prototype._validateResponse = function(response) {
+        var removeThisLineOfCode;
+        removeThisLineOfCode = response;
+        return true;
+      };
+
+      return ApiService;
+
+    })();
+    Vigor.ApiService = ApiService;
+    Vigor.SubscriptionKeys = {
+      extend: function(object) {
+        return _.extend(this, object);
+      }
+    };
+    Vigor.EventKeys = {
+      ALL_EVENTS: 'all',
+      extend: function(object) {
+        _.extend(this, object);
+        return this;
+      }
+    };
     ComponentIdentifier = (function() {
       ComponentIdentifier.prototype.id = void 0;
 
@@ -356,6 +490,114 @@
 
     })();
     Vigor.ComponentIdentifier = ComponentIdentifier;
+    DataCommunicationManager = (function() {
+      ProducerManager = Vigor.ProducerManager;
+
+      ComponentIdentifier = Vigor.ComponentIdentifier;
+
+      DataCommunicationManager.prototype.subscriptionsWithComponentIdentifiers = void 0;
+
+      DataCommunicationManager.prototype.subscriptionsWithProducers = void 0;
+
+      DataCommunicationManager.prototype.producerManager = void 0;
+
+      DataCommunicationManager.prototype.apiServices = void 0;
+
+      function DataCommunicationManager() {
+        this.subscriptionsWithComponentIdentifiers = {};
+        this.subscriptionsWithProducers = {};
+        this.producerManager = new ProducerManager();
+      }
+
+      DataCommunicationManager.prototype.subscribe = function(componentId, subscriptionKey, subscriptionCb, subscriptionOptions) {
+        var componentIdentifier;
+        if (subscriptionOptions == null) {
+          subscriptionOptions = {};
+        }
+        componentIdentifier = new ComponentIdentifier(componentId, subscriptionCb, subscriptionOptions);
+        if (!(__indexOf.call(this.subscriptionsWithComponentIdentifiers, subscriptionKey) >= 0)) {
+          this._createSubscription(subscriptionKey);
+        }
+        this._addComponentToSubscription(subscriptionKey, componentIdentifier);
+        return this.producerManager.subscribe(subscriptionKey, subscriptionOptions);
+      };
+
+      DataCommunicationManager.prototype.unsubscribe = function(componentId, subscriptionKey) {
+        return this._removeComponentFromSubscription(subscriptionKey, componentId);
+      };
+
+      DataCommunicationManager.prototype.unsubscribeAll = function(componentId) {
+        var keys, len, _results;
+        keys = _.keys(this.subscriptionsWithComponentIdentifiers);
+        len = keys.length;
+        _results = [];
+        while (len--) {
+          _results.push(this._removeComponentFromSubscription(keys[len], componentId));
+        }
+        return _results;
+      };
+
+      DataCommunicationManager.prototype._createSubscription = function(subscriptionKey) {
+        var producer;
+        this.subscriptionsWithComponentIdentifiers[subscriptionKey] = [];
+        producer = this.producerManager.getProducer(subscriptionKey);
+        return this.subscriptionsWithProducers[subscriptionKey] = producer;
+      };
+
+      DataCommunicationManager.prototype._removeSubscription = function(subscriptionKey) {
+        delete this.subscriptionsWithComponentIdentifiers[subscriptionKey];
+        delete this.subscriptionsWithProducers[subscriptionKey];
+        return this.producerManager.removeProducer(subscriptionKey);
+      };
+
+      DataCommunicationManager.prototype._addComponentToSubscription = function(subscriptionKey, componentIdentifier) {
+        var existingComponent, subscriptionComponents;
+        subscriptionComponents = this.subscriptionsWithComponentIdentifiers[subscriptionKey];
+        existingComponent = _.find(subscriptionComponents, function(component) {
+          return component.id === componentIdentifier.id;
+        });
+        if (!existingComponent) {
+          subscriptionComponents.push(componentIdentifier);
+          return this.producerManager.addComponentToProducer(subscriptionKey, componentIdentifier);
+        }
+      };
+
+      DataCommunicationManager.prototype._removeComponentFromSubscription = function(subscriptionKey, componentId) {
+        var component, componentIndex, components, index, _i, _len;
+        components = this.subscriptionsWithComponentIdentifiers[subscriptionKey];
+        componentIndex = -1;
+        for (index = _i = 0, _len = components.length; _i < _len; index = ++_i) {
+          component = components[index];
+          if (component.id === componentId) {
+            componentIndex = index;
+          }
+        }
+        if (componentIndex > -1) {
+          components.splice(componentIndex, 1);
+        }
+        if (!this._isSubscriptionValid(subscriptionKey)) {
+          return this._removeSubscription(subscriptionKey);
+        }
+      };
+
+      DataCommunicationManager.prototype._isSubscriptionValid = function(subscriptionKey) {
+        var componentIdentifiers;
+        componentIdentifiers = this.subscriptionsWithComponentIdentifiers[subscriptionKey];
+        if (_.isEmpty(componentIdentifiers)) {
+          return false;
+        } else {
+          return true;
+        }
+      };
+
+      DataCommunicationManager.prototype.makeTestInstance = function() {
+        return new DataCommunicationManager();
+      };
+
+      return DataCommunicationManager;
+
+    })();
+    Vigor.DataCommunicationManager = new DataCommunicationManager();
     Repository = (function(_super) {
       __extends(Repository, _super);
 

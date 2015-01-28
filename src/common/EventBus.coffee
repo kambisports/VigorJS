@@ -9,7 +9,6 @@ class EventRegistry
 #			# do something with `event` here...
 #
 class EventBus
-	EventKeys = Vigor.EventKeys
 	eventRegistry: new EventRegistry()
 
 
@@ -59,6 +58,6 @@ class EventBus
 		@eventRegistry.trigger key, message
 
 	_eventKeyExists: (key) ->
-		key in (value for property, value of EventKeys)
+		key in (value for property, value of Vigor.EventKeys)
 
 Vigor.EventBus = new EventBus()

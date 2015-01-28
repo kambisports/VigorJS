@@ -45,6 +45,7 @@
 
   # DATACOMMUNICATION
   #= include ./datacommunication/SubscriptionKeys.coffee
+  #= include ./datacommunication/EventKeys.coffee
   #= include ./datacommunication/ComponentIdentifier.coffee
   #= include ./datacommunication/DataCommunicationManager.coffee
 
