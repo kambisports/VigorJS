@@ -29,11 +29,27 @@
   Vigor.noConflict = ->
     root.Vigor = previousVigor
 
-  # Just return a value to define the module export.
-  # This example returns an object, but the module
-  # can return a function as the exported value.
-  # {}
-
+  # COMMON
+  #= include ./common/EventBus.coffee
+  #= include ./common/ComponentView.coffee
   #= include ./common/PackageBase.coffee
-  console.log Vigor
+  #= include ./common/ViewModel.coffee
+
+  # DATACOMMUNICATION/PRODUCERS
+  #= include ./datacommunication/producers/Producer.coffee
+  #= include ./datacommunication/producers/ProducerMapper.coffee
+  #= include ./datacommunication/producers/ProducerManager.coffee
+
+  # DATACOMMUNICATION/APISERVICES
+  #= include ./datacommunication/apiservices/ApiService.coffee
+
+  # DATACOMMUNICATION
+  #= include ./datacommunication/SubscriptionKeys.coffee
+  #= include ./datacommunication/ComponentIdentifier.coffee
+  #= include ./datacommunication/DataCommunicationManager.coffee
+
+  # REPOSITORIES
+  #= include ./datacommunication/repositories/Repository.coffee
+  #= include ./datacommunication/repositories/ServiceRepository.coffee
+
   return Vigor

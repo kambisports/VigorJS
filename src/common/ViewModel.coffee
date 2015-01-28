@@ -1,49 +1,25 @@
-define (require) ->
+class ViewModel
+	DataCommunicationManager = Vigor.DataCommunicationManager
 
-	DataCommunicationManager = require 'datacommunication/DataCommunicationManager'
+	id: 'ViewModel'
+	subscriptionIds: []
 
-	Q = require 'lib/q'
-	_ = require 'lib/underscore'
+	constructor: ->
+		@id = @getUniqueId()
 
-	class ViewModel
+	getUniqueId: ->
+		return "#{@id}_#{_.uniqueId()}"
 
-		id: 'ViewModel'
-		subscriptionIds: []
+	dispose: ->
+		do @unsubscribeAll
 
-		constructor: ->
-			@id = @getUniqueId()
+	subscribe: (key, callback, options) ->
+		return DataCommunicationManager.subscribe @id, key, callback, options
 
-		getUniqueId: ->
-			return "#{@id}_#{_.uniqueId()}"
+	unsubscribe: (key) ->
+		return DataCommunicationManager.unsubscribe @id, key
 
-		dispose: ->
-			do @unsubscribeAll
+	unsubscribeAll: ->
+		return DataCommunicationManager.unsubscribeAll @id
 
-		subscribe: (key, callback, options) ->
-			return DataCommunicationManager.subscribe @id, key, callback, options
-
-		###
-		query: (key, options) ->
-			return DataCommunicationManager.query key, options
-
-		queryAndSubscribe: (queryKey, queryOptions, subscriptionKey, subscriptionCallback, subscriptionOptions) ->
-			deferred = Q.defer()
-
-			DataCommunicationManager
-				.query(queryKey, queryOptions)
-				.then (response) =>
-					deferred.resolve response
-					DataCommunicationManager.subscribe @id, subscriptionKey, subscriptionCallback, subscriptionOptions
-				.catch (error) ->
-					deferred.reject error
-
-			return deferred.promise
-		###
-
-		unsubscribe: (key) ->
-			return DataCommunicationManager.unsubscribe @id, key
-
-		unsubscribeAll: ->
-			return DataCommunicationManager.unsubscribeAll @id
-
-	return ViewModel
+Vigor.ViewModel = ViewModel
