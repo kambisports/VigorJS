@@ -22,8 +22,16 @@ class ProducerMapper
 		index = @producers.indexOf(producerClass)
 		if index isnt -1
 			@producers.splice index, 1
+
+			producerClass.prototype.SUBSCRIPTION_KEYS.forEach (subscriptionKey) =>
+				delete @subscriptionKeyToProducerMap[subscriptionKey]
+
 			do @_buildMap
 		return @
+
+	removeAllProducers: ->
+		@producers = []
+		@subscriptionKeyToProducerMap = {}
 
 	_buildMap: ->
 		@producers.forEach (producer) =>

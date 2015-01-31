@@ -22,6 +22,12 @@ class DataCommunicationManager
 	registerProducers: (producers) ->
 		@producerManager.addProducersToMap producers
 
+	unregisterProducers: (producers) ->
+		@producerManager.removeProducersFromMap producers
+
+	unregisterAllProducers: ->
+		do @producerManager.removeAllProducersFromMap
+
 	# Public methods
 	subscribe: (componentId, subscriptionKey, subscriptionCb, subscriptionOptions = {}) ->
 		componentIdentifier = new ComponentIdentifier(componentId, subscriptionCb, subscriptionOptions)

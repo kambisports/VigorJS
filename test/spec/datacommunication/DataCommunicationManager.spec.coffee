@@ -1,6 +1,5 @@
 assert = require 'assert'
 sinon = require 'sinon'
-sandbox = undefined
 
 DataCommunicationManager = Vigor.DataCommunicationManager
 SubscriptionKeys = Vigor.SubscriptionKeys.extend
@@ -16,9 +15,7 @@ class DummyProducer extends Vigor.Producer
   NAME: 'DummyProducer'
 
 describe 'A DataCommunicationManager', ->
-
   beforeEach ->
-    sandbox = sinon.sandbox.create()
     dataCommunicationManager = DataCommunicationManager.makeTestInstance()
     dataCommunicationManager.registerProducers DummyProducer
 
@@ -29,14 +26,13 @@ describe 'A DataCommunicationManager', ->
     exampleComponent_2 =
       id: 'ComponentId_2'
       callback: ->
+
   afterEach ->
-    do sandbox.restore
+    do dataCommunicationManager.unregisterAllProducers
     dataCommunicationManager = undefined
 
   describe 'using subscribe', ->
-
     it 'should add unique component to subscription map', ->
-
       id = exampleComponent_1.id
       key = SubscriptionKeys.NEW_MOST_POPULAR_EVENTS
       callback = exampleComponent_1.callback
@@ -53,7 +49,6 @@ describe 'A DataCommunicationManager', ->
       assert.equal(component.callback, exampleComponent_1.callback)
 
     it 'should add multiple components for same subscription', ->
-
       id = exampleComponent_1.id
       key = SubscriptionKeys.NEW_MOST_POPULAR_EVENTS
       callback = exampleComponent_1.callback
@@ -79,7 +74,6 @@ describe 'A DataCommunicationManager', ->
       assert.equal(component2.callback, callback2)
 
     it 'should not add same component (same id) to subscription if it is already present', ->
-
       id = exampleComponent_1.id
       key = SubscriptionKeys.NEW_MOST_POPULAR_EVENTS
       callback = exampleComponent_1.callback
@@ -99,7 +93,6 @@ describe 'A DataCommunicationManager', ->
 
   describe 'using unsubscribe', ->
     it 'should remove component from subscription map', ->
-
       id = exampleComponent_1.id
       key = SubscriptionKeys.NEW_MOST_POPULAR_EVENTS
       callback = exampleComponent_1.callback

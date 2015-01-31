@@ -264,22 +264,57 @@
       ProducerMapper.prototype.subscriptionKeyToProducerMap = {};
 
       function ProducerMapper() {
-        this.producers.forEach((function(_this) {
+        this._buildMap();
+      }
+
+      ProducerMapper.prototype.findProducerClassForSubscription = function(subscriptionKey) {
+        var producerClass;
+        producerClass = this.subscriptionKeyToProducerMap[subscriptionKey];
+        if (!(this.producers.length > 0)) {
+          throw "There are no producers registered - register producers through the DataCommunicationManager";
+        }
+        if (!producerClass) {
+          throw "No producer found for subscription " + subscriptionKey + "!";
+        }
+        return producerClass;
+      };
+
+      ProducerMapper.prototype.addProducerClass = function(producerClass) {
+        if (this.producers.indexOf(producerClass) === -1) {
+          this.producers.push(producerClass);
+          this._buildMap();
+        }
+        return this;
+      };
+
+      ProducerMapper.prototype.removeProducerClass = function(producerClass) {
+        var index;
+        index = this.producers.indexOf(producerClass);
+        if (index !== -1) {
+          this.producers.splice(index, 1);
+          producerClass.prototype.SUBSCRIPTION_KEYS.forEach((function(_this) {
+            return function(subscriptionKey) {
+              return delete _this.subscriptionKeyToProducerMap[subscriptionKey];
+            };
+          })(this));
+          this._buildMap();
+        }
+        return this;
+      };
+
+      ProducerMapper.prototype.removeAllProducers = function() {
+        this.producers = [];
+        return this.subscriptionKeyToProducerMap = {};
+      };
+
+      ProducerMapper.prototype._buildMap = function() {
+        return this.producers.forEach((function(_this) {
           return function(producer) {
             return producer.prototype.SUBSCRIPTION_KEYS.forEach(function(subscriptionKey) {
               return _this.subscriptionKeyToProducerMap[subscriptionKey] = producer;
             });
           };
         })(this));
-      }
-
-      ProducerMapper.prototype.findProducerClassForSubscription = function(subscriptionKey) {
-        var producerClass;
-        producerClass = this.subscriptionKeyToProducerMap[subscriptionKey];
-        if (!producerClass) {
-          throw "No producer found for subscription " + subscriptionKey + "!";
-        }
-        return producerClass;
       };
 
       return ProducerMapper;
@@ -292,6 +327,38 @@
       ProducerManager.prototype.producerMapper = new Vigor.ProducerMapper();
 
       ProducerManager.prototype.instansiatedProducers = {};
+
+      ProducerManager.prototype.addProducersToMap = function(producers) {
+        var producerClass, _i, _len, _results;
+        if (_.isArray(producers)) {
+          _results = [];
+          for (_i = 0, _len = producers.length; _i < _len; _i++) {
+            producerClass = producers[_i];
+            _results.push(this.producerMapper.addProducerClass(producerClass));
+          }
+          return _results;
+        } else {
+          return this.producerMapper.addProducerClass(producers);
+        }
+      };
+
+      ProducerManager.prototype.removeProducersFromMap = function(producers) {
+        var producerClass, _i, _len, _results;
+        if (_.isArray(producers)) {
+          _results = [];
+          for (_i = 0, _len = producers.length; _i < _len; _i++) {
+            producerClass = producers[_i];
+            _results.push(this.producerMapper.removeProducerClass(producerClass));
+          }
+          return _results;
+        } else {
+          return this.producerMapper.removeProducerClass(producers);
+        }
+      };
+
+      ProducerManager.prototype.removeAllProducersFromMap = function() {
+        return this.producerMapper.removeAllProducers();
+      };
 
       ProducerManager.prototype.getProducer = function(subscriptionKey) {
         var producerClass;
@@ -509,13 +576,26 @@
         this.producerManager = new ProducerManager();
       }
 
+      DataCommunicationManager.prototype.registerProducers = function(producers) {
+        return this.producerManager.addProducersToMap(producers);
+      };
+
+      DataCommunicationManager.prototype.unregisterProducers = function(producers) {
+        return this.producerManager.removeProducersFromMap(producers);
+      };
+
+      DataCommunicationManager.prototype.unregisterAllProducers = function() {
+        return this.producerManager.removeAllProducersFromMap();
+      };
+
       DataCommunicationManager.prototype.subscribe = function(componentId, subscriptionKey, subscriptionCb, subscriptionOptions) {
-        var componentIdentifier;
+        var componentIdentifier, keys;
         if (subscriptionOptions == null) {
           subscriptionOptions = {};
         }
         componentIdentifier = new ComponentIdentifier(componentId, subscriptionCb, subscriptionOptions);
-        if (!(__indexOf.call(this.subscriptionsWithComponentIdentifiers, subscriptionKey) >= 0)) {
+        keys = _.keys(this.subscriptionsWithComponentIdentifiers);
+        if (_.indexOf(keys, subscriptionKey) === -1) {
           this._createSubscription(subscriptionKey);
         }
         this._addComponentToSubscription(subscriptionKey, componentIdentifier);

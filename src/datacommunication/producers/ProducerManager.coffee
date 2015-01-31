@@ -10,6 +10,16 @@ class ProducerManager
 		else
 			@producerMapper.addProducerClass producers
 
+	removeProducersFromMap: (producers) ->
+		if _.isArray producers
+			for producerClass in producers
+				@producerMapper.removeProducerClass producerClass
+		else
+			@producerMapper.removeProducerClass producers
+
+	removeAllProducersFromMap: ->
+		do @producerMapper.removeAllProducers
+
 	getProducer: (subscriptionKey) ->
 		producerClass = @producerMapper.findProducerClassForSubscription subscriptionKey
 		@_instansiateProducer producerClass
