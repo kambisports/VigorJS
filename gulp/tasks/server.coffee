@@ -27,5 +27,3 @@ gulp.task 'server', ->
   ).listen(port)
 
   console.log('Development server running at http://localhost:%d', port)
-
-

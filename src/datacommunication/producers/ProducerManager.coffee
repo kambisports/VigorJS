@@ -3,6 +3,13 @@ class ProducerManager
 	producerMapper: new Vigor.ProducerMapper()
 	instansiatedProducers: {}
 
+	addProducersToMap: (producers) ->
+		if _.isArray producers
+			for producerClass in producers
+				@producerMapper.addProducerClass producerClass
+		else
+			@producerMapper.addProducerClass producers
+
 	getProducer: (subscriptionKey) ->
 		producerClass = @producerMapper.findProducerClassForSubscription subscriptionKey
 		@_instansiateProducer producerClass

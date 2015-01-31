@@ -19,16 +19,19 @@ class DataCommunicationManager
 		# Only used to create singletons of services in application
 		# @apiServices = new ApiServices()
 
+	registerProducers: (producers) ->
+		@producerManager.addProducersToMap producers
+
 	# Public methods
 	subscribe: (componentId, subscriptionKey, subscriptionCb, subscriptionOptions = {}) ->
 		componentIdentifier = new ComponentIdentifier(componentId, subscriptionCb, subscriptionOptions)
-		if not (subscriptionKey in @subscriptionsWithComponentIdentifiers)
+		keys = _.keys @subscriptionsWithComponentIdentifiers
+
+		if _.indexOf(keys, subscriptionKey) is -1
 			@_createSubscription subscriptionKey
-		# if not @subscriptionsWithComponentIdentifiers.containsKey(subscriptionKey)
 
 		# we have the subscription key already, add component id to list of components for that subscription
 		@_addComponentToSubscription subscriptionKey, componentIdentifier
-
 		@producerManager.subscribe subscriptionKey, subscriptionOptions
 
 
@@ -39,7 +42,6 @@ class DataCommunicationManager
 
 	unsubscribeAll: (componentId) ->
 		# clear all subscriptions for given component
-		# keys = @subscriptionsWithComponentIdentifiers.keys()
 		keys = _.keys @subscriptionsWithComponentIdentifiers
 		len = keys.length
 
@@ -49,20 +51,14 @@ class DataCommunicationManager
 
 	# Private methods
 	_createSubscription: (subscriptionKey) ->
-		# @subscriptionsWithComponentIdentifiers.put subscriptionKey, []
 		@subscriptionsWithComponentIdentifiers[subscriptionKey] = []
-
 		producer = @producerManager.getProducer subscriptionKey
-		# @subscriptionsWithProducers.put subscriptionKey, producer
 		@subscriptionsWithProducers[subscriptionKey] = producer
 
 
 	_removeSubscription: (subscriptionKey) ->
-		# @subscriptionsWithComponentIdentifiers.remove subscriptionKey
 		delete @subscriptionsWithComponentIdentifiers[subscriptionKey]
-		# @subscriptionsWithProducers.remove subscriptionKey
 		delete @subscriptionsWithProducers[subscriptionKey]
-
 		@producerManager.removeProducer subscriptionKey
 
 

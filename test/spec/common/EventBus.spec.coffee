@@ -1,6 +1,6 @@
 assert = require 'assert'
 sinon = require 'sinon'
-
+sandbox = undefined
 
 EventBus = Vigor.EventBus
 
@@ -15,7 +15,6 @@ EventKeys = Vigor.EventKeys.extend
   BET_PLACED: 'bet_placed'
 
 callbacks = {}
-sandbox = undefined
 
 describe 'An eventbus', ->
   beforeEach ->
@@ -25,7 +24,6 @@ describe 'An eventbus', ->
     callbacks.subscriber2 = sinon.spy()
     callbacks.subscriberOnce = sinon.spy()
     callbacks.subscriberToAll = sinon.spy()
-
 
   afterEach ->
     do sandbox.restore
