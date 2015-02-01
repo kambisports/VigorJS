@@ -10,6 +10,11 @@ class DummyProducer extends Vigor.Producer
   SUBSCRIPTION_KEYS: [KEY]
   NAME: 'DummyProducer'
 
+class DummyProducer2 extends Vigor.Producer
+  subscribe: ->
+  SUBSCRIPTION_KEYS: [KEY, KEY2]
+  NAME: 'DummyProducer2'
+
 producerMapper = undefined
 
 describe 'A ProducerMapper', ->
@@ -67,3 +72,12 @@ describe 'A ProducerMapper', ->
         assert.equal(producerMapper.producers.length, 0)
         assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY], undefined)
 
+  describe 'when running _buildMap', ->
+      it 'it should store the producer for each subscription key in the producer', ->
+        buildMap = sinon.spy producerMapper, '_buildMap'
+        producerMapper.addProducerClass DummyProducer2
+
+        assert.equal(producerMapper.producers.length, 1)
+        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY], DummyProducer2)
+        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY2], DummyProducer2)
+        sinon.assert.calledOnce(buildMap)
