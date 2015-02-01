@@ -3,15 +3,12 @@ class Producer
 	subscriptionKeyToComponents: {}
 
 	constructor: ->
-		# add valid subscription keys to map (keys listed in subclass)
-		for key in @SUBSCRIPTION_KEYS
-			@subscriptionKeyToComponents[key] = []
-
-	dispose: ->
+		do @_addKeysToMap
 
 	addComponent: (subscriptionKey, componentIdentifier) ->
 		registeredComponents = @subscriptionKeyToComponents[subscriptionKey]
-		unless registeredComponents then throw new Error('Unknown subscription key, could not add component!')
+		unless registeredComponents
+			throw new Error('Unknown subscription key, could not add component!')
 
 		@subscriptionKeyToComponents[subscriptionKey].push componentIdentifier
 
@@ -24,6 +21,14 @@ class Producer
 
 	subscribe: (subscriptionKey, options) ->
 		throw new Error("Subscription handler should be overriden in subclass! Implement for subscription #{subscriptionKey} with options #{options}")
+
+	dispose: ->
+		throw new Error("Dispose shuld be overriden in subclass!")
+
+	# add valid subscription keys to map (keys listed in subclass)
+	_addKeysToMap: ->
+		for key in @SUBSCRIPTION_KEYS
+			@subscriptionKeyToComponents[key] = []
 
 	# Default
 	SUBSCRIPTION_KEYS: []

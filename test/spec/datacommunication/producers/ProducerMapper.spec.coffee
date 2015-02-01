@@ -7,11 +7,13 @@ KEY2 = 'dummy2'
 
 class DummyProducer extends Vigor.Producer
   subscribe: ->
+  dispose: ->
   SUBSCRIPTION_KEYS: [KEY]
   NAME: 'DummyProducer'
 
 class DummyProducer2 extends Vigor.Producer
   subscribe: ->
+  dispose: ->
   SUBSCRIPTION_KEYS: [KEY, KEY2]
   NAME: 'DummyProducer2'
 

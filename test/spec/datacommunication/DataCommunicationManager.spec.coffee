@@ -10,6 +10,7 @@ exampleComponent_2 = undefined
 dataCommunicationManager = undefined
 
 class DummyProducer extends Vigor.Producer
+  dispose: ->
   subscribe: ->
   SUBSCRIPTION_KEYS: [SubscriptionKeys.NEW_MOST_POPULAR_EVENTS]
   NAME: 'DummyProducer'
