@@ -1,6 +1,5 @@
 define (require) ->
 
-	$ = require 'jquery'
 	_ = require 'lib/underscore'
 	PackageBase = require 'common/PackageBase'
 	HelloWorldView = require './HelloWorldView'
@@ -24,13 +23,10 @@ define (require) ->
 				viewModel: @_helloWorldModel
 
 		render: ->
-			container = $ '<div></div>'
-			container.append @_helloWorldView.render().$el
-
-			@$el = container
+			@$el = @_helloWorldView.render().$el
 
 			_.defer =>
-				do @renderDeferred.resolve
+				do @renderDeferred.reject
 
 			return @
 
@@ -39,7 +35,7 @@ define (require) ->
 			do @_helloWorldModel.dispose
 			@_helloWorldView = undefined
 			@_helloWorldModel = undefined
-			super
+
 
 		HelloWorld.NAME = 'HelloWorld'
 

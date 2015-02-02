@@ -29,12 +29,19 @@ define (require) ->
 
 		initialize: (options) ->
 			super
+			@_helloWorldItems = []
 			@listenTo @viewModel.helloWorldItems, 'add', @_onHelloWorldItemsAdd
 			@listenTo @viewModel.helloWorldItems, 'remove', @_onHelloWorldItemsRemove
 
 		dispose: ->
+			_.invoke @_helloWorldItems, 'dispose'
+			@_helloWorldItems = []
+
+			do @$helloWorldItemsList.remove
+
 			@stopListening @viewModel.helloWorldItems, 'add', @_onHelloWorldItemsAdd
 			@stopListening @viewModel.helloWorldItems, 'remove', @_onHelloWorldItemsRemove
+			super
 
 		renderStaticContent: ->
 			@$el.html tmpl {}

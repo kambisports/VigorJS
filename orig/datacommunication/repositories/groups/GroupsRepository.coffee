@@ -1,7 +1,6 @@
 define (require) ->
 
 	_ = require 'lib/underscore'
-	Q = require 'lib/q'
 	ServiceRepository = require 'datacommunication/repositories/ServiceRepository'
 	GroupModel = require 'datacommunication/repositories/groups/GroupModel'
 
@@ -9,37 +8,24 @@ define (require) ->
 
 		model: GroupModel
 
-		_highlightedIdsArray: []
-
 		initialize: ->
 			super
 
 		queryGroups: ->
 			@models
 
-		querySportsGroups: ->
-			@getChildGroupsById 1
+		querySportsGroups: (sortAlphabetically) ->
+			groups = @getGroupsByLevel 1
 
-		###
-		queryGroupById: (id) ->
-			deferred = Q.defer()
-			console.log '@getGroupById id', id, @getGroupById id
-			if @isEmpty()
-				@listenToOnce @, 'add', ->
-					deferred.resolve @getGroupById id
+			if sortAlphabetically
+				groups.sort @_sortOnGroupName
 
-				@trigger GroupsRepository::POLL_ONCE_GROUPS
-			else
-				deferred.resolve @getGroupById id
+			groups
 
-			return deferred.promise
-		###
 
 		queryHighlightedGroups: ->
 			groups = @_getHighlightedGroups() or []
-			
-			#groups
-			@sortLeafEventGroups groups, false
+			@sortLeafGroups groups, false
 
 
 		#TODO: UNIT TEST THEESE METHODS
@@ -88,22 +74,83 @@ define (require) ->
 
 			siblings
 
-		getSubGroups: (id) ->
-			[]
+		getSiblingsToGroupById: (id) ->
+			group = @getGroupById id
+			# Featured resource can incorrectly send groups that does not
+			# exist in open.json or groups.json. Then we can not do anything.
+			return [] unless group
 
-		getLeafEventGroups: (id) ->
-			leafEventGroups = []
+			siblings = @getSiblingsToGroup group.get('id')
+			return _.without(siblings, id)
+
+		getClosestCommonParentGroup: (a, b) ->
+			aParentId = a.get('parentId')
+			bParentId = b.get('parentId')
+
+			# check if parents are the same
+			# or if ones parent is same as other self
+			if aParentId is bParentId
+				return @getGroupById(aParentId)
+			else if aParentId is b.get('id')
+				return @getGroupById(bParentId)
+			else if bParentId is a.get('id')
+				return @getGroupById(aParentId)
+
+			# move to next level
+			a =	 @getGroupById(aParentId)
+			b =	 @getGroupById(bParentId)
+
+			if a and b and aParentId isnt bParentId and aParentId isnt GroupsRepository::EVENT_GROUP_ROOT_ID and bParentId isnt GroupsRepository::EVENT_GROUP_ROOT_ID
+				return @getClosestCommonParentGroup a, b
+			else
+				return @getGroupById(GroupsRepository::EVENT_GROUP_ROOT_ID)
+
+		getGroupsByLevel: (level) ->
+			allWithWantedLevel = _.filter @models, (group) ->
+				group.get('level') is level
+
+			allWithWantedLevel
+
+		getLeafGroups: (id) ->
+			leafGroups = []
 
 			_.each @models, (group) =>
 				groupId = group.get('id')
-				isChild = @_isEventGroupChildOf groupId, id
+				isChild = @isGroupChildOf groupId, id
 				if isChild
-					isLeaf = @_isLeafGroup groupId
-					if isLeaf then leafEventGroups.push group
+					isLeaf = @isLeafGroup groupId
+					if isLeaf then leafGroups.push group
 
-			leafEventGroups
+			leafGroups
 
-		sortLeafEventGroups: (groups, sortAlphabetically) ->
+		isLeafGroup: (id) ->
+			foundChild = _.find @models, (group) ->
+				return group.get('parentId') is id
+
+			not foundChild
+
+		isGroupChildOf: (id, parentId) ->
+			group = @getGroupById id
+
+			while (group and (group.get('id')) isnt GroupsRepository::EVENT_GROUP_ROOT_ID)
+				if group.get('parentId') is parentId
+					return true
+				group = @getGroupById group.get('parentId')
+
+			false
+
+		# Removes highlighted data from groups that are not in provided list
+		undecorateHighlightedGroupsNotInList: (referenceGroups) ->
+			highlightedGroups = @_getHighlightedGroups()
+			for highlightedGroup in highlightedGroups
+				found = _.find referenceGroups, (referenceGroup) ->
+					return highlightedGroup.get('id') is referenceGroup.id
+
+				if not found
+					highlightedGroup.unset 'highlighted'
+					highlightedGroup.unset 'highlightedSortOrder'
+
+		sortLeafGroups: (groups, sortAlphabetically) ->
 			result = if groups then groups.concat() else []
 
 			result.sort _.bind (a, b) ->
@@ -111,11 +158,9 @@ define (require) ->
 				bSortOrder = @_getBranchHighlightedSortOrder(b)
 				aSortOrderValid = @_isValidSortOrder(aSortOrder)
 				bSortOrderValid = @_isValidSortOrder(bSortOrder)
-				aIsHighlighted = @_getHighlightData(a).highlighted
-				bIsHighlighted = @_getHighlightData(b).highlighted
+				aIsHighlighted = a.get('highlighted')
+				bIsHighlighted = b.get('highlighted')
 				isInHighlighted = aSortOrderValid or bSortOrderValid or aIsHighlighted or bIsHighlighted
-
-				console.log 'aSortOrder', aSortOrder, a.get('name')
 
 				# check highlighted sort order
 				if not sortAlphabetically and isInHighlighted
@@ -176,11 +221,7 @@ define (require) ->
 				isSortAlphabetically = sortAlphabetically is true
 				isLevel2 = level is 2
 				if not hasSortOrder or (isSortAlphabetically and isLevel2)
-					if a.get('name').toLowerCase() > b.get('name').toLowerCase()
-						return 1
-					else if a.get('name').toLowerCase() < b.get('name').toLowerCase()
-						return -1
-					return 0
+					return @_sortOnGroupName a, b
 
 				else if not aHasSortOrder and bHasSortOrder
 					# sort a after b
@@ -195,15 +236,25 @@ define (require) ->
 
 			result
 
+		_sortOnGroupName: (groupA, groupB) ->
+			aName = groupA.get('name').toLowerCase()
+			bName = groupB.get('name').toLowerCase()
+			if aName > bName
+				return 1
+			else if aName < bName
+				return -1
+			else
+				return 0
+
 		###
 		Returns highest highlighted sortOrder (Number) for specified group
 		or its parent group.
 		###
 		_getBranchHighlightedSortOrder: (group) ->
 			sortOrder = undefined
-			leafEventGroup = group
+			leafGroup = group
 			updateSortOrder = (what) =>
-				highlightedSortOrder = @_getHighlightData(what).highlightedSortOrder
+				highlightedSortOrder = what?.getHighlightedSortOrder()
 				if @_isValidSortOrder(highlightedSortOrder)
 					if not @_isValidSortOrder(sortOrder) or +highlightedSortOrder < sortOrder
 						sortOrder = +highlightedSortOrder
@@ -214,7 +265,7 @@ define (require) ->
 
 			# check sibling event groups
 			if not @_isValidSortOrder(sortOrder)
-				siblings = @_getSiblingsToEventGroupById(leafEventGroup.get('id'))
+				siblings = @getSiblingsToGroupById(leafGroup.get('id'))
 				_.each siblings, (siblingId) =>
 					sibling = @getGroupById(siblingId)
 					updateSortOrder(sibling)
@@ -230,7 +281,7 @@ define (require) ->
 		in highlighted list.
 		###
 		_getGroupsToSort: (a, b) ->
-			ccEG = @_getClosestCommonParentGroup(a, b)
+			ccEG = @getClosestCommonParentGroup(a, b)
 			ccId = if ccEG then ccEG.get('id') else undefined
 
 			# get the groups inside the closest common parent group
@@ -246,53 +297,6 @@ define (require) ->
 					break
 				b = bParentGroup
 			return [a, b]
-
-		_getSiblingsToEventGroupById: (id) ->
-			group = @getGroupById id
-			# Featured resource can incorrectly send groups that does not
-			# exist in open.json or groups.json. Then we can not do anything.
-			return [] unless group
-
-			siblings = @getSiblingsToGroup group.get('id')
-			return _.without(siblings, id)
-
-		_getClosestCommonParentGroup: (a, b) ->
-			aParentId = a.get('parentId')
-			bParentId = b.get('parentId')
-
-			# check if parents are the same
-			# or if ones parent is same as other self
-			if aParentId is bParentId
-				return @getGroupById(aParentId)
-			else if aParentId is b.get('id')
-				return @getGroupById(bParentId)
-			else if bParentId is a.get('id')
-				return @getGroupById(aParentId)
-
-			# move to next level
-			a =	 @getGroupById(aParentId)
-			b =	 @getGroupById(bParentId)
-			
-			if a and b and aParentId isnt bParentId and aParentId isnt GroupsRepository::EVENT_GROUP_ROOT_ID and bParentId isnt GroupsRepository::EVENT_GROUP_ROOT_ID
-				return @_getClosestCommonParentGroup a, b
-			else
-				return @getGroupById(GroupsRepository::EVENT_GROUP_ROOT_ID)
-
-		_isLeafGroup: (id) ->
-			foundChild = _.find @models, (group) ->
-				return group.get('parentId') is id
-
-			not foundChild
-
-		_isEventGroupChildOf: (id, parentId) ->
-			group = @getGroupById id
-
-			while (group and (group.get('id')) isnt GroupsRepository::EVENT_GROUP_ROOT_ID)
-				if group.get('parentId') is parentId
-					return true
-				group = @getGroupById group.get('parentId')
-
-			false
 
 		# attaches a groups object on each model containeng each groups subgroup
 		# starging with the passed parent group
@@ -341,22 +345,8 @@ define (require) ->
 
 			return if group?.length then group[0] else undefined
 
-		_getHighlightData: (group) ->
-			if group
-				highlightedGroup = @_getHighlightedGroupById group.get('id')
-
-			if highlightedGroup
-				highlighted: true
-				highlightedSortOrder: highlightedGroup.get('sortOrder') or ''
-			else
-				highlighted: false
-				highlightedSortOrder: ''
-
 		_filterById: (idArray) ->
 			return _.map idArray, (id) => return @get(id)
-
-		POLL_ONCE_GROUPS: 'poll_once_groups'
-		POLL_ONCE_HIGHLIGHTED: 'poll_once_highlighted'
 
 		EVENT_GROUP_ROOT_ID: 1
 

@@ -1,7 +1,6 @@
 define (require) ->
 
 	_ = require 'lib/underscore'
-	Q = require 'lib/q'
 	Hashtable = require 'lib/hashtable-require'
 
 	ProducerManager = require 'datacommunication/producers/ProducerManager'

@@ -1,7 +1,6 @@
 define (require) ->
 	ProducerManager = require 'datacommunication/producers/ProducerManager'
 	SubscriptionKeys = require 'datacommunication/SubscriptionKeys'
-	QueryKeys = require 'datacommunication/QueryKeys'
 
 	producerManager = undefined
 

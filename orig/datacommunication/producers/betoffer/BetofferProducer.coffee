@@ -1,6 +1,5 @@
 define (require) ->
 
-	Q = require 'lib/q'
 	Producer = require 'datacommunication/producers/Producer'
 
 	SubscriptionKeys = require 'datacommunication/SubscriptionKeys'

@@ -2,7 +2,6 @@ define (require) ->
 
 	Backbone = require 'lib/backbone'
 	ViewModel = require 'common/ViewModel'
-	QueryKeys = require 'datacommunication/QueryKeys'
 	SubscriptionKeys = require 'datacommunication/SubscriptionKeys'
 
 	# Re-written in CS - vicweb - 10/12/2014
@@ -20,10 +19,8 @@ define (require) ->
 			super
 
 		addSubscriptions: ->
-			@subscribe SubscriptionKeys.HIGHLIGHTED_GROUPS_CHANGE, @_onNewGroups, {}
+			@subscribe SubscriptionKeys.HIGHLIGHTED_GROUPS, @_onNewGroups, {}
 		# ------------------------------------------------------------------------------------------------
-
-
 
 		# ------------------------------------------------------------------------------------------------
 		_storeData: (highlightedGroups) =>

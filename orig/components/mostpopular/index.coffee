@@ -3,7 +3,7 @@ define (require) ->
 	_ = require 'lib/underscore'
 	PackageBase = require 'common/PackageBase'
 	MostPopularView = require './MostPopularView'
-	MostPopularModel = require './MostPopularModel'
+	MostPopularViewModel = require './MostPopularViewModel'
 	MostPopularEvents = require('common/constants').MostPopularEvents
 
 	class MostPopular extends PackageBase
@@ -20,7 +20,7 @@ define (require) ->
 		constructor: ->
 			super
 
-			@_viewModel = new MostPopularModel()
+			@_viewModel = new MostPopularViewModel()
 			@_mostPopularView = new MostPopularView
 				viewModel: @_viewModel
 

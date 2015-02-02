@@ -1,9 +1,7 @@
 define (require) ->
 
-	Q = require 'lib/q'
 	Producer = require 'datacommunication/producers/Producer'
 
-	QueryKeys = require 'datacommunication/QueryKeys'
 	SubscriptionKeys = require 'datacommunication/SubscriptionKeys'
 
 	# Collections needed to build/produce data

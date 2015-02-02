@@ -1,6 +1,5 @@
 define (require) ->
 
-	Q = require 'lib/q'
 	Repository = require 'datacommunication/repositories/Repository'
 	OutcomeModel = require 'datacommunication/repositories/outcomes/OutcomeModel'
 

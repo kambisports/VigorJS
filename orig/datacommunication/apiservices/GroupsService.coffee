@@ -14,14 +14,6 @@ define (require) ->
 
 			super GroupsRepository, pollInterval
 
-		bindRepositoryListeners: ->
-			super
-			@service.listenTo @repository, GroupsRepository.POLL_ONCE_GROUPS, @pollOnce
-
-		unbindRepositoryListeners: ->
-			super
-			@service.stopListening @repository, GroupsRepository.POLL_ONCE_GROUPS, @pollOnce
-
 		parse: (response) ->
 			super
 			flatGroupModels = @flattenResponse response
@@ -46,6 +38,7 @@ define (require) ->
 				# maybe be provided to identity several child-nodes.
 				indexName: 'groups,test'
 
+				# We always use group.groups, so we can always set this to 1
 				startLevel: 1
 
 			flattenedResponse = responseFlattener.flatten groupModels, flatteningSpecs
@@ -67,17 +60,6 @@ define (require) ->
 				groups = response.group.groups
 
 			return groups
-
-		###
-		getStartLevelFromResponse: (response) ->
-			# Some api responses (and unit test data) don't include the root node
-			if response?.group.id is GroupsRepository.EVENT_GROUP_ROOT_ID
-				startLevel = 0
-			else
-				startLevel = 1
-
-			return startLevel
-		###
 
 		NAME: 'GroupsService'
 

@@ -1,6 +1,5 @@
 define (require) ->
 	require 'localstorage'
-	Q = require 'lib/q'
 
 	class LocalStorageRepository extends Backbone.Model
 

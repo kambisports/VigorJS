@@ -1,6 +1,5 @@
 define (require) ->
 
-	Q = require 'lib/q'
 	_ = require 'lib/underscore'
 
 	class Producer
@@ -35,15 +34,6 @@ define (require) ->
 
 			component.callback(data) for component in componentsInterestedInChange
 
-		# Implement in subclass
-		###
-		query: (queryKey, options) ->
-			deferred = Q.defer()
-			deferred.reject new Error("Query handler should be overriden in subclass! Implement for query #{queryKey} with options #{options}")
-
-			return deferred.promise
-		###
-
 		subscribe: (subscriptionKey, options) ->
 			throw new Error("Subscription handler should be overriden in subclass! Implement for subscription #{subscriptionKey} with options #{options}")
 
@@ -58,7 +48,5 @@ define (require) ->
 
 		# Default
 		SUBSCRIPTION_KEYS : []
-
-		#QUERY_KEYS: []
 
 		NAME : 'Producer'

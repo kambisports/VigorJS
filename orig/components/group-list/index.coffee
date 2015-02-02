@@ -2,19 +2,19 @@ define (require) ->
 
 	_ = require 'lib/underscore'
 	PackageBase = require 'common/PackageBase'
-	HighlightedListModel = require './types/highlighted/HighlightedListModel'
+	HighlightedListViewModel = require './types/highlighted/HighlightedListViewModel'
 	HighlightedListView = require './types/highlighted/HighlightedListView'
-	SportsListModel = require './types/sports/SportsListModel'
+	SportsListViewModel = require './types/sports/SportsListViewModel'
 	SportsListView = require './types/sports/SportsListView'
-	RacingListModel = require './types/racing/RacingListModel'
+	RacingListViewModel = require './types/racing/RacingListViewModel'
 	RacingListView = require './types/racing/RacingListView'
-	RacingSportsListModel = require './types/racing-sports/RacingSportsListModel'
+	RacingSportsListViewModel = require './types/racing-sports/RacingSportsListViewModel'
 	RacingSportsListView = require './types/racing-sports/RacingSportsListView'
 
 	class GroupList extends PackageBase
 
 		$el: undefined
-		
+
 		_model: undefined
 
 		_view: undefined
@@ -35,14 +35,15 @@ define (require) ->
 
 		render: ->
 			@$el = @_view.render().$el
-			#TODO
-			#_.defer =>
-			#	do @renderDeferred.resolve
+			
+			_.defer =>
+				do @renderDeferred.resolve
+
 			return @
 
 		# Exposes the group list header to outside of component.
 		getHeader: () ->
-			@_model.getHeader()
+			@_model.getHeader() + ' [TCMOD]'#TODO remove
 
 		dispose: ->
 			do @_view.dispose
@@ -68,13 +69,13 @@ define (require) ->
 		_getModelClass: (type) ->
 			switch type
 				when 'sports'
-					Class = SportsListModel
+					Class = SportsListViewModel
 				when 'highlighted'
-					Class = HighlightedListModel
+					Class = HighlightedListViewModel
 				when 'racing'
-					Class = RacingListModel
+					Class = RacingListViewModel
 				when 'racing-sports'
-					Class = RacingSportsListModel
+					Class = RacingSportsListViewModel
 
 			return Class
 

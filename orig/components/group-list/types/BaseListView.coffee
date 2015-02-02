@@ -50,7 +50,7 @@ define (require) ->
 			@stopListening @viewModel.groups, 'reset', @_onGroupsChange
 
 			@_$showMore?.off 'click', @_onShowMoreClick
-			
+
 			@_disposeGroups()
 			super
 
@@ -68,15 +68,7 @@ define (require) ->
 			@_disposeGroups()
 
 		_renderGroups: (groups) ->
-			
-			# simulate changed data for third group
-			#groups[2]?.set({name: ''+Math.random()}, {silent: true})
-			
 			if groups and groups.length
-
-				#TODO Sort in Producer
-				#if @_sortingMethod is GroupListWidgetView2.SORTING_METHOD_HIGHLIGHTED_FIRST
-				#	groups = EventGroupSortUtil.sortLeafEventGroups(groups, sortAlphabetically)
 
 				eventGroupList = @$el.find '.event-groups__list'
 				frag = document.createDocumentFragment()
@@ -89,7 +81,7 @@ define (require) ->
 					view.render()
 					view.$el.hide() if index >= @concatLimit unless @concatLimit is false
 					frag.appendChild view.$el[0]
-				
+
 				@$el.find('.event-groups__list').html frag
 
 				@_setExpandState groups.length
@@ -115,7 +107,7 @@ define (require) ->
 
 			# always render after set
 			@_renderExpandState()
-		
+
 		_renderExpandState: =>
 			if @viewModel.state.get('expanded')
 				@_showAllGroups()

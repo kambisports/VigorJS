@@ -20,6 +20,9 @@ define (require) ->
 			so = @get('sortOrder')
 			so and !_.isNaN(so)
 
+		getHighlightedSortOrder: ->
+			@get('highlightedSortOrder') or ''
+
 	Object.defineProperty GroupModel.prototype, 'MODEL_TYPE',
 		value: 'GroupModel'
 		writeable: false

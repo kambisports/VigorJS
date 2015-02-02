@@ -2,8 +2,6 @@ define (require) ->
 
 	Backbone = require 'lib/backbone'
 	ViewModel = require 'common/ViewModel'
-	QueryKeys = require 'datacommunication/QueryKeys'
-	SubscriptionKeys = require 'datacommunication/SubscriptionKeys'
 
 	class GroupItemModel extends ViewModel
 

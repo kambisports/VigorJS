@@ -5,6 +5,16 @@
 
 // Hello World
 .modularized__hello-world {
-	border: 1px salid red;
-	background: red;
+	background: white;
+	margin: 0 5px;
+	padding: 5px 10px;
+}
+
+.modularized__hello-world-items-list {
+	list-style: none;
+	padding: 0;
+}
+
+.modularized__hello-world-item {
+	border-bottom: 1px dotted lightgray;
 }

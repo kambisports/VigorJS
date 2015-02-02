@@ -8,9 +8,7 @@ define (require) ->
 
 	###
 		Base class for services interacting with the API (polling)
-		Each service is bound to a repository and whenever that repository has a listener
-		for data, the service will start polling. If the repository has no active listeners the
-		service will stop polling for data.
+		The repository bound to the service will trigger events to initate and cancel polling
 	###
 
 	class ApiService
@@ -96,43 +94,9 @@ define (require) ->
 			else
 				do @poller.stop
 
-		###
-		pollOnce: =>
-
-			# if the poller is active (we have a running subscription) we should stop poller and fire
-			# a request without delay and then restart polling
-			if @poller.active()
-				shouldRestart = true
-
-			# if the poller isn't active we can just proceed by fire one request and then stop poller
-
-			# by creating a new poller it will stop any exisiting poller for this service
-			@_createPoller {
-				delay: 0
-				delayed: true
-				continueOnError: true
-				autostart: false
-				prefetchDataKey: @prefetchDataKey
-			}
-
-			pollOnceHandler = () =>
-				do @_unbindPollerListeners
-
-				# reset poller options if a subscription comes along in a later stage
-				@_createPoller @pollerOptions
-
-				if shouldRestart
-					do @_startPolling
-
-			@poller.on 'success', pollOnceHandler
-			@poller.on 'error', pollOnceHandler
-
-			# trigger poll once
-			do @poller.start
-		###
-
+		# FIXME
 		# Check xhr status in some generic way here?
-		# or use the backbone validate methdo in the models?
+		# Or use the backbone validate method in the models?
 		_validateResponse: (response) ->
 			removeThisLineOfCode = response
 			return true
