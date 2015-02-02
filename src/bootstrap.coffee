@@ -31,9 +31,7 @@
 
   # COMMON
   #= include ./common/EventBus.coffee
-  #= include ./common/ComponentView.coffee
   #= include ./common/PackageBase.coffee
-  #= include ./common/ViewModel.coffee
 
   # DATACOMMUNICATION/PRODUCERS
   #= include ./datacommunication/producers/Producer.coffee
@@ -48,6 +46,9 @@
   #= include ./datacommunication/EventKeys.coffee
   #= include ./datacommunication/ComponentIdentifier.coffee
   #= include ./datacommunication/DataCommunicationManager.coffee
+
+  #= include ./common/ComponentView.coffee
+  #= include ./common/ViewModel.coffee
 
   # REPOSITORIES
   #= include ./datacommunication/repositories/Repository.coffee

@@ -25,6 +25,8 @@ class Producer
 	dispose: ->
 		throw new Error("Dispose shuld be overriden in subclass!")
 
+	@extend = Backbone.View.extend
+
 	# add valid subscription keys to map (keys listed in subclass)
 	_addKeysToMap: ->
 		for key in @SUBSCRIPTION_KEYS

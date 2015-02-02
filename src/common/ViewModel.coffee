@@ -22,4 +22,6 @@ class ViewModel
 	unsubscribeAll: ->
 		return DataCommunicationManager.unsubscribeAll @id
 
+	@extend = Backbone.View.extend
+
 Vigor.ViewModel = ViewModel

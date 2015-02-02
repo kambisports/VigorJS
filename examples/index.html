@@ -2,16 +2,50 @@
   <head>
     <title></title>
 
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
-
-    <script src="../dist/backbone.whateverwewanttocallit.js"></script>
-    <script type="text/javascript">
-      console.log(Vigor);
-
-    </script>
   </head>
   <body>
+  Demopage
+  <div class="component-area"></div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
+
+  <script src="../dist/backbone.whateverwewanttocallit.js"></script>
+
+  <!-- hello world producer-->
+  <script src="./examples/producers/HelloWorldProducer.js"></script>
+
+  <!-- hello world component -->
+  <script src="./examples/helloworld/HelloWorldViewModel.js"></script>
+  <script src="./examples/helloworld/HelloWorldView.js"></script>
+  <script src="./examples/helloworld/index.js"></script>
+
+  <script type="text/javascript">
+    var app = app || {};
+    $(document).ready(function () {
+      'use strict'
+      var SubscriptionKeys, helloWorldComponent, helloWorldProducer;
+
+      // App setup stuff
+      SubscriptionKeys = Vigor.SubscriptionKeys.extend({
+        HELLO_WORLDS: 'hello-worlds'
+      });
+
+      // helloWorldProducer = new app.HelloWorldProducer();
+      // Vigor.DataCommunicationManager.registerProducers(helloWorldProducer);
+
+
+      // Create component
+      helloWorldComponent = new app.HelloWorld()
+
+      $('.component-area').html(
+        helloWorldComponent.render().$el
+      );
+
+      console.log(helloWorldComponent);
+    });
+
+  </script>
   </body>
 </html>

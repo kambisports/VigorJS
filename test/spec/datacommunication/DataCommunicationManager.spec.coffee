@@ -5,8 +5,8 @@ DataCommunicationManager = Vigor.DataCommunicationManager
 SubscriptionKeys = Vigor.SubscriptionKeys.extend
   NEW_MOST_POPULAR_EVENTS: 'new_most_popular_events'
 
-exampleComponent_1 = undefined
-exampleComponent_2 = undefined
+exampleComponent1 = undefined
+exampleComponent2 = undefined
 dataCommunicationManager = undefined
 
 class DummyProducer extends Vigor.Producer
@@ -20,12 +20,12 @@ describe 'A DataCommunicationManager', ->
     dataCommunicationManager = DataCommunicationManager.makeTestInstance()
     dataCommunicationManager.registerProducers DummyProducer
 
-    exampleComponent_1 =
-      id: 'ComponentId_1'
+    exampleComponent1 =
+      id: 'ComponentId1'
       callback: ->
 
-    exampleComponent_2 =
-      id: 'ComponentId_2'
+    exampleComponent2 =
+      id: 'ComponentId2'
       callback: ->
 
   afterEach ->
@@ -34,9 +34,9 @@ describe 'A DataCommunicationManager', ->
 
   describe 'using subscribe', ->
     it 'should add unique component to subscription map', ->
-      id = exampleComponent_1.id
+      id = exampleComponent1.id
       key = SubscriptionKeys.NEW_MOST_POPULAR_EVENTS
-      callback = exampleComponent_1.callback
+      callback = exampleComponent1.callback
       options = {}
 
       dataCommunicationManager.subscribe id, key, callback, options
@@ -46,18 +46,18 @@ describe 'A DataCommunicationManager', ->
       assert.equal(subscriptionComponentList.length, 1)
 
       component = subscriptionComponentList[0]
-      assert.equal(component.id, exampleComponent_1.id)
-      assert.equal(component.callback, exampleComponent_1.callback)
+      assert.equal(component.id, exampleComponent1.id)
+      assert.equal(component.callback, exampleComponent1.callback)
 
     it 'should add multiple components for same subscription', ->
-      id = exampleComponent_1.id
+      id = exampleComponent1.id
       key = SubscriptionKeys.NEW_MOST_POPULAR_EVENTS
-      callback = exampleComponent_1.callback
+      callback = exampleComponent1.callback
       options = {}
 
-      id2 = exampleComponent_2.id
+      id2 = exampleComponent2.id
       key = SubscriptionKeys.NEW_MOST_POPULAR_EVENTS
-      callback2 = exampleComponent_2.callback
+      callback2 = exampleComponent2.callback
 
       dataCommunicationManager.subscribe id, key, callback, options
       dataCommunicationManager.subscribe id2, key, callback2, options
@@ -75,9 +75,9 @@ describe 'A DataCommunicationManager', ->
       assert.equal(component2.callback, callback2)
 
     it 'should not add same component (same id) to subscription if it is already present', ->
-      id = exampleComponent_1.id
+      id = exampleComponent1.id
       key = SubscriptionKeys.NEW_MOST_POPULAR_EVENTS
-      callback = exampleComponent_1.callback
+      callback = exampleComponent1.callback
       options = {}
 
       dataCommunicationManager.subscribe id, key, callback, options
@@ -94,14 +94,14 @@ describe 'A DataCommunicationManager', ->
 
   describe 'using unsubscribe', ->
     it 'should remove component from subscription map', ->
-      id = exampleComponent_1.id
+      id = exampleComponent1.id
       key = SubscriptionKeys.NEW_MOST_POPULAR_EVENTS
-      callback = exampleComponent_1.callback
+      callback = exampleComponent1.callback
       options = {}
 
-      id2 = exampleComponent_2.id
+      id2 = exampleComponent2.id
       key = SubscriptionKeys.NEW_MOST_POPULAR_EVENTS
-      callback2 = exampleComponent_2.callback
+      callback2 = exampleComponent2.callback
 
       dataCommunicationManager.subscribe id, key, callback, options
       dataCommunicationManager.subscribe id2, key, callback2, options
@@ -119,9 +119,9 @@ describe 'A DataCommunicationManager', ->
       assert.equal(component.callback, callback2)
 
     it 'should remove subscription if there are no components registered for that subscription', ->
-      id = exampleComponent_1.id
+      id = exampleComponent1.id
       key = SubscriptionKeys.NEW_MOST_POPULAR_EVENTS
-      callback = exampleComponent_1.callback
+      callback = exampleComponent1.callback
       options = {}
 
       dataCommunicationManager.subscribe id, key, callback, options

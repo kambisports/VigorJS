@@ -8,6 +8,7 @@ class ComponentView extends Backbone.View
 		# you don't need them).
 		@_checkIfImplemented [
 			'renderStaticContent',
+			'renderDynamicContent',
 			'addSubscriptions',
 			'removeSubscriptions',
 			'dispose'
@@ -31,6 +32,11 @@ class ComponentView extends Backbone.View
 		return
 
 	# Override this.
+	# Render parts of component that relies on model.
+	renderDynamicContent: ->
+		return
+
+	# Override this.
 	# Add view model subscriptions if needed.
 	addSubscriptions: ->
 		return
@@ -48,6 +54,7 @@ class ComponentView extends Backbone.View
 		do @$el.off
 		do @$el.remove
 		do @off
+
 
 	_checkIfImplemented: (methodNames) ->
 		for methodName in methodNames

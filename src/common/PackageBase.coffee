@@ -9,4 +9,6 @@ class PackageBase
 	dispose: ->
 		throw 'PackageBase->dispose needs to be over-ridden'
 
+	@extend = Backbone.View.extend
+
 Vigor.PackageBase = PackageBase

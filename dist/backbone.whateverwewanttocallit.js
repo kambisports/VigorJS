@@ -1,8 +1,8 @@
 (function() {
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
 
   (function(root, factory) {
@@ -96,65 +96,6 @@
 
     })();
     Vigor.EventBus = new EventBus();
-    ComponentView = (function(_super) {
-      __extends(ComponentView, _super);
-
-      ComponentView.prototype.viewModel = void 0;
-
-      function ComponentView() {
-        this._checkIfImplemented(['renderStaticContent', 'addSubscriptions', 'removeSubscriptions', 'dispose']);
-        ComponentView.__super__.constructor.apply(this, arguments);
-      }
-
-      ComponentView.prototype.initialize = function(options) {
-        ComponentView.__super__.initialize.apply(this, arguments);
-        if (options.viewModel) {
-          return this.viewModel = options.viewModel;
-        }
-      };
-
-      ComponentView.prototype.render = function() {
-        this.renderStaticContent();
-        this.addSubscriptions();
-        return this;
-      };
-
-      ComponentView.prototype.renderStaticContent = function() {};
-
-      ComponentView.prototype.addSubscriptions = function() {};
-
-      ComponentView.prototype.removeSubscriptions = function() {};
-
-      ComponentView.prototype.dispose = function() {
-        var _ref;
-        if ((_ref = this.model) != null) {
-          _ref.unbind();
-        }
-        this.removeSubscriptions();
-        this.stopListening();
-        this.$el.off();
-        this.$el.remove();
-        return this.off();
-      };
-
-      ComponentView.prototype._checkIfImplemented = function(methodNames) {
-        var methodName, _i, _len, _results;
-        _results = [];
-        for (_i = 0, _len = methodNames.length; _i < _len; _i++) {
-          methodName = methodNames[_i];
-          if (!this.constructor.prototype.hasOwnProperty(methodName)) {
-            throw new Error("" + this.constructor.name + " - " + methodName + "() must be implemented in View.");
-          } else {
-            _results.push(void 0);
-          }
-        }
-        return _results;
-      };
-
-      return ComponentView;
-
-    })(Backbone.View);
-    Vigor.ComponentView = ComponentView;
     PackageBase = (function() {
       function PackageBase() {
         _.extend(this, Backbone.Events);
@@ -168,60 +109,18 @@
         throw 'PackageBase->dispose needs to be over-ridden';
       };
 
+      PackageBase.extend = Backbone.View.extend;
+
       return PackageBase;
 
     })();
     Vigor.PackageBase = PackageBase;
-    ViewModel = (function() {
-      var DataCommunicationManager;
-
-      DataCommunicationManager = Vigor.DataCommunicationManager;
-
-      ViewModel.prototype.id = 'ViewModel';
-
-      ViewModel.prototype.subscriptionIds = [];
-
-      function ViewModel() {
-        this.id = this.getUniqueId();
-      }
-
-      ViewModel.prototype.getUniqueId = function() {
-        return "" + this.id + "_" + (_.uniqueId());
-      };
-
-      ViewModel.prototype.dispose = function() {
-        return this.unsubscribeAll();
-      };
-
-      ViewModel.prototype.subscribe = function(key, callback, options) {
-        return DataCommunicationManager.subscribe(this.id, key, callback, options);
-      };
-
-      ViewModel.prototype.unsubscribe = function(key) {
-        return DataCommunicationManager.unsubscribe(this.id, key);
-      };
-
-      ViewModel.prototype.unsubscribeAll = function() {
-        return DataCommunicationManager.unsubscribeAll(this.id);
-      };
-
-      return ViewModel;
-
-    })();
-    Vigor.ViewModel = ViewModel;
     Producer = (function() {
       Producer.prototype.subscriptionKeyToComponents = {};
 
       function Producer() {
-        var key, _i, _len, _ref;
-        _ref = this.SUBSCRIPTION_KEYS;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          key = _ref[_i];
-          this.subscriptionKeyToComponents[key] = [];
-        }
+        this._addKeysToMap();
       }
-
-      Producer.prototype.dispose = function() {};
 
       Producer.prototype.addComponent = function(subscriptionKey, componentIdentifier) {
         var registeredComponents;
@@ -248,6 +147,23 @@
 
       Producer.prototype.subscribe = function(subscriptionKey, options) {
         throw new Error("Subscription handler should be overriden in subclass! Implement for subscription " + subscriptionKey + " with options " + options);
+      };
+
+      Producer.prototype.dispose = function() {
+        throw new Error("Dispose shuld be overriden in subclass!");
+      };
+
+      Producer.extend = Backbone.View.extend;
+
+      Producer.prototype._addKeysToMap = function() {
+        var key, _i, _len, _ref, _results;
+        _ref = this.SUBSCRIPTION_KEYS;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          key = _ref[_i];
+          _results.push(this.subscriptionKeyToComponents[key] = []);
+        }
+        return _results;
       };
 
       Producer.prototype.SUBSCRIPTION_KEYS = [];
@@ -678,6 +594,104 @@
 
     })();
     Vigor.DataCommunicationManager = new DataCommunicationManager();
+    ComponentView = (function(_super) {
+      __extends(ComponentView, _super);
+
+      ComponentView.prototype.viewModel = void 0;
+
+      function ComponentView() {
+        this._checkIfImplemented(['renderStaticContent', 'renderDynamicContent', 'addSubscriptions', 'removeSubscriptions', 'dispose']);
+        ComponentView.__super__.constructor.apply(this, arguments);
+      }
+
+      ComponentView.prototype.initialize = function(options) {
+        ComponentView.__super__.initialize.apply(this, arguments);
+        if (options.viewModel) {
+          return this.viewModel = options.viewModel;
+        }
+      };
+
+      ComponentView.prototype.render = function() {
+        this.renderStaticContent();
+        this.addSubscriptions();
+        return this;
+      };
+
+      ComponentView.prototype.renderStaticContent = function() {};
+
+      ComponentView.prototype.renderDynamicContent = function() {};
+
+      ComponentView.prototype.addSubscriptions = function() {};
+
+      ComponentView.prototype.removeSubscriptions = function() {};
+
+      ComponentView.prototype.dispose = function() {
+        var _ref;
+        if ((_ref = this.model) != null) {
+          _ref.unbind();
+        }
+        this.removeSubscriptions();
+        this.stopListening();
+        this.$el.off();
+        this.$el.remove();
+        return this.off();
+      };
+
+      ComponentView.prototype._checkIfImplemented = function(methodNames) {
+        var methodName, _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = methodNames.length; _i < _len; _i++) {
+          methodName = methodNames[_i];
+          if (!this.constructor.prototype.hasOwnProperty(methodName)) {
+            throw new Error("" + this.constructor.name + " - " + methodName + "() must be implemented in View.");
+          } else {
+            _results.push(void 0);
+          }
+        }
+        return _results;
+      };
+
+      return ComponentView;
+
+    })(Backbone.View);
+    Vigor.ComponentView = ComponentView;
+    ViewModel = (function() {
+      DataCommunicationManager = Vigor.DataCommunicationManager;
+
+      ViewModel.prototype.id = 'ViewModel';
+
+      ViewModel.prototype.subscriptionIds = [];
+
+      function ViewModel() {
+        this.id = this.getUniqueId();
+      }
+
+      ViewModel.prototype.getUniqueId = function() {
+        return "" + this.id + "_" + (_.uniqueId());
+      };
+
+      ViewModel.prototype.dispose = function() {
+        return this.unsubscribeAll();
+      };
+
+      ViewModel.prototype.subscribe = function(key, callback, options) {
+        return DataCommunicationManager.subscribe(this.id, key, callback, options);
+      };
+
+      ViewModel.prototype.unsubscribe = function(key) {
+        return DataCommunicationManager.unsubscribe(this.id, key);
+      };
+
+      ViewModel.prototype.unsubscribeAll = function() {
+        return DataCommunicationManager.unsubscribeAll(this.id);
+      };
+
+      ViewModel.extend = Backbone.View.extend;
+
+      return ViewModel;
+
+    })();
+    Vigor.ViewModel = ViewModel;
     Repository = (function(_super) {
       __extends(Repository, _super);
 
