@@ -226,7 +226,6 @@
       ProducerMapper.prototype._buildMap = function() {
         return this.producers.forEach((function(_this) {
           return function(producer) {
-            debugger;
             return producer.prototype.SUBSCRIPTION_KEYS.forEach(function(subscriptionKey) {
               return _this.subscriptionKeyToProducerMap[subscriptionKey] = producer;
             });

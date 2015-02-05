@@ -36,8 +36,6 @@ class ProducerMapper
   _buildMap: ->
     # console.log '@producers: ', @producers
     @producers.forEach (producer) =>
-      debugger
-
       producer.prototype.SUBSCRIPTION_KEYS.forEach (subscriptionKey) =>
         @subscriptionKeyToProducerMap[subscriptionKey] = producer
 

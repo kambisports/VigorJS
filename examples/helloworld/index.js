@@ -8,8 +8,8 @@ var app = app || {};
     _helloWorldViewModel: undefined,
     _helloWorldView: undefined,
 
-    constructor: function () {
-      Vigor.ComponentView.prototype.constructor.call(this, options);
+    constructor: function (options) {
+      Vigor.PackageBase.prototype.constructor.call(this, options);
       this._helloWorldViewModel = new app.HelloWorldViewModel();
       this._helloWorldView = new app.HelloWorldView({viewModel: this._helloWorldViewModel});
     },

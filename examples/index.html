@@ -13,8 +13,10 @@
 
   <script src="../dist/backbone.whateverwewanttocallit.js"></script>
 
-  <!-- hello world producer-->
+  <!-- hello world repositories -->
+  <script src="./examples/repositories/HelloWorldRepository.js"></script>
 
+  <!-- hello world producer -->
   <script src="./examples/producers/HelloWorldProducer.js"></script>
 
   <script src="./examples/helloworld/HelloWorldView.js"></script>
@@ -27,11 +29,9 @@
     var app = app || {};
     $(document).ready(function () {
       'use strict'
-      var helloWorldComponent, helloWorldProducer;
+      var helloWorldComponent;
 
-
-      helloWorldProducer = new app.HelloWorldProducer();
-      Vigor.DataCommunicationManager.registerProducers(helloWorldProducer);
+      Vigor.DataCommunicationManager.registerProducers(app.HelloWorldProducer);
 
       // Create component
       helloWorldComponent = new app.HelloWorld()
