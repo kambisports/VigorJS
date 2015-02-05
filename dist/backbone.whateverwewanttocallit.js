@@ -28,6 +28,7 @@
     Vigor.noConflict = function() {
       return root.Vigor = previousVigor;
     };
+    Vigor.extend = Backbone.Model.extend;
     EventRegistry = (function() {
       function EventRegistry() {
         _.extend(this, Backbone.Events);
@@ -99,6 +100,7 @@
     PackageBase = (function() {
       function PackageBase() {
         _.extend(this, Backbone.Events);
+        console.log('yey');
       }
 
       PackageBase.prototype.render = function() {
@@ -109,11 +111,10 @@
         throw 'PackageBase->dispose needs to be over-ridden';
       };
 
-      PackageBase.extend = Backbone.View.extend;
-
       return PackageBase;
 
     })();
+    PackageBase.extend = Vigor.extend;
     Vigor.PackageBase = PackageBase;
     Producer = (function() {
       Producer.prototype.subscriptionKeyToComponents = {};
@@ -153,8 +154,6 @@
         throw new Error("Dispose shuld be overriden in subclass!");
       };
 
-      Producer.extend = Backbone.View.extend;
-
       Producer.prototype._addKeysToMap = function() {
         var key, _i, _len, _ref, _results;
         _ref = this.SUBSCRIPTION_KEYS;
@@ -173,6 +172,7 @@
       return Producer;
 
     })();
+    Producer.extend = Vigor.extend;
     Vigor.Producer = Producer;
     ProducerMapper = (function() {
       ProducerMapper.prototype.producers = [];
@@ -226,6 +226,7 @@
       ProducerMapper.prototype._buildMap = function() {
         return this.producers.forEach((function(_this) {
           return function(producer) {
+            debugger;
             return producer.prototype.SUBSCRIPTION_KEYS.forEach(function(subscriptionKey) {
               return _this.subscriptionKeyToProducerMap[subscriptionKey] = producer;
             });
@@ -327,10 +328,10 @@
     };
 
     /*
-    	Base class for services interacting with the API (polling)
-    	Each service is bound to a repository and whenever that repository has a listener
-    	for data, the service will start polling. If the repository has no active listeners the
-    	service will stop polling for data.
+      Base class for services interacting with the API (polling)
+      Each service is bound to a repository and whenever that repository has a listener
+      for data, the service will start polling. If the repository has no active listeners the
+      service will stop polling for data.
      */
     ApiService = (function() {
       var ServiceRepository;
@@ -405,11 +406,11 @@
       ApiService.prototype._bindPollerListeners = function() {
 
         /*
-          		@poller.on 'success',  ->
-          			window.console.log 'Api service poller success'
+        @poller.on 'success',  ->
+          window.console.log 'Api service poller success'
           
-          		@poller.on 'complete', ->
-          			window.console.log 'Api service poller complete'
+        @poller.on 'complete', ->
+          window.console.log 'Api service poller complete'
          */
         return this.poller.on('error', function(e) {
           return window.console.log('Api service poller error', arguments, this);
@@ -601,6 +602,7 @@
 
       function ComponentView() {
         this._checkIfImplemented(['renderStaticContent', 'renderDynamicContent', 'addSubscriptions', 'removeSubscriptions', 'dispose']);
+        console.log('ComponentView: ', this);
         ComponentView.__super__.constructor.apply(this, arguments);
       }
 
@@ -686,11 +688,10 @@
         return DataCommunicationManager.unsubscribeAll(this.id);
       };
 
-      ViewModel.extend = Backbone.View.extend;
-
       return ViewModel;
 
     })();
+    ViewModel.extend = Vigor.extend;
     Vigor.ViewModel = ViewModel;
     Repository = (function(_super) {
       __extends(Repository, _super);

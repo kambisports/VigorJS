@@ -1,27 +1,26 @@
 class ViewModel
-	DataCommunicationManager = Vigor.DataCommunicationManager
+  DataCommunicationManager = Vigor.DataCommunicationManager
 
-	id: 'ViewModel'
-	subscriptionIds: []
+  id: 'ViewModel'
+  subscriptionIds: []
 
-	constructor: ->
-		@id = @getUniqueId()
+  constructor: ->
+    @id = @getUniqueId()
 
-	getUniqueId: ->
-		return "#{@id}_#{_.uniqueId()}"
+  getUniqueId: ->
+    return "#{@id}_#{_.uniqueId()}"
 
-	dispose: ->
-		do @unsubscribeAll
+  dispose: ->
+    do @unsubscribeAll
 
-	subscribe: (key, callback, options) ->
-		return DataCommunicationManager.subscribe @id, key, callback, options
+  subscribe: (key, callback, options) ->
+    return DataCommunicationManager.subscribe @id, key, callback, options
 
-	unsubscribe: (key) ->
-		return DataCommunicationManager.unsubscribe @id, key
+  unsubscribe: (key) ->
+    return DataCommunicationManager.unsubscribe @id, key
 
-	unsubscribeAll: ->
-		return DataCommunicationManager.unsubscribeAll @id
+  unsubscribeAll: ->
+    return DataCommunicationManager.unsubscribeAll @id
 
-	@extend = Backbone.View.extend
-
+ViewModel.extend = Vigor.extend
 Vigor.ViewModel = ViewModel

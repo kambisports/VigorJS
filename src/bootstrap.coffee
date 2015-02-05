@@ -29,6 +29,8 @@
   Vigor.noConflict = ->
     root.Vigor = previousVigor
 
+  Vigor.extend = Backbone.Model.extend
+
   # COMMON
   #= include ./common/EventBus.coffee
   #= include ./common/PackageBase.coffee

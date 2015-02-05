@@ -1,14 +1,15 @@
 class PackageBase
 
-	constructor: ->
-		_.extend @, Backbone.Events
+  constructor: ->
+    _.extend @, Backbone.Events
+    console.log 'yey'
 
-	render: ->
-		throw 'PackageBase->render needs to be over-ridden'
+  render: ->
+    throw 'PackageBase->render needs to be over-ridden'
 
-	dispose: ->
-		throw 'PackageBase->dispose needs to be over-ridden'
+  dispose: ->
+    throw 'PackageBase->dispose needs to be over-ridden'
 
-	@extend = Backbone.View.extend
 
+PackageBase.extend = Vigor.extend
 Vigor.PackageBase = PackageBase

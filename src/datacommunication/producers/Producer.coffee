@@ -1,39 +1,39 @@
 class Producer
 
-	subscriptionKeyToComponents: {}
+  subscriptionKeyToComponents: {}
 
-	constructor: ->
-		do @_addKeysToMap
+  constructor: ->
+    do @_addKeysToMap
 
-	addComponent: (subscriptionKey, componentIdentifier) ->
-		registeredComponents = @subscriptionKeyToComponents[subscriptionKey]
-		unless registeredComponents
-			throw new Error('Unknown subscription key, could not add component!')
+  addComponent: (subscriptionKey, componentIdentifier) ->
+    registeredComponents = @subscriptionKeyToComponents[subscriptionKey]
+    unless registeredComponents
+      throw new Error('Unknown subscription key, could not add component!')
 
-		@subscriptionKeyToComponents[subscriptionKey].push componentIdentifier
+    @subscriptionKeyToComponents[subscriptionKey].push componentIdentifier
 
-	produce: (subscriptionKey, data, filterFn) ->
-		componentsForSubscription = @subscriptionKeyToComponents[subscriptionKey]
-		componentsInterestedInChange = _.filter componentsForSubscription, (componentIdentifier) ->
-			_.isEmpty(componentIdentifier.options) or filterFn(componentIdentifier.options)
+  produce: (subscriptionKey, data, filterFn) ->
+    componentsForSubscription = @subscriptionKeyToComponents[subscriptionKey]
+    componentsInterestedInChange = _.filter componentsForSubscription, (componentIdentifier) ->
+      _.isEmpty(componentIdentifier.options) or filterFn(componentIdentifier.options)
 
-		component.callback(data) for component in componentsInterestedInChange
+    component.callback(data) for component in componentsInterestedInChange
 
-	subscribe: (subscriptionKey, options) ->
-		throw new Error("Subscription handler should be overriden in subclass! Implement for subscription #{subscriptionKey} with options #{options}")
+  subscribe: (subscriptionKey, options) ->
+    throw new Error("Subscription handler should be overriden in subclass! Implement for subscription #{subscriptionKey} with options #{options}")
 
-	dispose: ->
-		throw new Error("Dispose shuld be overriden in subclass!")
+  dispose: ->
+    throw new Error("Dispose shuld be overriden in subclass!")
 
-	@extend = Backbone.View.extend
 
-	# add valid subscription keys to map (keys listed in subclass)
-	_addKeysToMap: ->
-		for key in @SUBSCRIPTION_KEYS
-			@subscriptionKeyToComponents[key] = []
+  # add valid subscription keys to map (keys listed in subclass)
+  _addKeysToMap: ->
+    for key in @SUBSCRIPTION_KEYS
+      @subscriptionKeyToComponents[key] = []
 
-	# Default
-	SUBSCRIPTION_KEYS: []
-	NAME: 'Producer'
+  # Default
+  SUBSCRIPTION_KEYS: []
+  NAME: 'Producer'
 
+Producer.extend = Vigor.extend
 Vigor.Producer = Producer
