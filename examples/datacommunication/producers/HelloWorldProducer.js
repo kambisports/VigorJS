@@ -69,11 +69,9 @@ var app = app || {};
           break;
         case Vigor.SubscriptionKeys.HELLO_WORLD_BY_ID:
           for (var i = 0; i < this.models.length; i ++) {
-
             this.produce(subscriptionKey, models, function (componentOptions) {
               return model.id === componentOptions.id
             });
-
           }
           break;
         default:

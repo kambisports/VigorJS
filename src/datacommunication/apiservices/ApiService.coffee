@@ -98,4 +98,5 @@ class ApiService
     removeThisLineOfCode = response
     return true
 
+ApiService.extend = Vigor.extend
 Vigor.ApiService = ApiService

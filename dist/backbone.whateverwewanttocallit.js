@@ -443,6 +443,7 @@
       return ApiService;
 
     })();
+    ApiService.extend = Vigor.extend;
     Vigor.ApiService = ApiService;
     Vigor.SubscriptionKeys = {
       extend: function(object) {
