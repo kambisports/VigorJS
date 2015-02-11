@@ -1,3 +1,7 @@
+`
+//= require ../node_modules/backbone-poller/backbone.poller.js
+`
+
 ((root, factory) ->
   if typeof define is "function" and define.amd
 

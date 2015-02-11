@@ -2,7 +2,6 @@ class PackageBase
 
   constructor: ->
     _.extend @, Backbone.Events
-    console.log 'yey'
 
   render: ->
     throw 'PackageBase->render needs to be over-ridden'

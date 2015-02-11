@@ -9,8 +9,9 @@ var app = app || {};
     _helloWorldView: undefined,
 
     constructor: function (options) {
+      var viewModelId = 'dummy';
       Vigor.PackageBase.prototype.constructor.call(this, options);
-      this._helloWorldViewModel = new app.HelloWorldViewModel();
+      this._helloWorldViewModel = new app.HelloWorldViewModel(viewModelId);
       this._helloWorldView = new app.HelloWorldView({viewModel: this._helloWorldViewModel});
     },
 

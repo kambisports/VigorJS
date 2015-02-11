@@ -14,7 +14,6 @@ class ComponentView extends Backbone.View
       'dispose'
     ]
 
-    console.log 'ComponentView: ', @
     super
 
   initialize: (options) ->

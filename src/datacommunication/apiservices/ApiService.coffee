@@ -1,7 +1,4 @@
-# Poller = require 'lib/backbone.poller'
-Poller = ->
-  get: -> return {}
-
+Poller = Backbone.Poller
 # ApiServiceHelper = require 'datacommunication/apiservices/ApiServiceHelper'
 
 ###
@@ -11,22 +8,22 @@ Poller = ->
   service will stop polling for data.
 ###
 
+ServiceRepository = Vigor.ServiceRepository
+
 class ApiService
 
-  ServiceRepository = Vigor.ServiceRepository
 
   service: undefined
   repository: undefined
   poller: undefined
   pollerOptions: undefined
   shouldStop: false
+  url: undefined
 
   # Repository to listen for active listeners on, Default poll interval is 10 seconds
   constructor: (@repository, pollInterval = 10000) ->
     @service = new Backbone.Model()
-    @service.url = ''
-    # @service.url = ApiServiceHelper.getUrl @NAME
-    # @service.sync = ApiServiceHelper.sync
+    @service.url = @url
     @service.parse = @parse
 
     if @repository then do @bindRepositoryListeners
