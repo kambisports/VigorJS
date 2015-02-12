@@ -6,28 +6,24 @@ var app = app || {};
   app.HelloWorldViewModel = Vigor.ViewModel.extend({
 
     id: 'HelloWorldViewModel',
-    helloWorldId: undefined,
-    helloWorld: undefined,
+    helloWorldItems: undefined,
 
-    constructor: function (helloWorldId) {
-      if (helloWorldId) {
-        this.helloWorldId = helloWorldId;
-      }
+    constructor: function () {
       Vigor.ViewModel.prototype.constructor.apply(this, arguments);
-      this.helloWorld = new Backbone.Model();
+      this.helloWorldItems = new Backbone.Collection();
     },
 
     addSubscriptions: function () {
-      this.subscribe(SubscriptionKeys.HELLO_WORLD_BY_ID, this._onChangedById, { id: this.helloWorldId });
+      this.subscribe(SubscriptionKeys.HELLO_WORLDS, _.bind(this._onHelloWorldItemsChanged, this), {});
     },
 
     removeSubscriptions: function () {
-      this.unsubscribe(SubscriptionKeys.HELLO_WORLD_BY_ID)
+      this.unsubscribe(SubscriptionKeys.HELLO_WORLDS);
     },
 
-    _onHelloWorldItemsChanged: function (jsonData) {
-      console.log('just set some data: ', jsonData)
-      this.helloWorld.set(jsonData, {add: false, remove: false, merge: true});
+    _onHelloWorldItemsChanged: function (jsonArray) {
+      console.log(this, jsonArray);
+      this.helloWorldItems.set(jsonArray, {add: true, remove: true, merge: false});
     }
 
   });

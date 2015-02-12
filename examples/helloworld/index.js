@@ -21,7 +21,10 @@ var app = app || {};
     },
 
     dispose: function () {
-
+      this._helloWorldView.dispose();
+      this._helloWorldViewModel.dispose();
+      this._helloWorldView = undefined;
+      this._helloWorldViewModel = undefined;
     }
 
   });
