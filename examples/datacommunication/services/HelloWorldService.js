@@ -13,6 +13,26 @@ var app = app || {};
 
     constructor: function (helloWorldRepository) {
       Vigor.ApiService.prototype.constructor.call(this, helloWorldRepository, 5000);
+      setTimeout(_.bind(function () {
+        var response = [
+          {
+            'id': 'dummy',
+            'message': 'im a change',
+            'count': 100
+          },
+          {
+            'id': 'rummy',
+            'message': 'im added',
+            'count': 5
+          },
+          {
+            'id': 'summy',
+            'message': 'im also added',
+            'count': 3
+          }
+        ]
+        this.parse(response);
+      }, this), 12500);
     },
 
     parse: function (response) {

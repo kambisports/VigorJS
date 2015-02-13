@@ -2,14 +2,14 @@ var app = app || {};
 
 (function ($) {
   'use strict';
-  app.HelloWorldItemModel = Vigor.ComponentView.extend({
+  app.HelloWorldItemModel = Vigor.ViewModel.extend({
 
     id: 'HelloWorldItemModel',
     helloWorldId: undefined,
     helloWorld: undefined,
 
     constructor: function (helloWorldId) {
-      Vigor.ComponentView.prototype.constructor.call(this, arguments);
+      Vigor.ViewModel.prototype.constructor.call(this, arguments);
       this.helloWorldId = helloWorldId;
       this.helloWorld = new Backbone.Model();
     },

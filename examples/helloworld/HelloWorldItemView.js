@@ -13,13 +13,27 @@ var app = app || {};
     },
 
     renderStaticContent: function () {
-      tmpl = "render static";
+      var tmpl,
+          helloWorld = this.viewModel.helloWorld.toJSON(),
+          id = helloWorld.id,
+          message = helloWorld.message,
+          count = helloWorld.count;
+
+      tmpl = "Item with id: " + id + ", message: " + message + ", and count: " + count;
       this.$el.html(tmpl);
       return this;
     },
 
     renderDynamicContent: function () {
-      this.$el.html('dynamic');
+
+      var tmpl,
+          helloWorld = this.viewModel.helloWorld.toJSON(),
+          id = helloWorld.id,
+          message = helloWorld.message,
+          count = helloWorld.count;
+
+      tmpl = "Item with id: " + id + ", message: " + message + ", and count: " + count;
+      this.$el.html(tmpl);
       return this;
     },
 
