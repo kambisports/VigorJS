@@ -36,11 +36,13 @@ var app = app || {};
     },
 
     parse: function (response) {
+      var models;
       Vigor.ApiService.prototype.parse.call(this, response);
       if (Array.isArray(response)) {
         this.repository.set(response)
       } else {
-        this.repository.set(this._buildHelloWorldModels(response))
+        models = this._buildHelloWorldModels(response);
+        this.repository.set(models)
       }
     },
 

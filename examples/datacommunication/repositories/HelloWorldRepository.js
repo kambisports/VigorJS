@@ -13,7 +13,7 @@ var app = app || {};
     },
 
     queryById: function (id) {
-      this.get({'id': id});
+      return this.get(id);
     }
 
   });

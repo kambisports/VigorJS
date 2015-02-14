@@ -22,7 +22,6 @@ var app = app || {};
     },
 
     _onHelloWorldItemsChanged: function (jsonArray) {
-      console.log(this, jsonArray);
       this.helloWorldItems.set(jsonArray, {add: true, remove: true, merge: false});
     }
 
