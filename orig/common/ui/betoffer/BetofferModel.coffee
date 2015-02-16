@@ -20,7 +20,7 @@ define (require) ->
 			@outcomes = new Backbone.Collection()
 
 		addSubscriptions: ->
-			@subscribe SubscriptionKeys.BETOFFER_CHANGE, @_onBetofferChange, {betofferId: @betofferId}
+			@subscribe SubscriptionKeys.BETOFFER, @_onBetofferChange, {betofferId: @betofferId}
 
 		getSelectedOutcomes: ->
 			highlighted = _.filter @outcomes.toJSON(), (outcome) ->
@@ -32,6 +32,11 @@ define (require) ->
 					odds: outcome.odds
 				}
 			return outcomes
+
+		dispose: ->
+			@betoffer = undefined
+			@outcomes = undefined
+			super
 
 		#----------------------------------------------
 		# Callbacks

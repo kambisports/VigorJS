@@ -16,7 +16,7 @@ define (require) ->
 			do @addSubscriptions
 
 		addSubscriptions: ->
-			@subscribe SubscriptionKeys.EVENT_CHANGE, @onEventChange, {eventId: @eventId}
+			@subscribe SubscriptionKeys.EVENT, @onEventChange, {eventId: @eventId}
 
 		onEventChange: (event) =>
 			@event.set event

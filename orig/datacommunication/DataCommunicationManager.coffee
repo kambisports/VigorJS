@@ -14,16 +14,12 @@ define (require) ->
 		subscriptionsWithProducers: undefined
 
 		producerManager: undefined
-		apiServices: undefined
 
 		constructor: ->
 			@subscriptionsWithComponentIdentifiers = new Hashtable()
 			@subscriptionsWithProducers = new Hashtable()
 
 			@producerManager = new ProducerManager()
-
-			# Only used to create singletons of services in application
-			@apiServices = new ApiServices()
 
 		# Public methods
 		subscribe: (componentId, subscriptionKey, subscriptionCb, subscriptionOptions = {}) ->
@@ -50,11 +46,6 @@ define (require) ->
 
 			while len--
 				@_removeComponentFromSubscription keys[len], componentId
-
-		###
-		query: (key, options) ->
-			@producerManager.query key, options
-		###
 
 
 		# Private methods
@@ -107,4 +98,3 @@ define (require) ->
 			new DataCommunicationManager()
 
 	return new DataCommunicationManager()
-

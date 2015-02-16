@@ -19,33 +19,32 @@ define (require) ->
 		#----------------------------------------------
 		# Public methods
 		#----------------------------------------------
-
 		initialize: (options) ->
 			@_uglyWorkarounds = options.uglyWorkarounds
 			super
 
-		render: ->
-			###
-			sportsMenuView = new SportsMenuView {}
-			$sportsMenu = sportsMenuView.render().$el
-			navDOMHTML = do navTemplate
-			this.$el.html navDOMHTML
-			this.$el.find('nav').append $sportsMenu
-			###
+		addSubscriptions: ->
+			super
 
+		removeSubscriptions: ->
+			super
+
+		renderStaticContent: ->
 			@$el.html navTemplate()
-			do @_renderWidgets
 
-			@
-
-		_renderWidgets: ->
 			widgetContainer =
 				navPanel: $ '.navigation-menu', @el
 
 			_.each _.keys(widgetContainer), (key) =>
 				@_widgets.push(require('view/widget/WidgetRenderer').renderWidgetsToContainer(widgetContainer[key], key, @_uglyWorkarounds))
 
+		renderDynamicContent: ->
+			super
 
-	Object.defineProperty NavigationView.prototype, 'NAME', value: 'NavigationView'
+		dispose: ->
+			super
+
+
+		NAME: 'NavigationView'
 
 	return NavigationView

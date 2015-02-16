@@ -8,11 +8,10 @@ define (require) ->
 	DOMUtil = require 'utils/DOMUtil'
 	EventItem = require 'common/ui/event-item'
 	Betoffer = require 'common/ui/betoffer'
-	BetofferEvents = require('common/constants').BetofferEvents
 	EventBus = require 'common/EventBus'
 	EventKeys = require 'datacommunication/EventKeys'
 
-	MostPopularEvents = require('common/constants').MostPopularEvents
+	MostPopularEvents = require './MostPopularEvents'
 	MostPopularDetails = require './MostPopularDetailsView'
 	tmpl = require 'hbs!./templates/MostPopular'
 
@@ -21,7 +20,7 @@ define (require) ->
 		className: 'modularized__most-popular'
 		renderDeferred: undefined
 		events:
-			'click .modularized__add-to-betslip-btn': '_onAddToBetslipClick'
+			'click .modularized__js-most-popular__add-to-betslip-btn': '_onAddToBetslipClick'
 
 		#--------------------------------------
 		#	Private properties
@@ -44,7 +43,7 @@ define (require) ->
 		#----------------------------------------------
 		constructor: ->
 			@events = @events or {}
-			@events[BetofferEvents.OUTCOME_CLICK] = '_onOutcomeClick'
+			@events[Betoffer::EVENTS.OUTCOME_CLICK] = '_onOutcomeClick'
 			super
 
 
@@ -52,33 +51,39 @@ define (require) ->
 			@_viewModel = options.viewModel
 			@_betoffers = []
 			@_eventItems = []
-
 			@listenTo @_viewModel.selectedOutcomes, 'reset', @_onViewModelDataLoaded
-			do @_viewModel.addSubscriptions
-
 			super
 
+		addSubscriptions: ->
+			do @_viewModel.addSubscriptions
+
+		removeSubscriptions: ->
+			do @_viewModel.removeSubscriptions
+
 		render: ->
-			@$el.html tmpl
-				labelLeft: 'mostpopular.outcomeLabel.home'
-				labelMiddle: 'mostpopular.outcomeLabel.draw'
-				labelRight: 'mostpopular.outcomeLabel.away'
-
-			@$_spinner = $ '.modularized__most-popular__spinner', @el
-			@$_eventsList = $ '.modularized__event-list', @el
-			@$_details = $ '.modularized__most-popular__details', @el
-
-			do @_showSpinner
-			do @_renderDetails
-			do @disableAddToBetslip
-
+			super
 			do @createEventItems
-
 			_.defer =>
 				do @renderDeferred.resolve
 
 			return @
 
+		renderStaticContent: ->
+			@$el.html tmpl
+				labelLeft: 'mostpopular.outcomeLabel.home'
+				labelMiddle: 'mostpopular.outcomeLabel.draw'
+				labelRight: 'mostpopular.outcomeLabel.away'
+
+			@$_spinner = $ '.modularized__js-most-popular__spinner', @el
+			@$_eventsList = $ '.modularized__js-event-list', @el
+			@$_details = $ '.modularized__js-most-popular__details', @el
+
+			do @_showSpinner
+			do @_renderDetails
+			do @disableAddToBetslip
+
+		renderDynamicContent: ->
+			return
 
 		dispose: ->
 			for item in @_eventItems
@@ -95,7 +100,6 @@ define (require) ->
 			@_eventItems = undefined
 			@_betoffers = undefined
 			@_details = undefined
-
 			super
 
 
@@ -191,6 +195,6 @@ define (require) ->
 			do @_setBetoffersOutcomeState
 
 		_onViewModelDataLoaded: =>
-			do @render
+			do @renderDynamicContent
 
 	return MostPopularView

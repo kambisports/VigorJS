@@ -15,10 +15,10 @@ define (require) ->
 			@helloWorld = new Backbone.Model()
 
 		addSubscriptions: ->
-			@subscribe SubscriptionKeys.HELLO_WORLD_BY_ID, @_onChangedById, { id: @helloWorldId }
+			@subscribe SubscriptionKeys.HELLO_WORLD, @_onChangedById, { id: @helloWorldId }
 
 		removeSubscriptions: ->
-			@unsubscribe SubscriptionKeys.HELLO_WORLD_BY_ID
+			@unsubscribe SubscriptionKeys.HELLO_WORLD
 
 		#----------------------------------------------
 		# Callbacks

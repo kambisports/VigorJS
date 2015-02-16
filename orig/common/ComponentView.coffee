@@ -19,6 +19,7 @@ define (require) ->
 			# you don't need them).
 			@_checkIfImplemented [
 				'renderStaticContent',
+				'renderDynamicContent',
 				'addSubscriptions',
 				'removeSubscriptions',
 				'dispose'
@@ -42,6 +43,11 @@ define (require) ->
 		# Override this.
 		# Render parts of component that don't rely on model.
 		renderStaticContent: ->
+			return
+
+		# Override this
+		# Render parts of component that relies on model changes.
+		renderDynamicContent: ->
 			return
 
 		# Override this.

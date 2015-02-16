@@ -7,7 +7,7 @@ define (require) ->
 
 		ODDS_CHANGE_TIMEOUT: 10000
 
-		className: 'modularized__outcome'
+		className: 'modularized__outcome modularized__js-outcome'
 		tagName: 'button'
 		attributes:
 			'data-touch-feedback': true
@@ -25,8 +25,8 @@ define (require) ->
 			@listenTo @model, 'change:odds', @_onOddsChange
 
 		render: ->
-			@$odds = $ '.modularized__outcome-odds', @el
-			@$label = $ '.modularized__outcome-label', @el
+			@$odds = $ '.modularized__js-outcome-odds', @el
+			@$label = $ '.modularized__js-outcome-label', @el
 
 			@$el.attr 'data-outcome-id', @model.get('id')
 
@@ -37,6 +37,7 @@ define (require) ->
 		dispose: ->
 			super
 			@model = undefined
+
 
 		#----------------------------------------------
 		# Private methods

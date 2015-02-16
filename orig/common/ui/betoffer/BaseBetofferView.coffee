@@ -4,14 +4,14 @@ define (require) ->
 	BetofferModel = require './BetofferModel'
 	ComponentView = require 'common/ComponentView'
 	BasicOutcomeView = require './outcome-types/basic/BasicOutcomeView'
-	BetofferEvents = require('common/constants').BetofferEvents
+	BetofferEvents = require './BetofferEvents'
 
 	class BaseBetofferView extends ComponentView
 
 		tagName: 'div'
-		className: 'modularized__outcomes-container'
+		className: 'modularized__outcomes-container modularized__js-outcomes-container'
 		events:
-			'click .modularized__outcome': '_onOutcomeClick'
+			'click .modularized__js-outcome': '_onOutcomeClick'
 
 		outcomes: undefined
 		outcomesAsRadioBtns: false
@@ -28,28 +28,20 @@ define (require) ->
 			@outcomes = []
 			do @_createOutcomes
 
-		render: ->
-			# override me
-			return @
-
-
 		deselectOutcomes: ->
 			@viewModel.outcomes.each (outcome) ->
 				outcome.set 'highlight', false
-
 
 		dispose: ->
 			for outcome in @outcomes
 				do outcome.dispose
 				outcome = undefined
+			@outcomes = undefined
 			super
 
 		#----------------------------------------------
 		# Private methods
 		#----------------------------------------------
-		_renderOutcomes: ->
-			# override me
-
 		_createOutcomes: ->
 			@viewModel.outcomes.each (outcomeModel) =>
 				outcome = new BasicOutcomeView

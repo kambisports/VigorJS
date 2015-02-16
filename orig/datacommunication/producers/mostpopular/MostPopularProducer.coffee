@@ -8,80 +8,63 @@ define (require) ->
 	SubscriptionKeys = require 'datacommunication/SubscriptionKeys'
 
 	# Collections needed to build/produce data
-	MostPopularRepository = require 'datacommunication/repositories/mostpopular/MostPopularRepository'
+	EventsRepository = require 'datacommunication/repositories/events/EventsRepository'
+	BetoffersRepository = require 'datacommunication/repositories/betoffers/BetoffersRepository'
+	OutcomesRepository = require 'datacommunication/repositories/outcomes/OutcomesRepository'
 
 	DefaultStakes = require './DefaultStakes'
 
 	class MostPopularProducer extends Producer
 
-		_debouncedOnRepositoryAdd: undefined
-		_debouncedOnRepositoryChange: undefined
-		_debouncedOnRepositoryRemove: undefined
-
 		constructor: ->
-			@_debouncedOnRepositoryAdd = _.debounce @_onChangesInRepository, 0
-			@_debouncedOnRepositoryChange = _.debounce @_onChangesInRepository, 0
-			@_debouncedOnRepositoryRemove = _.debounce @_onChangesInRepository, 0
-
-			MostPopularRepository.on 'reset', @_onResetInRepository, @
-
-			# Most popular doesn't subscribe to changes ATM
-			#MostPopularRepository.on 'add', @_debouncedOnRepositoryAdd, @
-			#MostPopularRepository.on 'change', @_debouncedOnRepositoryChange, @
-			#MostPopularRepository.on 'remove', @_debouncedOnRepositoryRemove, @
 			super
+			EventsRepository.on EventsRepository.REPOSITORY_DIFF, @_onDiffInRepository, @
 
 		dispose: ->
-			MostPopularRepository.off 'reset', @_onResetInRepository, @
-			MostPopularRepository.off 'add', @_debouncedOnRepositoryAdd, @
-			MostPopularRepository.off 'change', @_debouncedOnRepositoryChange, @
-			MostPopularRepository.off 'remove', @_debouncedOnRepositoryRemove, @
-
-			@_debouncedOnRepositoryAdd = undefined
-			@_debouncedOnRepositoryChange = undefined
-			@_debouncedOnRepositoryRemove = undefined
-
-			MostPopularRepository.notInterestedInUpdates @NAME
+			EventsRepository.off EventsRepository.REPOSITORY_DIFF, @_onDiffInRepository, @
+			super
 
 		subscribe: (subscriptionKey, options) ->
-			MostPopularRepository.interestedInUpdates @NAME
+			EventsRepository.fetchMostPopularEvents options
+			do @_produceData
 
-			switch subscriptionKey
-				when SubscriptionKeys.NEW_MOST_POPULAR_EVENTS
-					models = MostPopularRepository.queryBetoffers options
-					if models.length > 0 then @_produceData models
-				else
-					throw new Error("Unknown query subscriptionKey: #{subscriptionKey}")
+		_produceData: ->
+			@produce SubscriptionKeys.MOST_POPULAR_EVENTS, @_buildData()
 
-		# Builders
-		buildData: (data) ->
+		_buildData: ->
 			formattedData = {}
+			events = []
+			selectedOutcomes = []
+			mostPopularBetoffers = BetoffersRepository.getMostPopularBetoffers()
+
+			for betoffer in mostPopularBetoffers
+				outcomes = _.map OutcomesRepository.getOutcomesByBetofferId(betoffer.id), (outcome) ->
+					outcome.toJSON()
+
+				event =
+					eventId: betoffer.get 'eventId'
+					betofferId: betoffer.get 'id'
+
+				selectedOutcome =
+					outcomeId: (_.findWhere outcomes, { popular: true }).id
+					odds: (_.findWhere outcomes, { popular: true }).odds
+
+				events.push event
+				selectedOutcomes.push selectedOutcome
+
 			currency = ApplicationSettingsModel.get 'currency'
 			currencyKey = "#{StringUtil.toUpperCase(currency)}_CURRENCY_DEFAULT_STAKES"
 
-			formattedData.events = _.map data, (mostPopModel) ->
-				eventId: mostPopModel.get 'eventId'
-				betofferId: mostPopModel.get 'betofferId'
-
-			formattedData.selectedOutcomes = _.map data, (mostPopModel) ->
-				outcomeId: mostPopModel.get 'outcomeId'
-				odds: mostPopModel.get 'outcomeOdds'
-
+			formattedData.events = events
+			formattedData.selectedOutcomes = selectedOutcomes
 			formattedData.defaultStakes = DefaultStakes[currencyKey]
 
 			return formattedData
 
-		_produceData: (models) ->
-			producedData = @buildData models
-			@produce SubscriptionKeys.NEW_MOST_POPULAR_EVENTS, producedData, ->
-
 		# Handlers
-		_onResetInRepository: (collection) ->
-			@_produceData collection.models
+		_onDiffInRepository:  =>
+			do @_produceData
 
-		_onChangesInRepository: () ->
-			@_produceData MostPopularRepository.models
+		SUBSCRIPTION_KEYS: [SubscriptionKeys.MOST_POPULAR_EVENTS]
 
-		SUBSCRIPTION_KEYS : [SubscriptionKeys.NEW_MOST_POPULAR_EVENTS]
-
-		NAME : 'MostPopularProducer'
+		NAME: 'MostPopularProducer'

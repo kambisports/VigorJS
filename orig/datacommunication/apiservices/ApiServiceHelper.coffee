@@ -8,6 +8,7 @@ define ->
 			'MostPopularService' : '/betoffer/mostpopular/3way.json'
 			'GroupsService' : '/group.json'
 			'GroupsHighlightedService': '/group/highlight.json'
+			'LiveEventsService': '/event/live/open.json'
 
 		# Base sync
 		sync: (method, model, options) =>
@@ -23,7 +24,7 @@ define ->
 
 		getUrl: (serviceName) ->
 			switch serviceName
-				when 'LiveService', 'GroupsHighlightedService', 'GroupsService', 'MostPopularService'
+				when 'LiveService', 'GroupsHighlightedService', 'GroupsService', 'MostPopularService', 'LiveEventsService'
 					return @_getOfferingBaseUrl() + @_getCustomer() + @_getServiceUrl(serviceName) + @_getParams()
 				when 'HelloWorldService'
 					return './js/datacommunication/repositories/helloworld/helloWorld.json'

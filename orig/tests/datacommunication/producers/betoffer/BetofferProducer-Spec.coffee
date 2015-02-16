@@ -33,7 +33,7 @@ define (require) ->
 			mockComponentCb = () ->
 
 			mockComponent = new ComponentIdentifier 'MockComponent_1', mockComponentCb, { betofferId: 1 }
-			betofferProducer.addComponent SubscriptionKeys.BETOFFER_CHANGE, mockComponent
+			betofferProducer.addComponent SubscriptionKeys.BETOFFER, mockComponent
 
 		describe 'should produce data', ->
 

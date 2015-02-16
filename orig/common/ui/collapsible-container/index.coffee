@@ -47,6 +47,6 @@ define (require) ->
 			return ViewClass
 
 
-		CollapsibleContainer.NAME = 'CollapsibleContainer'
+		NAME: 'CollapsibleContainer'
 
 	return CollapsibleContainer

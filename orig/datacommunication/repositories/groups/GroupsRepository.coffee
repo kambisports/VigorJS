@@ -3,30 +3,63 @@ define (require) ->
 	_ = require 'lib/underscore'
 	ServiceRepository = require 'datacommunication/repositories/ServiceRepository'
 	GroupModel = require 'datacommunication/repositories/groups/GroupModel'
+	GroupsService = require 'datacommunication/apiservices/GroupsService'
+	GroupsHighlightedService = require 'datacommunication/apiservices/GroupsHighlightedService'
 
 	class GroupsRepository extends ServiceRepository
 
 		model: GroupModel
 
 		initialize: ->
+			GroupsService.on GroupsService.GROUPS_RECEIVED, @_onGroupsReceived
+			GroupsHighlightedService.on GroupsHighlightedService.GROUPS_HIGHLIGHTED_RECEIVED, @_onGroupsHighlighedReceived
 			super
 
-		queryGroups: ->
-			@models
+		# ------------------------------------------------------------------------------------------------
+		fetchGroups: ->
+			if @isEmpty()
+				@callApiService GroupsService.NAME, {}
 
-		querySportsGroups: (sortAlphabetically) ->
+			return @getGroups()
+
+		fetchSportsGroups: (sortAlphabetically) ->
+			@callApiService GroupsService.NAME, {}
+			return @getSportsGroups(sortAlphabetically)
+
+		fetchHighlightedGroups: ->
+			@callApiService GroupsHighlightedService.NAME, {}
+			return @getHighlightedGroups()
+
+		fetchTopSports: ->
+			# when should we do this?
+			@callApiService GroupsService.NAME, {}
+			return @getTopSports()
+
+		# ------------------------------------------------------------------------------------------------
+		getGroups: ->
+			return @models
+
+		getSportsGroups: (sortAlphabetically) ->
 			groups = @getGroupsByLevel 1
 
 			if sortAlphabetically
 				groups.sort @_sortOnGroupName
 
-			groups
+			return groups
 
+		getTopSports: ->
+			sortAlphabetically = true
+			lvlOneGroups = @getGroupsByLevel(1)
 
-		queryHighlightedGroups: ->
+			groupsWithSortOrder = _.filter lvlOneGroups, (model) ->
+				return model.hasSortOrder()
+
+			groups = @sortLeafGroups groupsWithSortOrder, sortAlphabetically
+			return groups
+
+		getHighlightedGroups: ->
 			groups = @_getHighlightedGroups() or []
-			@sortLeafGroups groups, false
-
+			return @sortLeafGroups(groups, false)
 
 		#TODO: UNIT TEST THEESE METHODS
 		getChildTreeById: (id) ->
@@ -53,15 +86,29 @@ define (require) ->
 		getChildGroupsById: (id) ->
 			return @where 'parentId': id
 
-		getLocalizedGroupPathById: (id, separator = ' / ', reverse = true, skipFirst = false) ->
+		getGroupPathById: (id, separator = ' / ', reverse = true, skipFirst = false, name = 'englishName') ->
 			pathArray = @getAncestorArrayById id
-			nameArray = (pathItem.get('name') for pathItem in pathArray)
+			nameArray = (pathItem.get(name) for pathItem in pathArray)
 			if skipFirst then do nameArray.shift
 			if reverse then nameArray.reverse()
 			return nameArray.join(separator)
 
+		getLocalizedGroupPathById: (id, separator = ' / ', reverse = true, skipFirst = false) ->
+			return @getGroupPathById(id, separator, reverse, skipFirst, 'name')
+
 		getGroupById: (id) ->
 			return @get id
+
+		getGroupsByIds: (ids) ->
+			groups = []
+			unless ids?.length then return groups
+
+			for groupId in ids
+				group = @getGroupById(groupId)
+				if group
+					groups.push group
+
+			return groups
 
 		# Returns an array of group ids of all siblings to the group
 		# with specified id.
@@ -72,7 +119,7 @@ define (require) ->
 				if group.get('parentId') is parentId
 					siblings.push group.get('id')
 
-			siblings
+			return siblings
 
 		getSiblingsToGroupById: (id) ->
 			group = @getGroupById id
@@ -109,7 +156,7 @@ define (require) ->
 			allWithWantedLevel = _.filter @models, (group) ->
 				group.get('level') is level
 
-			allWithWantedLevel
+			return allWithWantedLevel
 
 		getLeafGroups: (id) ->
 			leafGroups = []
@@ -121,7 +168,7 @@ define (require) ->
 					isLeaf = @isLeafGroup groupId
 					if isLeaf then leafGroups.push group
 
-			leafGroups
+			return leafGroups
 
 		isLeafGroup: (id) ->
 			foundChild = _.find @models, (group) ->
@@ -137,7 +184,7 @@ define (require) ->
 					return true
 				group = @getGroupById group.get('parentId')
 
-			false
+			return false
 
 		# Removes highlighted data from groups that are not in provided list
 		undecorateHighlightedGroupsNotInList: (referenceGroups) ->
@@ -234,8 +281,9 @@ define (require) ->
 					return ((+aSortOrder) - (+bSortOrder))
 			, this #scope
 
-			result
+			return result
 
+		# ------------------------------------------------------------------------------------------------
 		_sortOnGroupName: (groupA, groupB) ->
 			aName = groupA.get('name').toLowerCase()
 			bName = groupB.get('name').toLowerCase()
@@ -270,7 +318,7 @@ define (require) ->
 					sibling = @getGroupById(siblingId)
 					updateSortOrder(sibling)
 
-			sortOrder
+			return sortOrder
 
 		_isValidSortOrder: (sortOrderString) ->
 			not _.isNaN(parseInt(sortOrderString, 10))
@@ -348,8 +396,17 @@ define (require) ->
 		_filterById: (idArray) ->
 			return _.map idArray, (id) => return @get(id)
 
-		EVENT_GROUP_ROOT_ID: 1
+		_onGroupsReceived: (flatGroupModels) =>
+			@set flatGroupModels
 
+		_onGroupsHighlighedReceived: (groups) =>
+			# Remove highlighted flag from existing model
+			# if not in response.
+			@set groups, { remove: false }
+			@undecorateHighlightedGroupsNotInList groups
+
+
+		EVENT_GROUP_ROOT_ID: 1
 		NAME: 'GroupsRepository'
 
 		makeTestInstance: ->

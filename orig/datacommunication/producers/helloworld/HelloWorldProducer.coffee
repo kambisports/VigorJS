@@ -1,7 +1,6 @@
 define (require) ->
 
 	Producer = require 'datacommunication/producers/Producer'
-
 	SubscriptionKeys = require 'datacommunication/SubscriptionKeys'
 
 	# Collections needed to build/produce data
@@ -15,56 +14,32 @@ define (require) ->
 
 		dispose: ->
 			HelloWorldRepository.off HelloWorldRepository.REPOSITORY_DIFF, @_onDiffInRepository, @
-			HelloWorldRepository.notInterestedInUpdates @NAME
 			super
 
 		subscribe: (subscriptionKey, options) ->
-			HelloWorldRepository.interestedInUpdates @NAME
-			switch subscriptionKey
-				when SubscriptionKeys.HELLO_WORLDS
-					do @_produceHelloWorlds
+			# If we want to send the id to the service and fetch something specific from the server
+			# model = HelloWorldRepository.fetchById options.id
 
-				when SubscriptionKeys.HELLO_WORLD_BY_ID
-					model = HelloWorldRepository.queryById options.id
-					@_produceData subscriptionKey, [model]
-				else
-					throw new Error("Unknown query subscriptionKey: #{key}")
+			# If we are only interested in already loaded models
+			model = HelloWorldRepository.get options.id
+			@_produceData [model]
 
-		_produceHelloWorlds: ->
-			models = HelloWorldRepository.queryHelloWorlds()
-			@_produceData SubscriptionKeys.HELLO_WORLDS, models
-
-		_produceData: (subscriptionKey, models = []) ->
+		_produceData: (models = []) ->
 			unless models.length > 0 then return
 
 			models = _.without models, undefined
-			models = _.map models, (model) ->
-				return model.toJSON()
+			models = @modelsToJSON models
 
-			switch subscriptionKey
-				when SubscriptionKeys.HELLO_WORLDS
-					@produce subscriptionKey, models, ->
+			for model in models
+				# model = @decorate model, [@decorator.addSomeFancyData]
+				@produce SubscriptionKeys.HELLO_WORLD, model, (componentOptions) ->
+					model.id is componentOptions.id
 
-				when SubscriptionKeys.HELLO_WORLD_BY_ID
-					for model in models
-						@produce subscriptionKey, model, (componentOptions) ->
-							model.id is componentOptions.id
-				else
-					throw new Error("Unknown query subscriptionKey: #{key}")
-
-		# Handlers
 		_onDiffInRepository: (dataDiff) =>
-			# the incomming data diff should be used to decide if we should produce or not
-			# something was added or removed in repo, regenerate full list of hello world models
-			if dataDiff.added.length > 0 or dataDiff.removed.length > 0 then do @_produceHelloWorlds
+			if dataDiff.changed.length > 0
+				@_produceData dataDiff.changed
 
-			# someting(s) was changed
-			if dataDiff.changed.length > 0 then @_produceData SubscriptionKeys.HELLO_WORLD_BY_ID, dataDiff.changed
-
-		SUBSCRIPTION_KEYS: [
-			SubscriptionKeys.HELLO_WORLDS
-			SubscriptionKeys.HELLO_WORLD_BY_ID
-		]
+		SUBSCRIPTION_KEYS: [SubscriptionKeys.HELLO_WORLD]
 
 		NAME: 'HelloWorldProducer'
 

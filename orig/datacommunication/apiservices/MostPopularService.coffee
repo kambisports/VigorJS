@@ -1,38 +1,37 @@
 define (require) ->
 
+	$ = require 'jquery'
 	ApiService = require 'datacommunication/apiservices/ApiService'
-
-	# this resource defines if this service should poll / fetch data
-	MostPopularRepository = require 'datacommunication/repositories/mostpopular/MostPopularRepository'
-
-	# Model used for the collection that this service operates on
-	MostPopopularModel = require 'datacommunication/repositories/mostpopular/MostPopularModel'
-
-	# Repositories needed for this service (service returns events, betoffers with outcomes)
-	EventsRepository = require 'datacommunication/repositories/events/EventsRepository'
-	BetoffersRepository = require 'datacommunication/repositories/betoffers/BetoffersRepository'
-	OutcomesRepository = require 'datacommunication/repositories/outcomes/OutcomesRepository'
+	EventBus = require 'common/EventBus'
+	EventKeys = require 'datacommunication/EventKeys'
 
 	class MostPopularService extends ApiService
 
 		prefetchDataKey: 'prefetched3way'
 
-		constructor: (mostPopularRepository) ->
-			super mostPopularRepository
+		constructor: ->
+			super 15000
+
+		run: (options) ->
+			do @startPolling
 
 		parse: (response) ->
 			super response
+
+			# Remove this when the betslip has been converted
+			# This sends the response to the C_PARSE_MOST_POPULAR command which stores
+
+			# the models in the facade
+			$clonedResponse = $.extend(true, {}, response)
+			EventBus.send EventKeys.FACADE_PARSE_MOSTPOPULAR, $clonedResponse
 
 			# Set the data in our repositories so that components later on can request (query) that data
 			@_parseEvents response.events
 			@_parseBetoffers response.betoffers
 
-			# Update the most popular collection and trigger event
-			@_buildMostPopularRepositoryModels response
-
 		# Helper to update the EventsRepository
 		_parseEvents: (eventObjs) ->
-			EventsRepository.set eventObjs
+			@propagateResponse @EVENTS_RECEIVED, eventObjs
 
 		# Helper to set betoffers and outcomes in corresponding store
 		_parseBetoffers: (betofferObjs) ->
@@ -49,28 +48,17 @@ define (require) ->
 				delete outcome.betOfferId
 				return outcome
 
-			BetoffersRepository.set betoffers
-			OutcomesRepository.set outcomes
+			@propagateResponse @BETOFFERS_RECEIVED, betoffers
+			@propagateResponse @OUTCOMES_RECEIVED, outcomes
 
-		# Update the collection related to his service
-		_buildMostPopularRepositoryModels: (response) ->
-			updateRepositoryMethod = if @repository.isEmpty() then 'reset' else 'set'
-
-			@repository[updateRepositoryMethod] _.map response.betoffers, (betoffer) ->
-				new MostPopopularModel
-					id: betoffer.eventId + betoffer.id # avoid removing / adding models on every poll
-					eventId: betoffer.eventId
-					betofferId: betoffer.id
-					outcomeId: (_.findWhere betoffer.outcomes, { popular: true }).id
-					outcomeOdds: (_.findWhere betoffer.outcomes, { popular: true }).odds
-
-		# Unit testing of singleton
-		makeTestInstance: (defaultCollection = MostPopularRepository) ->
-			new MostPopularService defaultCollection
 
 		NAME: 'MostPopularService'
 
-	return new MostPopularService MostPopularRepository
+		EVENTS_RECEIVED: 'events-received'
+		BETOFFERS_RECEIVED: 'betoffers-received'
+		OUTCOMES_RECEIVED: 'outcomes-received'
+
+	return new MostPopularService()
 
 
 

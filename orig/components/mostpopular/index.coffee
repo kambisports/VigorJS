@@ -4,10 +4,9 @@ define (require) ->
 	PackageBase = require 'common/PackageBase'
 	MostPopularView = require './MostPopularView'
 	MostPopularViewModel = require './MostPopularViewModel'
-	MostPopularEvents = require('common/constants').MostPopularEvents
+	MostPopularEvents = require './MostPopularEvents'
 
 	class MostPopular extends PackageBase
-
 
 		# private properties
 		$el: undefined
@@ -19,7 +18,6 @@ define (require) ->
 		#----------------------------------------------
 		constructor: ->
 			super
-
 			@_viewModel = new MostPopularViewModel()
 			@_mostPopularView = new MostPopularView
 				viewModel: @_viewModel
@@ -41,6 +39,7 @@ define (require) ->
 		_onEmpty: =>
 			@trigger MostPopularEvents.EMPTY
 
-		MostPopular.NAME = 'MostPopular'
+		NAME: 'MostPopular'
+		EVENTS: MostPopularEvents
 
 	return MostPopular

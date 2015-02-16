@@ -3,12 +3,12 @@ define (require) ->
 	$ = require 'jquery'
 	BaseBetofferView = require '../../BaseBetofferView'
 	NoLabelOutcomeView = require '../../outcome-types/no-label/NoLabelOutcomeView'
-	OutcomeTypes = require('common/constants').OutcomeTypes
+	OutcomeTypes = require '../../outcome-types/OutcomeTypes'
 	tmpl = require 'hbs!./templates/OneCrossTwo'
 
 	class OneCrossTwoView extends BaseBetofferView
 
-		className: 'modularized__outcomes-container modularized__three-column'
+		className: 'modularized__outcomes-container modularized__outcomes-container--three-column'
 		$_leftCol: undefined
 		$_middleCol: undefined
 		$_rightCol: undefined
@@ -17,15 +17,27 @@ define (require) ->
 		#----------------------------------------------
 		# Public methods
 		#----------------------------------------------
-		render: ->
+		addSubscriptions: ->
+			super
+
+		removeSubscriptions: ->
+			super
+
+		renderStaticContent: ->
 			@$el.html tmpl(@viewModel.betoffer.toJSON())
-			@$_leftCol = $ '.modularized__column-left', @el
-			@$_middleCol = $ '.modularized__column-middle', @el
-			@$_rightCol = $ '.modularized__column-right', @el
-
+			@$_leftCol = $ '.modularized__js-column-left', @el
+			@$_middleCol = $ '.modularized__js-column-middle', @el
+			@$_rightCol = $ '.modularized__js-column-right', @el
 			do @_renderOutcomes
-			return @
 
+		renderDynamicContent: ->
+			super
+
+		dispose: ->
+			@$_leftCol = undefined
+			@$_middleCol = undefined
+			@$_rightCol = undefined
+			super
 
 		#----------------------------------------------
 		# Private methods

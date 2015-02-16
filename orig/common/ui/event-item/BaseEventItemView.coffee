@@ -1,9 +1,6 @@
 define (require) ->
 
-	$ = require 'jquery'
-	Backbone = require 'lib/backbone'
 	ComponentView = require 'common/ComponentView'
-
 	tmpl = require 'hbs!./templates/EventItem'
 
 	class BaseEventItemView extends ComponentView
@@ -11,14 +8,15 @@ define (require) ->
 		className: 'modularized__event-item'
 		tagName: 'li'
 
-		betoffers: undefined
+		viewModel: undefined
+		_betoffers: undefined
 
 		#----------------------------------------------
 		# Public methods
 		#----------------------------------------------
 		initialize: ->
 			super
-			@betoffers = []
+			@_betoffers = []
 			@listenTo @viewModel.event, 'change', @_onEventChange
 
 		render: ->
@@ -27,18 +25,30 @@ define (require) ->
 			templateData.homeName = templateData.homeName
 
 			@$el.html tmpl(templateData)
+
 			@renderDeferred.resolve @
 			return @
 
+		renderStaticContent: ->
+			return
+
+		renderDynamicContent: ->
+			return
+
+		addSubscriptions: ->
+			return
+
+		removeSubscriptions: ->
+			return
+
 		addBetoffer: (betoffer) ->
-			@betoffers.push betoffer
+			@_betoffers.push betoffer
 			betoffer.render().then ($el) =>
-				@$el.find('.modularized__outcomes-container').remove()
+				@$el.find('.modularized__js-outcomes-container').remove()
 				@$el.append $el
 
-
 		dispose: ->
-			for betoffer in @betoffers
+			for betoffer in @_betoffers
 				do betoffer.dispose
 			super
 

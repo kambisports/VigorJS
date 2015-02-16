@@ -22,7 +22,7 @@ define (require) ->
 			super
 
 			@_groupItemModel = new GroupItemModel group
-						
+
 			@_groupItemView = new GroupItemView
 				viewModel: @_groupItemModel
 
@@ -42,6 +42,6 @@ define (require) ->
 			do @_groupItemModel?.dispose
 			@_groupItemModel = undefined
 
-		GroupItem.NAME = 'GroupItem'
+		NAME: 'GroupItem'
 
 	return GroupItem

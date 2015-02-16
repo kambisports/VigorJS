@@ -19,7 +19,10 @@ define (require) ->
 			super
 
 		addSubscriptions: ->
-			@subscribe SubscriptionKeys.NEW_MOST_POPULAR_EVENTS, @_onNewEvents, {}
+			@subscribe SubscriptionKeys.MOST_POPULAR_EVENTS, @_onNewEvents, {}
+
+		removeSubscriptions: ->
+			@unsubscribe SubscriptionKeys.MOST_POPULAR_EVENTS
 
 		calculateCombinedOdds: =>
 			combinedOdds = if @selectedOutcomes.length then 1 else 0

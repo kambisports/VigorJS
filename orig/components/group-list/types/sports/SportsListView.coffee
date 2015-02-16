@@ -19,6 +19,9 @@ define (require) ->
 		renderStaticContent: ->
 			super()
 
+		renderDynamicContent: ->
+			return
+
 		addSubscriptions: ->
 			super()
 

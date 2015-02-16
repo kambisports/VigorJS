@@ -27,7 +27,7 @@ define (require) ->
 				groupsService = GroupsService
 				groupsService.service.url = dataGroups
 
-				repository = groupsService.repository
+				repository = GroupsRepository
 				repository.reset()
 
 			afterEach ->
@@ -288,7 +288,7 @@ define (require) ->
 				groupsService = GroupsService
 				groupsService.service.url = dataGroups
 
-				repository = groupsService.repository
+				repository = GroupsRepository
 				repository.reset()
 
 			afterEach ->
@@ -370,7 +370,7 @@ define (require) ->
 				groupsService = GroupsService
 				groupsService.service.url = dataGroups
 
-				repository = groupsService.repository
+				repository = GroupsRepository
 				repository.reset()
 
 			afterEach ->

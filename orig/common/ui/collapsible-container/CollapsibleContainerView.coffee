@@ -39,6 +39,9 @@ define (require) ->
 			@renderDeferred.resolve @
 			return @
 
+		renderDynamicContent: ->
+			return
+
 		addSubscriptions: ->
 			return
 
@@ -90,6 +93,6 @@ define (require) ->
 
 		_onHeaderClicked: () =>
 			@_expand !@_isExpanded
-			
+
 
 	return CollapsibleContainerView

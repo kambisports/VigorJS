@@ -18,4 +18,4 @@ define (require) ->
 		render: ->
 			return @_navigationView.render().$el
 
-		Navigation.NAME = 'Navigation'
+		NAME: 'Navigation'

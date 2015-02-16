@@ -3,14 +3,13 @@ define (require) ->
 	ApiService = require 'datacommunication/apiservices/ApiService'
 
 	# this resource defines if this service should poll / fetch data
-	HelloWorldRepository = require 'datacommunication/repositories/helloworld/HelloWorldRepository'
 
 	class HelloWorldService extends ApiService
 
 		count: 0
 
-		constructor: (helloWorldRepository) ->
-			super helloWorldRepository, 5000
+		constructor: ->
+			super 3000
 
 			# simulated incomming from another service
 
@@ -36,12 +35,21 @@ define (require) ->
 				@parse response
 			, 12500
 
+
+		run: (options) ->
+			console.log 'helloWorldOptons: ', options
+			do @startPolling
+
 		parse: (response) ->
 			super response
+			models = []
+
 			if Array.isArray(response)
-				@repository.set response
+				models = response
 			else
-				@repository.set @_buildHelloWorldModels(response)
+				models = @_buildHelloWorldModels(response)
+
+			@propagateResponse @HELLO_WORLDS_RECEIVED, models
 
 
 		# Update the collection related to his service
@@ -62,12 +70,10 @@ define (require) ->
 			return models
 
 
-		# Unit testing of singleton
-		makeTestInstance: (defaultCollection = HelloWorldRepository) ->
-			new HelloWorldService defaultCollection
+		HELLO_WORLDS_RECEIVED: 'hello-worlds-received'
 
 		NAME: 'HelloWorldService'
 
-	return new HelloWorldService HelloWorldRepository
+	return new HelloWorldService()
 
 

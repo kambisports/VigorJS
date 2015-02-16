@@ -26,9 +26,12 @@ define (require) ->
 				path: this._buildPathtString(@_viewModel.group.get('id'))
 
 			@$el.attr 'data-touch-feedback', 'true'
-			
+
 			@renderDeferred.resolve @
 			@
+
+		renderDynamicContent: ->
+			return
 
 		addSubscriptions: ->
 			return

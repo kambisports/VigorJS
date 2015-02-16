@@ -16,10 +16,10 @@ define (require) ->
 			setting = @get  settingName
 
 			if not setting then setting = false
-			
+
 			if _.isString setting
 				setting = if (setting is 'true') then true else false
-			
+
 			setting
 
 	return new ApplicationSettingsModel()

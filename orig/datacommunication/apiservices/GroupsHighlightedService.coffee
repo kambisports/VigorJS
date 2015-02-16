@@ -1,24 +1,22 @@
 define (require) ->
 
 	ApiService = require 'datacommunication/apiservices/ApiService'
-	GroupsRepository = require 'datacommunication/repositories/groups/GroupsRepository'
 	LocalStorage = require 'datacommunication/repositories/localstorage/LocalStorageRepository'
 
 	class GroupsHighlightedService extends ApiService
 
 		prefetchDataKey: 'prefetchedHighlight'
 
-		constructor: (GroupsRepository) ->
+		constructor: () ->
 			pollInterval = 1000 * 30
-			super GroupsRepository, pollInterval
+			super pollInterval
+
+		run: (options) ->
+			do @startPolling
 
 		parse: (response) ->
 			super response
-			@repository.set @_decorateHighlightedGroups(response.groups), { remove: false }
-
-			# Remove highlighted flag from existing model
-			# if not in response.
-			@repository.undecorateHighlightedGroupsNotInList response.groups
+			@propagateResponse @GROUPS_HIGHLIGHTED_RECEIVED, @_decorateHighlightedGroups(response.groups)
 
 		_decorateHighlightedGroups: (groups) ->
 			for group in groups
@@ -32,5 +30,6 @@ define (require) ->
 			groups
 
 		NAME: 'GroupsHighlightedService'
+		GROUPS_HIGHLIGHTED_RECEIVED: 'highlighted-groups-received'
 
-	return new GroupsHighlightedService GroupsRepository
+	return new GroupsHighlightedService()

@@ -23,11 +23,11 @@ define (require) ->
 
 		addComponent: (subscriptionKey, componentIdentifier) ->
 			registeredComponents = @subscriptionKeyToComponents[subscriptionKey]
-			unless registeredComponents then throw new Error('Unknown subscription key, could not add component!')
+			unless registeredComponents then throw new Error("Unknown subscription key: #{subscriptionKey}, could not add component!")
 
 			@subscriptionKeyToComponents[subscriptionKey].push componentIdentifier
 
-		produce: (subscriptionKey, data, filterFn) ->
+		produce: (subscriptionKey, data, filterFn = ->) ->
 			componentsForSubscription = @subscriptionKeyToComponents[subscriptionKey]
 			componentsInterestedInChange = _.filter componentsForSubscription, (componentIdentifier) ->
 				_.isEmpty(componentIdentifier.options) or filterFn(componentIdentifier.options)
@@ -36,6 +36,18 @@ define (require) ->
 
 		subscribe: (subscriptionKey, options) ->
 			throw new Error("Subscription handler should be overriden in subclass! Implement for subscription #{subscriptionKey} with options #{options}")
+
+		extend: (obj, mixin) ->
+			obj[name] = method for name, method of mixin
+			obj
+
+		mixin: (instance, mixin) ->
+			@extend instance, mixin
+
+		decorate: (data, decoratorList) ->
+			for decorator in decoratorList
+				decorator(data)
+			return data
 
 		createPushSubscription: (type) ->
 			console.log 'C_PUSH_SUBSCRIPTION_CREATE', type, @pushSubscriptionId
@@ -46,7 +58,11 @@ define (require) ->
 		removePushSubscription: () ->
 			console.log 'C_PUSH_SUBSCRIPTION_REMOVE', null, @pushSubscriptionId
 
-		# Default
-		SUBSCRIPTION_KEYS : []
+		modelsToJSON: (models) ->
+			modelsJSON = _.map models, (model) ->
+				return model.toJSON()
+			return modelsJSON
 
-		NAME : 'Producer'
+		# Default
+		SUBSCRIPTION_KEYS: []
+		NAME: 'Producer'

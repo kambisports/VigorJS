@@ -2,9 +2,10 @@ define (require) ->
 
 	PackageBase = require 'common/PackageBase'
 	BetofferModel = require './BetofferModel'
-	BetofferTypes = require('common/constants').BetofferTypes
 	BaseBetofferView = require './BaseBetofferView'
 	OneCrossTwoView = require './betoffer-types/one-cross-two/OneCrossTwoView'
+	BetofferTypes = require './betoffer-types/BetofferTypes'
+	BetofferEvents = require './BetofferEvents'
 
 	class Betoffer extends PackageBase
 
@@ -81,6 +82,7 @@ define (require) ->
 			@createBetoffer betofferModel.toJSON()
 			do @_deferredRender
 
-		Betoffer.NAME = 'Betoffer'
+		NAME: 'Betoffer'
+		EVENTS: BetofferEvents
 
 	return Betoffer

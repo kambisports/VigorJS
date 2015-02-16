@@ -35,7 +35,7 @@ define (require) ->
 
 		render: ->
 			@$el = @_view.render().$el
-			
+
 			_.defer =>
 				do @renderDeferred.resolve
 
@@ -79,6 +79,6 @@ define (require) ->
 
 			return Class
 
-		GroupList.NAME = 'GroupList'
+		NAME: 'GroupList'
 
 	return GroupList

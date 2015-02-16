@@ -1,20 +1,18 @@
 define (require) ->
 
+	_ = require 'lib/underscore'
 	Backbone = require 'lib/backbone'
 	Poller = require 'lib/backbone.poller'
 
 	ApiServiceHelper = require 'datacommunication/apiservices/ApiServiceHelper'
-	ServiceRepository = require 'datacommunication/repositories/ServiceRepository'
 
 	###
 		Base class for services interacting with the API (polling)
-		The repository bound to the service will trigger events to initate and cancel polling
 	###
 
 	class ApiService
 
 		service: undefined
-		repository: undefined
 		poller: undefined
 		pollerOptions: undefined
 		shouldStop: false
@@ -24,13 +22,11 @@ define (require) ->
 
 
 		# Repository to listen for active listeners on, Default poll interval is 10 seconds
-		constructor: (@repository, pollInterval = 10000) ->
+		constructor: (pollInterval = 10000) ->
 			@service = new Backbone.Model()
 			@service.url = ApiServiceHelper.getUrl @NAME
 			@service.sync = ApiServiceHelper.sync
 			@service.parse = @parse
-
-			if @repository then do @bindRepositoryListeners
 
 			@pollerOptions = {
 				delay: pollInterval
@@ -43,7 +39,6 @@ define (require) ->
 			@_createPoller @pollerOptions
 
 		dispose: () ->
-			if @repository then	do @unbindRepositoryListeners
 			do @_unbindPollerListeners
 
 			@service = undefined
@@ -55,13 +50,20 @@ define (require) ->
 			if @shouldStop
 				do @poller.stop
 
-		bindRepositoryListeners: () ->
-			@service.listenTo @repository, ServiceRepository::START_POLLING, @_startPolling
-			@service.listenTo @repository, ServiceRepository::STOP_POLLING, @_stopPolling
+		startPolling: =>
+			do @poller?.start
 
-		unbindRepositoryListeners: () ->
-			@service.stopListening @repository, ServiceRepository::START_POLLING, @_startPolling
-			@service.stopListening @repository, ServiceRepository::STOP_POLLING, @_stopPolling
+		run: ->
+			throw 'ApiService->run must be overriden.'
+
+		stopPolling: =>
+			if @poller.active()
+				@shouldStop = true
+			else
+				do @poller.stop
+
+		propagateResponse: (key, responseData) ->
+			@trigger key, responseData
 
 		_createPoller: (options) ->
 			@poller = Poller.get @service, options
@@ -85,15 +87,6 @@ define (require) ->
 		_unbindPollerListeners: () ->
 			do @poller?.off
 
-		_startPolling: =>
-			do @poller?.start
-
-		_stopPolling: =>
-			if @poller.active()
-				@shouldStop = true
-			else
-				do @poller.stop
-
 		# FIXME
 		# Check xhr status in some generic way here?
 		# Or use the backbone validate method in the models?
@@ -101,7 +94,9 @@ define (require) ->
 			removeThisLineOfCode = response
 			return true
 
-	return ApiService
 
+		_.extend @prototype, Backbone.Events
+
+	return ApiService
 
 

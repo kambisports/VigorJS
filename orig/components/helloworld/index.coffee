@@ -36,7 +36,6 @@ define (require) ->
 			@_helloWorldView = undefined
 			@_helloWorldModel = undefined
 
-
-		HelloWorld.NAME = 'HelloWorld'
+		NAME: 'HelloWorld'
 
 	return HelloWorld

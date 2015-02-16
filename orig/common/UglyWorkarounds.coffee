@@ -18,12 +18,10 @@ define (require) ->
 			@_appModel = @retrieveModel(AppModel.NAME)
 			@_eventsModel = @retrieveModel(Events.NAME)
 			EventBus.subscribe EventKeys.ADD_OUTCOMES_TO_BETSLIP_REQUESTED, @_onAddOutcomeToBetslipRequest
+			EventBus.subscribe EventKeys.FACADE_PARSE_MOSTPOPULAR, @_onFacadeParseMostPopular
 
-		getCurrency: ->
-			return @_appModel.get('settings').currency
-
-		getDefaultStakes: ->
-			return CurrencyUtil.getDefaultStakes @getCurrency()
+		_onFacadeParseMostPopular: (response) =>
+			@sendMessage AppConstants.C_PARSE_MOST_POPULAR, response, AppConstants.FETCH_MOST_POPULAR_SUCCESS
 
 		_onAddOutcomeToBetslipRequest: (betslipData) =>
 			unless betslipData?.outcomes then return

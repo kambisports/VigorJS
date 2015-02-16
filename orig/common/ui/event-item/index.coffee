@@ -1,7 +1,7 @@
 define (require) ->
 
 	PackageBase = require 'common/PackageBase'
-	EventItemView = require './ExampleEventItemView'
+	EventItemView = require './BaseEventItemView'
 	EventItemModel = require './EventItemModel'
 
 	class EventItem extends PackageBase
@@ -30,6 +30,6 @@ define (require) ->
 			do @_eventItemView.dispose
 			do @_viewModel.dispose
 
-		EventItem.NAME = 'EventItem'
+		NAME: 'EventItem'
 
 	return EventItem

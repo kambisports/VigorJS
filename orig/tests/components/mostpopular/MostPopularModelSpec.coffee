@@ -1,8 +1,8 @@
 define (require) ->
 
-	MostPopularModel = require 'components/mostpopular/MostPopularModel'
+	MostPopularViewModel = require 'components/mostpopular/MostPopularViewModel'
 
-	mostPopularModel = undefined
+	mostPopularViewModel = undefined
 	deferredResponse = undefined
 	mockedResponse =
     "events": [
@@ -51,19 +51,19 @@ define (require) ->
     ],
     "defaultStakes": [2, 5, 10, 25, 50, 100 ]
 
-	describe 'MostPopularModel', ->
+	describe 'MostPopularViewModel', ->
 		beforeEach ->
-			mostPopularModel = new MostPopularModel()
+			mostPopularViewModel = new MostPopularViewModel()
 
 		afterEach ->
-			mostPopularModel = undefined
+			mostPopularViewModel = undefined
 
 		describe 'when having selected outcomes it', ->
 
 			it 'should calculate combined odds', ->
-				expect(mostPopularModel.selectedOutcomes.models.length).toEqual(0)
-				expect(mostPopularModel.calculateCombinedOdds()).toEqual(0)
+				expect(mostPopularViewModel.selectedOutcomes.models.length).toEqual(0)
+				expect(mostPopularViewModel.calculateCombinedOdds()).toEqual(0)
 
-				mostPopularModel._storeData(mockedResponse)
-				expect(mostPopularModel.selectedOutcomes.models.length).toEqual(5)
-				expect(mostPopularModel.calculateCombinedOdds()).toEqual(120)
+				mostPopularViewModel._storeData(mockedResponse)
+				expect(mostPopularViewModel.selectedOutcomes.models.length).toEqual(5)
+				expect(mostPopularViewModel.calculateCombinedOdds()).toEqual(120)

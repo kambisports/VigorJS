@@ -1,6 +1,9 @@
 define ->
 	ALL_EVENTS: 'all'
 
+	# This event is sent when a route change
+	ROUTE_CHANGE: 'route_change'
+
 	# This event is sent when a new bet has been placed in the client
 	BET_PLACED: 'bet-placed'
 
@@ -9,3 +12,8 @@ define ->
 
 	# This event is sent when one or more outcomes have been added to the betslip
 	OUTCOME_ADDED_TO_BETSLIP: 'outcome-added-to-betslip'
+
+
+
+	#### COMMUNICATION WITH OLD FACADE STUFF ####
+	FACADE_PARSE_MOSTPOPULAR: 'facade-parse-mostpopular'

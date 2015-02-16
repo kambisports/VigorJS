@@ -22,7 +22,6 @@
 		color: $outcomes-column-header-text-color;
 	}
 
-
 	.modularized__column-left, .modularized__column-right, .modularized__column-middle {
 		float: left;
 		min-height: 1px;
@@ -31,9 +30,9 @@
 			color: $outcomes-column-item-text-color;
 		}
 	}
-	// Variations
-	@import './three-columns';
 }
 
+// Variations
+@import './three-columns';
 
 @import './outcome';

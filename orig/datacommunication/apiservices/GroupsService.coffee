@@ -1,23 +1,23 @@
 define (require) ->
 
 	ApiService = require 'datacommunication/apiservices/ApiService'
-	GroupsRepository = require 'datacommunication/repositories/groups/GroupsRepository'
-
 	responseFlattener = require 'datacommunication/apiservices/utils/responseFlattener'
 
 	class GroupsService extends ApiService
 
 		prefetchDataKey: 'prefetchedGroup'
 
-		constructor: (GroupsRepository) ->
+		constructor: ->
 			pollInterval = 1000 * 60 * 10
+			super pollInterval
 
-			super GroupsRepository, pollInterval
+		run: (options) ->
+			do @startPolling
 
 		parse: (response) ->
 			super
 			flatGroupModels = @flattenResponse response
-			GroupsRepository.set flatGroupModels
+			@propagateResponse @GROUPS_RECEIVED, flatGroupModels
 
 		flattenResponse: (response) ->
 			groupModels = @getGroupsFromResponse response
@@ -62,5 +62,6 @@ define (require) ->
 			return groups
 
 		NAME: 'GroupsService'
+		GROUPS_RECEIVED: 'groups-received'
 
-	return new GroupsService GroupsRepository
+	return new GroupsService()

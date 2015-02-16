@@ -23,11 +23,6 @@ define (require) ->
 		getHighlightedSortOrder: ->
 			@get('highlightedSortOrder') or ''
 
-	Object.defineProperty GroupModel.prototype, 'MODEL_TYPE',
-		value: 'GroupModel'
-		writeable: false
-		configurable: false
-		enumerable: true
-
+	NAME: 'GroupModel'
 
 	return GroupModel

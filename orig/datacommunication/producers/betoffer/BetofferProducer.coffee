@@ -1,104 +1,52 @@
 define (require) ->
 
 	Producer = require 'datacommunication/producers/Producer'
-
 	SubscriptionKeys = require 'datacommunication/SubscriptionKeys'
 
 	# Collections needed to build/produce data
 	BetoffersRepository = require 'datacommunication/repositories/betoffers/BetoffersRepository'
 	OutcomesRepository = require 'datacommunication/repositories/outcomes/OutcomesRepository'
 
+	# decorators
+	betofferDecoratorBase = require 'datacommunication/producers/decorators/betoffers/betofferDecoratorBase'
+
 	class BetofferProducer extends Producer
 
-		_debouncedOnOutcomeRepositoryAdd: undefined
-		_debouncedOnOutcomeRepositoryChange: undefined
-		_debouncedOnOutcomeRepositoryRemove: undefined
-
 		constructor: ->
-			@_debouncedOnOutcomeRepositoryAdd = _.debounce @_onChangesInOutcomeRepository, 0
-			@_debouncedOnOutcomeRepositoryChange = _.debounce @_onChangesInOutcomeRepository, 0
-			@_debouncedOnOutcomeRepositoryRemove = _.debounce @_onChangesInOutcomeRepository, 0
-
-			OutcomesRepository.on 'add', @_debouncedOnOutcomeRepositoryAdd, @
-			OutcomesRepository.on 'change', @_debouncedOnOutcomeRepositoryChange, @
-			OutcomesRepository.on 'remove', @_debouncedOnOutcomeRepositoryRemove, @
-
-			BetoffersRepository.on 'change', @_onChangesInBetofferRepository, @
 			super
+			BetoffersRepository.on BetoffersRepository.REPOSITORY_DIFF, @_onDiffInBetofferRepository, @
+			OutcomesRepository.on OutcomesRepository.REPOSITORY_DIFF, @_onDiffInOutcomeRepository, @
+
 
 		dispose: ->
-			BetoffersRepository.off 'change', @_onChangesInBetofferRepository, @
-
-			OutcomesRepository.off 'add', @_debouncedOnOutcomeRepositoryAdd, @
-			OutcomesRepository.off 'change', @_debouncedOnOutcomeRepositoryChange, @
-			OutcomesRepository.off 'remove', @_debouncedOnOutcomeRepositoryRemove, @
-
-			_debouncedOnOutcomeRepositoryAdd: undefined
-			_debouncedOnOutcomeRepositoryChange: undefined
-			_debouncedOnOutcomeRepositoryRemove: undefined
+			BetoffersRepository.off BetoffersRepository.REPOSITORY_DIFF, @_onDiffInBetofferRepository, @
+			OutcomesRepository.off OutcomesRepository.REPOSITORY_DIFF, @_onDiffInOutcomeRepository, @
 			super
 
-		addRespositoryListeners: () ->
-			BetoffersRepository.on 'change', @onChangesInBetofferRepository, @
-
-			OutcomesRepository.on 'add', @onOutcomeRepositoryAdd, @
-			OutcomesRepository.on 'change', @onOutcomeRepositoryChange, @
-			OutcomesRepository.on 'remove', @onOutcomeRepositoryRemove, @
-
-		removeRespositoryListeners: () ->
-			BetoffersRepository.off 'change', @onChangesInBetofferRepository, @
-
-			OutcomesRepository.off 'add', @onOutcomeRepositoryAdd, @
-			OutcomesRepository.off 'change', @onOutcomeRepositoryChange, @
-			OutcomesRepository.off 'remove', @onOutcomeRepositoryRemove, @
-
 		subscribe: (subscriptionKey, options) ->
-			switch subscriptionKey
-				when SubscriptionKeys.BETOFFER_CHANGE
-					betofferModel = BetoffersRepository.queryBetoffer(options)
-					if betofferModel then @_produceDataFromBetoffer betofferModel
-				else
-					throw new Error("Unknown subscription subscriptionKey: #{subscriptionKey}")
+			betofferModel = BetoffersRepository.get options.betofferId
+			@_produceData [betofferModel]
 
-		_produceDataFromBetoffer: (betofferModel) ->
-			betofferData = @_buildData betofferModel
-			@produce SubscriptionKeys.BETOFFER_CHANGE, betofferData, (componentOptions) ->
-				betofferData.id is componentOptions.betofferId
+		_produceData: (betoffers = []) ->
+			unless betoffers.length > 0 then return
 
-		# Any change, add, remove of outcome in outcome repository should generate the same bet offer changed subscription
-		_produceDataFromOutcome: (outcomeModel) ->
-			boId = outcomeModel.get 'betofferId'
-			betofferModel = BetoffersRepository.queryBetoffer { betofferId: boId }
+			betoffers = _.without betoffers, undefined
+			betoffers = @modelsToJSON betoffers
 
-			if betofferModel then @_produceDataFromBetoffer betofferModel
+			for betoffer in betoffers
+				betoffer = @decorate betoffer, [betofferDecoratorBase.addOutcomesToBetoffer]
+				@produce SubscriptionKeys.BETOFFER, betoffer, (componentOptions) ->
+					betoffer.id is componentOptions.betofferId
 
-		# Handlers
-		_onChangesInBetofferRepository: (betofferModel) ->
-			@_produceDataFromBetoffer betofferModel
+		_onDiffInBetofferRepository: (dataDiff) ->
+			@_produceData dataDiff.consolidated
 
-		_onChangesInOutcomeRepository: (outcomeModel) ->
-			@_produceDataFromOutcome outcomeModel
+		_onDiffInOutcomeRepository: (dataDiff) ->
+			if dataDiff.changed.length > 0
+				betoffers = []
+				for outcome in dataDiff.changed
+					betoffers.push BetoffersRepository.get outcome.get('betofferId')
+				@_produceData betoffers
 
-		# Builders
-		# Dummy formatting, outcomesdata shuld come straight from the outcomes collection
-		_buildData: (betofferModel) ->
-			betofferData = betofferModel.toJSON()
-			betofferData.outcomes = @_buildOutcomesData betofferData.id
-			return betofferData
-
-		_buildOutcomesData: (betofferId) ->
-			outcomeObjs = []
-			outcomeModels = OutcomesRepository.findOutcomesByBetofferId betofferId
-
-			for outcomeModel in outcomeModels
-				outcome = outcomeModel.toJSON()
-				outcome.displayOdds = (outcome.odds / 1000).toFixed(2)
-				if outcome.popular
-					outcome.highlight = true
-				outcomeObjs.push outcome
-
-			return outcomeObjs
-
-		SUBSCRIPTION_KEYS: [SubscriptionKeys.BETOFFER_CHANGE]
-
+		SUBSCRIPTION_KEYS: [SubscriptionKeys.BETOFFER]
 		NAME: 'BetofferProducer'
