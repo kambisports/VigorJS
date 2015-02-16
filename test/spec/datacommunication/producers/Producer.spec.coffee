@@ -13,12 +13,10 @@ class DummyProducer extends Vigor.Producer
 exampleComponent1 =
   id: 'ComponentId1'
   callback: ->
-    console.log 'callback 1'
 
 exampleComponent2 =
   id: 'ComponentId2'
   callback: ->
-    console.log 'callback 2'
 
 
 describe 'A Producer', ->
@@ -72,7 +70,6 @@ describe 'A Producer', ->
       spiedCallback = sinon.spy componentIdentifier, 'callback'
       spiedCallback2 = sinon.spy componentIdentifier2, 'callback'
 
-      console.log producer.subscriptionKeyToComponents
       producer.produce KEY, dummyData
       sinon.assert.calledOnce(spiedCallback)
       sinon.assert.calledOnce(spiedCallback2)
