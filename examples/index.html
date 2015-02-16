@@ -24,13 +24,12 @@
   <script src="./examples/datacommunication/producers/HelloWorldProducer.js"></script>
   <script src="./examples/datacommunication/producers/HelloWorldsProducer.js"></script>
 
+  <!-- hello world component -->
   <script src="./examples/helloworld/HelloWorldView.js"></script>
   <script src="./examples/helloworld/HelloWorldItemView.js"></script>
   <script src="./examples/helloworld/HelloWorldViewModel.js"></script>
   <script src="./examples/helloworld/HelloWorldItemViewModel.js"></script>
   <script src="./examples/helloworld/index.js"></script>
-
-  <!-- hello world component -->
 
   <script type="text/javascript">
     var app = app || {};
@@ -39,7 +38,10 @@
       var helloWorldComponent;
 
       // Setup prodcers
-      Vigor.DataCommunicationManager.registerProducers([app.HelloWorldProducer, app.HelloWorldsProducer]);
+      Vigor.DataCommunicationManager.registerProducers([
+        app.HelloWorldProducer,
+        app.HelloWorldsProducer
+      ]);
 
       // Create component
       helloWorldComponent = new app.HelloWorld()
