@@ -367,6 +367,36 @@ Backbone Poller may be freely distributed under the MIT license.
         throw new Error("Dispose shuld be overriden in subclass!");
       };
 
+      Producer.prototype.extend = function(obj, mixin) {
+        var method, name;
+        for (name in mixin) {
+          method = mixin[name];
+          obj[name] = method;
+        }
+        return obj;
+      };
+
+      Producer.prototype.mixin = function(instance, mixin) {
+        return this.extend(instance, mixin);
+      };
+
+      Producer.prototype.decorate = function(data, decoratorList) {
+        var decorator, _i, _len;
+        for (_i = 0, _len = decoratorList.length; _i < _len; _i++) {
+          decorator = decoratorList[_i];
+          decorator(data);
+        }
+        return data;
+      };
+
+      Producer.prototype.modelsToJSON = function(models) {
+        var modelsJSON;
+        modelsJSON = _.map(models, function(model) {
+          return model.toJSON();
+        });
+        return modelsJSON;
+      };
+
       Producer.prototype._addKeysToMap = function() {
         var key, _i, _len, _ref, _results;
         _ref = this.SUBSCRIPTION_KEYS;
@@ -531,7 +561,6 @@ Backbone Poller may be freely distributed under the MIT license.
 
     })();
     Vigor.ProducerManager = ProducerManager;
-    Poller = Backbone.Poller;
 
     /*
       Base class for services interacting with the API (polling)
@@ -539,11 +568,10 @@ Backbone Poller may be freely distributed under the MIT license.
       for data, the service will start polling. If the repository has no active listeners the
       service will stop polling for data.
      */
+    Poller = Backbone.Poller;
     ServiceRepository = Vigor.ServiceRepository;
     ApiService = (function() {
       ApiService.prototype.service = void 0;
-
-      ApiService.prototype.repository = void 0;
 
       ApiService.prototype.poller = void 0;
 
@@ -558,15 +586,12 @@ Backbone Poller may be freely distributed under the MIT license.
         if (pollInterval == null) {
           pollInterval = 10000;
         }
-        this._stopPolling = __bind(this._stopPolling, this);
-        this._startPolling = __bind(this._startPolling, this);
+        this.stopPolling = __bind(this.stopPolling, this);
+        this.startPolling = __bind(this.startPolling, this);
         this.parse = __bind(this.parse, this);
         this.service = new Backbone.Model();
         this.service.url = this.url;
         this.service.parse = this.parse;
-        if (this.repository) {
-          this.bindRepositoryListeners();
-        }
         this.pollerOptions = {
           delay: pollInterval,
           delayed: false,
@@ -577,9 +602,6 @@ Backbone Poller may be freely distributed under the MIT license.
       }
 
       ApiService.prototype.dispose = function() {
-        if (this.repository) {
-          this.unbindRepositoryListeners();
-        }
         this._unbindPollerListeners();
         this.service = void 0;
         return this.poller = void 0;
@@ -592,14 +614,25 @@ Backbone Poller may be freely distributed under the MIT license.
         }
       };
 
-      ApiService.prototype.bindRepositoryListeners = function() {
-        this.service.listenTo(this.repository, ServiceRepository.prototype.START_POLLING, this._startPolling);
-        return this.service.listenTo(this.repository, ServiceRepository.prototype.STOP_POLLING, this._stopPolling);
+      ApiService.prototype.run = function() {
+        throw 'ApiService->run must be overriden.';
       };
 
-      ApiService.prototype.unbindRepositoryListeners = function() {
-        this.service.stopListening(this.repository, ServiceRepository.prototype.START_POLLING, this._startPolling);
-        return this.service.stopListening(this.repository, ServiceRepository.prototype.STOP_POLLING, this._stopPolling);
+      ApiService.prototype.startPolling = function() {
+        var _ref;
+        return (_ref = this.poller) != null ? _ref.start() : void 0;
+      };
+
+      ApiService.prototype.stopPolling = function() {
+        if (this.poller.active()) {
+          return this.shouldStop = true;
+        } else {
+          return this.poller.stop();
+        }
+      };
+
+      ApiService.prototype.propagateResponse = function(key, responseData) {
+        return this.trigger(key, responseData);
       };
 
       ApiService.prototype._createPoller = function(options) {
@@ -627,24 +660,13 @@ Backbone Poller may be freely distributed under the MIT license.
         return (_ref = this.poller) != null ? _ref.off() : void 0;
       };
 
-      ApiService.prototype._startPolling = function() {
-        var _ref;
-        return (_ref = this.poller) != null ? _ref.start() : void 0;
-      };
-
-      ApiService.prototype._stopPolling = function() {
-        if (this.poller.active()) {
-          return this.shouldStop = true;
-        } else {
-          return this.poller.stop();
-        }
-      };
-
       ApiService.prototype._validateResponse = function(response) {
         var removeThisLineOfCode;
         removeThisLineOfCode = response;
         return true;
       };
+
+      _.extend(ApiService.prototype, Backbone.Events);
 
       return ApiService;
 
@@ -902,76 +924,48 @@ Backbone Poller may be freely distributed under the MIT license.
       __extends(Repository, _super);
 
       function Repository() {
-        return Repository.__super__.constructor.apply(this, arguments);
-      }
-
-      return Repository;
-
-    })(Backbone.Collection);
-    Vigor.Repository = Repository;
-    ServiceRepository = (function(_super) {
-      __extends(ServiceRepository, _super);
-
-      function ServiceRepository() {
         this._debounced = __bind(this._debounced, this);
         this._onRemove = __bind(this._onRemove, this);
         this._onChange = __bind(this._onChange, this);
         this._onAdd = __bind(this._onAdd, this);
-        return ServiceRepository.__super__.constructor.apply(this, arguments);
+        return Repository.__super__.constructor.apply(this, arguments);
       }
 
-      ServiceRepository.prototype.producersInterestedInUpdates = void 0;
+      Repository.prototype._debouncedAddedModels = void 0;
 
-      ServiceRepository.prototype._debouncedAddedModels = void 0;
+      Repository.prototype._debouncedChangedModels = void 0;
 
-      ServiceRepository.prototype._debouncedChangedModels = void 0;
+      Repository.prototype._debouncedRemovedModels = void 0;
 
-      ServiceRepository.prototype._debouncedRemovedModels = void 0;
+      Repository.prototype._eventTimeout = void 0;
 
-      ServiceRepository.prototype._eventTimeout = void 0;
-
-      ServiceRepository.prototype.initialize = function() {
+      Repository.prototype.initialize = function() {
         this._debouncedAddedModels = {};
         this._debouncedChangedModels = {};
         this._debouncedRemovedModels = {};
-        this.producersInterestedInUpdates = [];
         this.addDebouncedListeners();
-        return ServiceRepository.__super__.initialize.apply(this, arguments);
+        return Repository.__super__.initialize.apply(this, arguments);
       };
 
-      ServiceRepository.prototype.addDebouncedListeners = function() {
+      Repository.prototype.addDebouncedListeners = function() {
         return this.on('all', this._onAll);
       };
 
-      ServiceRepository.prototype.isEmpty = function() {
+      Repository.prototype.getByIds = function(ids) {
+        var id, models, _i, _len;
+        models = [];
+        for (_i = 0, _len = ids.length; _i < _len; _i++) {
+          id = ids[_i];
+          models.push(this.get(id));
+        }
+        return models;
+      };
+
+      Repository.prototype.isEmpty = function() {
         return this.models.length <= 0;
       };
 
-      ServiceRepository.prototype.interestedInUpdates = function(name) {
-        var producerAlreadyInterested;
-        producerAlreadyInterested = _.indexOf(this.producersInterestedInUpdates, name) > -1;
-        if (producerAlreadyInterested) {
-          return;
-        } else {
-          this.producersInterestedInUpdates.push(name);
-        }
-        if (this.producersInterestedInUpdates.length > 0) {
-          return this.trigger(ServiceRepository.prototype.START_POLLING);
-        }
-      };
-
-      ServiceRepository.prototype.notInterestedInUpdates = function(name) {
-        var interestedProducerIndex;
-        interestedProducerIndex = _.indexOf(this.producersInterestedInUpdates, name);
-        if (interestedProducerIndex > -1) {
-          this.producersInterestedInUpdates.splice(interestedProducerIndex, 1);
-        }
-        if (this.producersInterestedInUpdates.length === 0) {
-          return this.trigger(ServiceRepository.prototype.STOP_POLLING);
-        }
-      };
-
-      ServiceRepository.prototype._onAll = function() {
+      Repository.prototype._onAll = function() {
         var args, event;
         event = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
         switch (event) {
@@ -988,21 +982,21 @@ Backbone Poller may be freely distributed under the MIT license.
         return this._eventTimeout = setTimeout(this._debounced, 100);
       };
 
-      ServiceRepository.prototype._onAdd = function(model) {
+      Repository.prototype._onAdd = function(model) {
         return this._debouncedAddedModels[model.id] = model;
       };
 
-      ServiceRepository.prototype._onChange = function(model) {
+      Repository.prototype._onChange = function(model) {
         return this._debouncedChangedModels[model.id] = model;
       };
 
-      ServiceRepository.prototype._onRemove = function(model) {
+      Repository.prototype._onRemove = function(model) {
         return this._debouncedRemovedModels[model.id] = model;
       };
 
-      ServiceRepository.prototype._debouncedAdd = function() {
+      Repository.prototype._debouncedAdd = function() {
         var event, models;
-        event = ServiceRepository.prototype.REPOSITORY_ADD;
+        event = Repository.prototype.REPOSITORY_ADD;
         models = _.values(this._debouncedAddedModels);
         this._debouncedAddedModels = {};
         if (models.length > 0) {
@@ -1011,9 +1005,9 @@ Backbone Poller may be freely distributed under the MIT license.
         return models;
       };
 
-      ServiceRepository.prototype._debouncedChange = function() {
+      Repository.prototype._debouncedChange = function() {
         var event, models;
-        event = ServiceRepository.prototype.REPOSITORY_CHANGE;
+        event = Repository.prototype.REPOSITORY_CHANGE;
         models = _.values(this._debouncedChangedModels);
         this._debouncedChangedModels = {};
         if (models.length > 0) {
@@ -1022,9 +1016,9 @@ Backbone Poller may be freely distributed under the MIT license.
         return models;
       };
 
-      ServiceRepository.prototype._debouncedRemove = function() {
+      Repository.prototype._debouncedRemove = function() {
         var event, models;
-        event = ServiceRepository.prototype.REPOSITORY_REMOVE;
+        event = Repository.prototype.REPOSITORY_REMOVE;
         models = _.values(this._debouncedRemovedModels);
         this._debouncedRemovedModels = {};
         if (models.length > 0) {
@@ -1033,36 +1027,44 @@ Backbone Poller may be freely distributed under the MIT license.
         return models;
       };
 
-      ServiceRepository.prototype._debouncedDiff = function(added, changed, removed) {
-        var event, models;
-        event = ServiceRepository.prototype.REPOSITORY_DIFF;
+      Repository.prototype._debouncedDiff = function(added, changed, removed) {
+        var consolidated, event, models;
+        event = Repository.prototype.REPOSITORY_DIFF;
         if (added.length || changed.length || removed.length) {
+          added = _.difference(added, removed);
+          consolidated = _.uniq(added.concat(changed));
           models = {
-            added: _.difference(added, removed),
+            added: added,
             changed: changed,
-            removed: removed
+            removed: removed,
+            consolidated: consolidated
           };
           return this.trigger(event, models, event);
         }
       };
 
-      ServiceRepository.prototype._debounced = function() {
+      Repository.prototype._debounced = function() {
         return this._debouncedDiff(this._debouncedAdd(), this._debouncedChange(), this._debouncedRemove());
       };
 
-      ServiceRepository.prototype.POLL_ONCE = 'poll_once';
+      Repository.prototype.REPOSITORY_DIFF = 'repository_diff';
 
-      ServiceRepository.prototype.START_POLLING = 'start_polling';
+      Repository.prototype.REPOSITORY_ADD = 'repository_add';
 
-      ServiceRepository.prototype.STOP_POLLING = 'stop_polling';
+      Repository.prototype.REPOSITORY_CHANGE = 'repository_change';
 
-      ServiceRepository.prototype.REPOSITORY_DIFF = 'repository_diff';
+      Repository.prototype.REPOSITORY_REMOVE = 'repository_remove';
 
-      ServiceRepository.prototype.REPOSITORY_ADD = 'repository_add';
+      return Repository;
 
-      ServiceRepository.prototype.REPOSITORY_CHANGE = 'repository_change';
+    })(Backbone.Collection);
+    Vigor.Repository = Repository;
+    ServiceRepository = (function(_super) {
+      __extends(ServiceRepository, _super);
 
-      ServiceRepository.prototype.REPOSITORY_REMOVE = 'repository_remove';
+      function ServiceRepository() {
+        return ServiceRepository.__super__.constructor.apply(this, arguments);
+      }
 
       return ServiceRepository;
 

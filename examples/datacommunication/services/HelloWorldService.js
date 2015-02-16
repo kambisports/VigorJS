@@ -10,6 +10,7 @@ var app = app || {};
     url: './examples/datacommunication/services/helloWorld.json',
 
     NAME: 'HelloWorldService',
+    HELLO_WORLDS_RECEIVED: 'hello-worlds-received',
 
     constructor: function (helloWorldRepository) {
       Vigor.ApiService.prototype.constructor.call(this, helloWorldRepository, 5000);
@@ -35,15 +36,19 @@ var app = app || {};
       }, this), 12500);
     },
 
+    run: function (options) {
+      this.startPolling();
+    },
+
     parse: function (response) {
-      var models;
+      var models = [];
       Vigor.ApiService.prototype.parse.call(this, response);
       if (Array.isArray(response)) {
-        this.repository.set(response)
+        models = response;
       } else {
         models = this._buildHelloWorldModels(response);
-        this.repository.set(models)
       }
+      this.propagateResponse(this.HELLO_WORLDS_RECEIVED, models);
     },
 
     _buildHelloWorldModels: function (response) {

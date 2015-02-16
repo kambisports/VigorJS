@@ -15,11 +15,11 @@ var app = app || {};
     },
 
     addSubscriptions: function () {
-      this.subscribe(Vigor.SubscriptionKeys.HELLO_WORLD_BY_ID, _.bind(this._onChangedById, this), { id: this.helloWorldId });
+      this.subscribe(Vigor.SubscriptionKeys.HELLO_WORLD, _.bind(this._onChangedById, this), { id: this.helloWorldId });
     },
 
     removeSubscriptions: function () {
-      this.unsubscribe(Vigor.SubscriptionKeys.HELLO_WORLD_BY_ID);
+      this.unsubscribe(Vigor.SubscriptionKeys.HELLO_WORLD);
     },
 
     _onChangedById: function (jsonData) {

@@ -4,53 +4,39 @@ var app = app || {};
   'use strict';
 
   Vigor.SubscriptionKeys.extend({
-    HELLO_WORLDS: 'hello-worlds',
-    HELLO_WORLD_BY_ID: 'hello-world-by-id'
+    HELLO_WORLD: 'hello-world'
   });
 
-  var HelloWorldRepository = app.HelloWorldRepository;
+  var SubscriptionKeys = Vigor.SubscriptionKeys,
+      HelloWorldRepository = app.HelloWorldRepository;
 
   app.HelloWorldProducer = Vigor.Producer.extend({
 
     SUBSCRIPTION_KEYS: [
-      Vigor.SubscriptionKeys.HELLO_WORLDS,
-      Vigor.SubscriptionKeys.HELLO_WORLD_BY_ID
+      Vigor.SubscriptionKeys.HELLO_WORLD
     ],
 
     NAME: 'HelloWorldProducer',
 
-    constructor: function (options) {
-      Vigor.Producer.prototype.constructor.call(this, options);
+    constructor: function () {
+      Vigor.Producer.prototype.constructor.call(this, arguments);
       HelloWorldRepository.on(HelloWorldRepository.REPOSITORY_DIFF, this._onDiffInRepository, this)
-    },
-
-    subscribe: function (subscriptionKey, options) {
-      HelloWorldRepository.interestedInUpdates(this.NAME);
-
-      switch (subscriptionKey) {
-        case Vigor.SubscriptionKeys.HELLO_WORLDS:
-          this._produceHelloWorlds();
-          break;
-        case Vigor.SubscriptionKeys.HELLO_WORLD_BY_ID:
-          var model = HelloWorldRepository.queryById(options.id);
-          this._produceData(subscriptionKey, [model]);
-          break;
-        default:
-          throw new Error("Unknown query subscriptionKey: " + key);
-      }
     },
 
     dispose: function () {
       HelloWorldRepository.off(HelloWorldRepository.REPOSITORY_DIFF, this._onDiffInRepository, this)
-      HelloWorldRepository.notInterestedInUpdates(this.NAME)
     },
 
-    _produceHelloWorlds: function () {
-      var models = HelloWorldRepository.queryHelloWorlds();
-      this._produceData(Vigor.SubscriptionKeys.HELLO_WORLDS, models);
+    subscribe: function (subscriptionKey, options) {
+      // If we want to send the id to the service and fetch something specific from the server
+      // model = HelloWorldRepository.fetchById options.id
+
+      // If we are only interested in already loaded models
+      var model = HelloWorldRepository.get(options.id);
+      this._produceData([model]);
     },
 
-    _produceData: function (subscriptionKey, models) {
+    _produceData: function (models) {
       if (models == null) {
         models = [];
       }
@@ -59,35 +45,19 @@ var app = app || {};
         return
 
       models = _.without(models, undefined);
-      models = _.map(models, function (model) {
-        return model.toJSON()
-      });
+      models = this.modelsToJSON(models);
 
-      switch (subscriptionKey) {
-        case Vigor.SubscriptionKeys.HELLO_WORLDS:
-          this.produce(subscriptionKey, models);
-          break;
-        case Vigor.SubscriptionKeys.HELLO_WORLD_BY_ID:
-          for (var i = 0; i < models.length; i ++) {
-            var model = models[i];
-            this.produce(subscriptionKey, model, function (componentOptions) {
-              return model.id === componentOptions.id
-            });
-          }
-          break;
-        default:
-          throw new Error("Unknown query subscriptionKey: " + key);
+      for (var i = 0; i < models.length; i ++) {
+        var model = models[i];
+        this.produce(SubscriptionKeys.HELLO_WORLD, model, function (componentOptions) {
+          return model.id === componentOptions.id
+        });
       }
-
     },
 
     _onDiffInRepository: function (dataDiff) {
-
-      if(dataDiff.added.length > 0 || dataDiff.removed.length > 0)
-        this._produceHelloWorlds();
-
       if(dataDiff.changed.length > 0)
-        this._produceData(Vigor.SubscriptionKeys.HELLO_WORLD_BY_ID, dataDiff.changed);
+        this._produceData(dataDiff.changed);
     }
 
   });

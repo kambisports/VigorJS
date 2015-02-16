@@ -14,14 +14,15 @@
   <script src="../dist/backbone.whateverwewanttocallit.js"></script>
 
 
-  <!-- hello world repositories -->
-  <script src="./examples/datacommunication/repositories/HelloWorldRepository.js"></script>
-
   <!-- hello world service-->
   <script src="./examples/datacommunication/services/HelloWorldService.js"></script>
 
+  <!-- hello world repositories -->
+  <script src="./examples/datacommunication/repositories/HelloWorldRepository.js"></script>
+
   <!-- hello world producer -->
   <script src="./examples/datacommunication/producers/HelloWorldProducer.js"></script>
+  <script src="./examples/datacommunication/producers/HelloWorldsProducer.js"></script>
 
   <script src="./examples/helloworld/HelloWorldView.js"></script>
   <script src="./examples/helloworld/HelloWorldItemView.js"></script>
@@ -38,7 +39,7 @@
       var helloWorldComponent;
 
       // Setup prodcers
-      Vigor.DataCommunicationManager.registerProducers(app.HelloWorldProducer);
+      Vigor.DataCommunicationManager.registerProducers([app.HelloWorldProducer, app.HelloWorldsProducer]);
 
       // Create component
       helloWorldComponent = new app.HelloWorld()

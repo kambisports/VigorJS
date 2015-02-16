@@ -10,7 +10,6 @@ ServiceRepository = Vigor.ServiceRepository
 
 class ApiService
 
-
   service: undefined
   poller: undefined
   pollerOptions: undefined
