@@ -1,6 +1,3 @@
-Poller = Backbone.Poller
-# ApiServiceHelper = require 'datacommunication/apiservices/ApiServiceHelper'
-
 ###
   Base class for services interacting with the API (polling)
   Each service is bound to a repository and whenever that repository has a listener
@@ -8,13 +5,13 @@ Poller = Backbone.Poller
   service will stop polling for data.
 ###
 
+Poller = Backbone.Poller
 ServiceRepository = Vigor.ServiceRepository
 
 class ApiService
 
 
   service: undefined
-  repository: undefined
   poller: undefined
   pollerOptions: undefined
   shouldStop: false
@@ -26,8 +23,6 @@ class ApiService
     @service.url = @url
     @service.parse = @parse
 
-    if @repository then do @bindRepositoryListeners
-
     @pollerOptions = {
       delay: pollInterval
       delayed: false
@@ -38,7 +33,6 @@ class ApiService
     @_createPoller @pollerOptions
 
   dispose: () ->
-    if @repository then do @unbindRepositoryListeners
     do @_unbindPollerListeners
 
     @service = undefined
@@ -50,13 +44,20 @@ class ApiService
     if @shouldStop
       do @poller.stop
 
-  bindRepositoryListeners: () ->
-    @service.listenTo @repository, ServiceRepository::START_POLLING, @_startPolling
-    @service.listenTo @repository, ServiceRepository::STOP_POLLING, @_stopPolling
+  run: ->
+    throw 'ApiService->run must be overriden.'
 
-  unbindRepositoryListeners: () ->
-    @service.stopListening @repository, ServiceRepository::START_POLLING, @_startPolling
-    @service.stopListening @repository, ServiceRepository::STOP_POLLING, @_stopPolling
+  startPolling: =>
+    do @poller?.start
+
+  stopPolling: =>
+    if @poller.active()
+      @shouldStop = true
+    else
+      do @poller.stop
+
+  propagateResponse: (key, responseData) ->
+    @trigger key, responseData
 
   _createPoller: (options) ->
     @poller = Poller.get @service, options
@@ -80,20 +81,13 @@ class ApiService
   _unbindPollerListeners: () ->
     do @poller?.off
 
-  _startPolling: =>
-    do @poller?.start
-
-  _stopPolling: =>
-    if @poller.active()
-      @shouldStop = true
-    else
-      do @poller.stop
-
   # Check xhr status in some generic way here?
   # or use the backbone validate methdo in the models?
   _validateResponse: (response) ->
     removeThisLineOfCode = response
     return true
+
+  _.extend @prototype, Backbone.Events
 
 ApiService.extend = Vigor.extend
 Vigor.ApiService = ApiService

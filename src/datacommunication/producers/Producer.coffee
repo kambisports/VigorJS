@@ -25,6 +25,22 @@ class Producer
   dispose: ->
     throw new Error("Dispose shuld be overriden in subclass!")
 
+  extend: (obj, mixin) ->
+    obj[name] = method for name, method of mixin
+    obj
+
+  mixin: (instance, mixin) ->
+    @extend instance, mixin
+
+  decorate: (data, decoratorList) ->
+    for decorator in decoratorList
+      decorator(data)
+    return data
+
+  modelsToJSON: (models) ->
+    modelsJSON = _.map models, (model) ->
+      return model.toJSON()
+    return modelsJSON
 
   # add valid subscription keys to map (keys listed in subclass)
   _addKeysToMap: ->
