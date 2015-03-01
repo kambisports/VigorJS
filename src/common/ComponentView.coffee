@@ -1,7 +1,12 @@
+# ComponentView
+# Base class for all component views
 class ComponentView extends Backbone.View
 
+  # A view model instance is usually passed to the view upon creation
+  # @property [ViewModel<instance>]
   viewModel: undefined
 
+  # Construct a new ComponentView
   constructor: ->
     # These methods are required to make our view code
     # structure more consistent (just make them empty if
@@ -16,35 +21,44 @@ class ComponentView extends Backbone.View
 
     super
 
+  # @param [object] view options, usually containging a viewModel instance
+  # @return [this]
   initialize: (options) ->
     super
     if options.viewModel
       @viewModel = options.viewModel
+    return @
 
+  # the views render method, it will call @renderStaticContent and @addSubscriptions
+  # @return [this]
   render: ->
     do @renderStaticContent
     do @addSubscriptions
-    @
+    return @
 
   # Override this.
   # Render parts of component that don't rely on model.
+  # @return [this]
   renderStaticContent: ->
-    return
+    return @
 
   # Override this.
   # Render parts of component that relies on model.
+  # @return [this]
   renderDynamicContent: ->
-    return
+    return @
 
   # Override this.
   # Add view model subscriptions if needed.
+  # @return [this]
   addSubscriptions: ->
-    return
+    return @
 
   # Override this.
   # Remove view model subscriptions.
+  # @return [this]
   removeSubscriptions: ->
-    return
+    return @
 
   # Override this, and call super.
   dispose: ->
@@ -55,7 +69,7 @@ class ComponentView extends Backbone.View
     do @$el.remove
     do @off
 
-
+  # Ensures that passed methods are implemented in the view
   _checkIfImplemented: (methodNames) ->
     for methodName in methodNames
       unless @constructor.prototype.hasOwnProperty(methodName)

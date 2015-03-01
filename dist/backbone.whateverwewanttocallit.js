@@ -836,8 +836,9 @@ Backbone Poller may be freely distributed under the MIT license.
       ComponentView.prototype.initialize = function(options) {
         ComponentView.__super__.initialize.apply(this, arguments);
         if (options.viewModel) {
-          return this.viewModel = options.viewModel;
+          this.viewModel = options.viewModel;
         }
+        return this;
       };
 
       ComponentView.prototype.render = function() {
@@ -846,13 +847,21 @@ Backbone Poller may be freely distributed under the MIT license.
         return this;
       };
 
-      ComponentView.prototype.renderStaticContent = function() {};
+      ComponentView.prototype.renderStaticContent = function() {
+        return this;
+      };
 
-      ComponentView.prototype.renderDynamicContent = function() {};
+      ComponentView.prototype.renderDynamicContent = function() {
+        return this;
+      };
 
-      ComponentView.prototype.addSubscriptions = function() {};
+      ComponentView.prototype.addSubscriptions = function() {
+        return this;
+      };
 
-      ComponentView.prototype.removeSubscriptions = function() {};
+      ComponentView.prototype.removeSubscriptions = function() {
+        return this;
+      };
 
       ComponentView.prototype.dispose = function() {
         var _ref;

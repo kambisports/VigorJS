@@ -7,7 +7,7 @@ var app = app || {};
 
     count: 0,
     repository: undefined,
-    url: './examples/datacommunication/services/helloWorld.json',
+    url: './datacommunication/services/helloWorld.json',
 
     NAME: 'HelloWorldService',
     HELLO_WORLDS_RECEIVED: 'hello-worlds-received',
