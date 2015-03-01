@@ -57,19 +57,22 @@ class DataCommunicationManager
 
   # Private methods
   _createSubscription: (subscriptionKey) ->
-    @subscriptionsWithComponentIdentifiers[subscriptionKey] = []
+    key = subscriptionKey.key
+    @subscriptionsWithComponentIdentifiers[key] = []
     producer = @producerManager.getProducer subscriptionKey
-    @subscriptionsWithProducers[subscriptionKey] = producer
+    @subscriptionsWithProducers[key] = producer
 
 
   _removeSubscription: (subscriptionKey) ->
-    delete @subscriptionsWithComponentIdentifiers[subscriptionKey]
-    delete @subscriptionsWithProducers[subscriptionKey]
+    key = subscriptionKey.key
+    delete @subscriptionsWithComponentIdentifiers[key]
+    delete @subscriptionsWithProducers[key]
     @producerManager.removeProducer subscriptionKey
 
 
   _addComponentToSubscription: (subscriptionKey, componentIdentifier) ->
-    subscriptionComponents = @subscriptionsWithComponentIdentifiers[subscriptionKey]
+    key = subscriptionKey.key
+    subscriptionComponents = @subscriptionsWithComponentIdentifiers[key]
 
     existingComponent = _.find subscriptionComponents, (component) ->
       component.id is componentIdentifier.id
@@ -80,7 +83,8 @@ class DataCommunicationManager
 
 
   _removeComponentFromSubscription: (subscriptionKey, componentId) ->
-    components = @subscriptionsWithComponentIdentifiers[subscriptionKey]
+    key = subscriptionKey.key
+    components = @subscriptionsWithComponentIdentifiers[key]
 
     componentIndex = -1
     for component, index in components
@@ -94,7 +98,8 @@ class DataCommunicationManager
 
   # Key is present in map and contains array of at least one component mapped for subscription
   _isSubscriptionValid: (subscriptionKey) ->
-    componentIdentifiers = @subscriptionsWithComponentIdentifiers[subscriptionKey]
+    key = subscriptionKey.key
+    componentIdentifiers = @subscriptionsWithComponentIdentifiers[key]
     if _.isEmpty(componentIdentifiers) then false else true
 
 

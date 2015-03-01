@@ -3,17 +3,13 @@ var app = app || {};
 (function ($) {
   'use strict';
 
-  Vigor.SubscriptionKeys.extend({
-    HELLO_WORLD: 'hello-world'
-  });
-
   var SubscriptionKeys = Vigor.SubscriptionKeys,
       HelloWorldRepository = app.HelloWorldRepository;
 
   app.HelloWorldProducer = Vigor.Producer.extend({
 
     SUBSCRIPTION_KEYS: [
-      Vigor.SubscriptionKeys.HELLO_WORLD
+      SubscriptionKeys.HELLO_WORLD
     ],
 
     NAME: 'HelloWorldProducer',

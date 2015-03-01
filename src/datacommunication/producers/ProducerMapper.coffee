@@ -7,9 +7,10 @@ class ProducerMapper
     do @_buildMap
 
   findProducerClassForSubscription: (subscriptionKey) ->
-    producerClass = @subscriptionKeyToProducerMap[subscriptionKey]
+    key = subscriptionKey.key
+    producerClass = @subscriptionKeyToProducerMap[key]
     throw "There are no producers registered - register producers through the DataCommunicationManager" unless @producers.length > 0
-    throw "No producer found for subscription #{subscriptionKey}!" unless producerClass
+    throw "No producer found for subscription #{key}!" unless producerClass
     return producerClass
 
   addProducerClass: (producerClass) ->
@@ -24,7 +25,8 @@ class ProducerMapper
       @producers.splice index, 1
 
       producerClass.prototype.SUBSCRIPTION_KEYS.forEach (subscriptionKey) =>
-        delete @subscriptionKeyToProducerMap[subscriptionKey]
+        key = subscriptionKey.key
+        delete @subscriptionKeyToProducerMap[key]
 
       do @_buildMap
     return @
@@ -37,6 +39,7 @@ class ProducerMapper
     # console.log '@producers: ', @producers
     @producers.forEach (producer) =>
       producer.prototype.SUBSCRIPTION_KEYS.forEach (subscriptionKey) =>
-        @subscriptionKeyToProducerMap[subscriptionKey] = producer
+        key = subscriptionKey.key
+        @subscriptionKeyToProducerMap[key] = producer
 
 Vigor.ProducerMapper = ProducerMapper

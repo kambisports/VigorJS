@@ -337,17 +337,23 @@ Backbone Poller may be freely distributed under the MIT license.
       }
 
       Producer.prototype.addComponent = function(subscriptionKey, componentIdentifier) {
-        var registeredComponents;
-        registeredComponents = this.subscriptionKeyToComponents[subscriptionKey];
+        var key, registeredComponents;
+        key = subscriptionKey.key;
+        registeredComponents = this.subscriptionKeyToComponents[key];
         if (!registeredComponents) {
           throw new Error('Unknown subscription key, could not add component!');
         }
-        return this.subscriptionKeyToComponents[subscriptionKey].push(componentIdentifier);
+        return this.subscriptionKeyToComponents[key].push(componentIdentifier);
       };
 
       Producer.prototype.produce = function(subscriptionKey, data, filterFn) {
-        var component, componentsForSubscription, componentsInterestedInChange, _i, _len, _results;
-        componentsForSubscription = this.subscriptionKeyToComponents[subscriptionKey];
+        var component, componentsForSubscription, componentsInterestedInChange, key, _i, _len, _results;
+        if (filterFn == null) {
+          filterFn = function() {};
+        }
+        key = subscriptionKey.key;
+        this._validateContract(subscriptionKey, data);
+        componentsForSubscription = this.subscriptionKeyToComponents[key];
         componentsInterestedInChange = _.filter(componentsForSubscription, function(componentIdentifier) {
           return _.isEmpty(componentIdentifier.options) || filterFn(componentIdentifier.options);
         });
@@ -397,13 +403,45 @@ Backbone Poller may be freely distributed under the MIT license.
         return modelsJSON;
       };
 
+      Producer.prototype._validateContract = function(subscriptionKey, dataToProduce) {
+        var contract, contractKeyCount, dataKeyCount, key, val;
+        contract = subscriptionKey.contract;
+        if (!contract) {
+          throw new Error("The " + subscriptionKey.key + " does not have any contract specified");
+          return false;
+        }
+        if (!dataToProduce) {
+          throw new Error("" + this.NAME + " is calling produce without any data");
+          return false;
+        }
+        contractKeyCount = _.keys(contract).length;
+        dataKeyCount = _.keys(dataToProduce).length;
+        if (dataKeyCount > contractKeyCount) {
+          console.warn("" + this.NAME + " is calling produce with more data then what is specified in the contract");
+        } else if (dataKeyCount < contractKeyCount) {
+          console.warn("" + this.NAME + " is calling produce with less data then what is specified in the contract");
+        }
+        for (key in contract) {
+          val = contract[key];
+          if (val != null) {
+            if (typeof dataToProduce[key] !== typeof val) {
+              console.warn("" + this.NAME + " is producing data of the wrong type according to the contract, " + key + ", expects " + (typeof val) + " but gets " + (typeof dataToProduce[key]));
+            }
+          }
+          if (__indexOf.call(dataToProduce, key) < 0) {
+            console.warn("" + this.NAME + " producing data but is missing the key: " + key);
+          }
+        }
+        return true;
+      };
+
       Producer.prototype._addKeysToMap = function() {
-        var key, _i, _len, _ref, _results;
+        var subscriptionKey, _i, _len, _ref, _results;
         _ref = this.SUBSCRIPTION_KEYS;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          key = _ref[_i];
-          _results.push(this.subscriptionKeyToComponents[key] = []);
+          subscriptionKey = _ref[_i];
+          _results.push(this.subscriptionKeyToComponents[subscriptionKey.key] = []);
         }
         return _results;
       };
@@ -427,13 +465,14 @@ Backbone Poller may be freely distributed under the MIT license.
       }
 
       ProducerMapper.prototype.findProducerClassForSubscription = function(subscriptionKey) {
-        var producerClass;
-        producerClass = this.subscriptionKeyToProducerMap[subscriptionKey];
+        var key, producerClass;
+        key = subscriptionKey.key;
+        producerClass = this.subscriptionKeyToProducerMap[key];
         if (!(this.producers.length > 0)) {
           throw "There are no producers registered - register producers through the DataCommunicationManager";
         }
         if (!producerClass) {
-          throw "No producer found for subscription " + subscriptionKey + "!";
+          throw "No producer found for subscription " + key + "!";
         }
         return producerClass;
       };
@@ -453,7 +492,9 @@ Backbone Poller may be freely distributed under the MIT license.
           this.producers.splice(index, 1);
           producerClass.prototype.SUBSCRIPTION_KEYS.forEach((function(_this) {
             return function(subscriptionKey) {
-              return delete _this.subscriptionKeyToProducerMap[subscriptionKey];
+              var key;
+              key = subscriptionKey.key;
+              return delete _this.subscriptionKeyToProducerMap[key];
             };
           })(this));
           this._buildMap();
@@ -470,7 +511,9 @@ Backbone Poller may be freely distributed under the MIT license.
         return this.producers.forEach((function(_this) {
           return function(producer) {
             return producer.prototype.SUBSCRIPTION_KEYS.forEach(function(subscriptionKey) {
-              return _this.subscriptionKeyToProducerMap[subscriptionKey] = producer;
+              var key;
+              key = subscriptionKey.key;
+              return _this.subscriptionKeyToProducerMap[key] = producer;
             });
           };
         })(this));
@@ -763,21 +806,25 @@ Backbone Poller may be freely distributed under the MIT license.
       };
 
       DataCommunicationManager.prototype._createSubscription = function(subscriptionKey) {
-        var producer;
-        this.subscriptionsWithComponentIdentifiers[subscriptionKey] = [];
+        var key, producer;
+        key = subscriptionKey.key;
+        this.subscriptionsWithComponentIdentifiers[key] = [];
         producer = this.producerManager.getProducer(subscriptionKey);
-        return this.subscriptionsWithProducers[subscriptionKey] = producer;
+        return this.subscriptionsWithProducers[key] = producer;
       };
 
       DataCommunicationManager.prototype._removeSubscription = function(subscriptionKey) {
-        delete this.subscriptionsWithComponentIdentifiers[subscriptionKey];
-        delete this.subscriptionsWithProducers[subscriptionKey];
+        var key;
+        key = subscriptionKey.key;
+        delete this.subscriptionsWithComponentIdentifiers[key];
+        delete this.subscriptionsWithProducers[key];
         return this.producerManager.removeProducer(subscriptionKey);
       };
 
       DataCommunicationManager.prototype._addComponentToSubscription = function(subscriptionKey, componentIdentifier) {
-        var existingComponent, subscriptionComponents;
-        subscriptionComponents = this.subscriptionsWithComponentIdentifiers[subscriptionKey];
+        var existingComponent, key, subscriptionComponents;
+        key = subscriptionKey.key;
+        subscriptionComponents = this.subscriptionsWithComponentIdentifiers[key];
         existingComponent = _.find(subscriptionComponents, function(component) {
           return component.id === componentIdentifier.id;
         });
@@ -788,8 +835,9 @@ Backbone Poller may be freely distributed under the MIT license.
       };
 
       DataCommunicationManager.prototype._removeComponentFromSubscription = function(subscriptionKey, componentId) {
-        var component, componentIndex, components, index, _i, _len;
-        components = this.subscriptionsWithComponentIdentifiers[subscriptionKey];
+        var component, componentIndex, components, index, key, _i, _len;
+        key = subscriptionKey.key;
+        components = this.subscriptionsWithComponentIdentifiers[key];
         componentIndex = -1;
         for (index = _i = 0, _len = components.length; _i < _len; index = ++_i) {
           component = components[index];
@@ -806,8 +854,9 @@ Backbone Poller may be freely distributed under the MIT license.
       };
 
       DataCommunicationManager.prototype._isSubscriptionValid = function(subscriptionKey) {
-        var componentIdentifiers;
-        componentIdentifiers = this.subscriptionsWithComponentIdentifiers[subscriptionKey];
+        var componentIdentifiers, key;
+        key = subscriptionKey.key;
+        componentIdentifiers = this.subscriptionsWithComponentIdentifiers[key];
         if (_.isEmpty(componentIdentifiers)) {
           return false;
         } else {

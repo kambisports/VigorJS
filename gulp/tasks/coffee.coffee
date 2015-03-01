@@ -9,6 +9,11 @@ gulp.task 'coffee', ->
   gulp.src(config.bootstrap)
     .pipe include()
     .pipe coffee()
+    .on('error', handleError)
     .pipe rename(config.outputName)
     .pipe gulp.dest(config.dest)
     .pipe livereload()
+
+handleError = (error) ->
+  console.log error
+  this.emit 'end'

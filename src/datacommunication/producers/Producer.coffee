@@ -6,14 +6,19 @@ class Producer
     do @_addKeysToMap
 
   addComponent: (subscriptionKey, componentIdentifier) ->
-    registeredComponents = @subscriptionKeyToComponents[subscriptionKey]
+    key = subscriptionKey.key
+    registeredComponents = @subscriptionKeyToComponents[key]
     unless registeredComponents
       throw new Error('Unknown subscription key, could not add component!')
 
-    @subscriptionKeyToComponents[subscriptionKey].push componentIdentifier
+    @subscriptionKeyToComponents[key].push componentIdentifier
 
-  produce: (subscriptionKey, data, filterFn) ->
-    componentsForSubscription = @subscriptionKeyToComponents[subscriptionKey]
+  produce: (subscriptionKey, data, filterFn = ->) ->
+
+    key = subscriptionKey.key
+    @_validateContract(subscriptionKey, data)
+
+    componentsForSubscription = @subscriptionKeyToComponents[key]
     componentsInterestedInChange = _.filter componentsForSubscription, (componentIdentifier) ->
       _.isEmpty(componentIdentifier.options) or filterFn(componentIdentifier.options)
 
@@ -42,10 +47,40 @@ class Producer
       return model.toJSON()
     return modelsJSON
 
+  _validateContract: (subscriptionKey, dataToProduce) ->
+    contract = subscriptionKey.contract
+
+    unless contract
+      throw new Error "The #{subscriptionKey.key} does not have any contract specified"
+      return false
+
+    unless dataToProduce
+      throw new Error "#{@NAME} is calling produce without any data"
+      return false
+
+    contractKeyCount = _.keys(contract).length
+    dataKeyCount = _.keys(dataToProduce).length
+
+    #TODO: should below warnings be errors instead?
+    if dataKeyCount > contractKeyCount
+      console.warn "#{@NAME} is calling produce with more data then what is specified in the contract"
+    else if dataKeyCount < contractKeyCount
+      console.warn "#{@NAME} is calling produce with less data then what is specified in the contract"
+
+    for key, val of contract
+      if val?
+        unless typeof dataToProduce[key] is typeof val
+          console.warn "#{@NAME} is producing data of the wrong type according to the contract, #{key}, expects #{typeof val} but gets #{typeof dataToProduce[key]}"
+
+      unless key in dataToProduce
+        console.warn "#{@NAME} producing data but is missing the key: #{key}"
+
+    return true
+
   # add valid subscription keys to map (keys listed in subclass)
   _addKeysToMap: ->
-    for key in @SUBSCRIPTION_KEYS
-      @subscriptionKeyToComponents[key] = []
+    for subscriptionKey in @SUBSCRIPTION_KEYS
+      @subscriptionKeyToComponents[subscriptionKey.key] = []
 
   # Default
   SUBSCRIPTION_KEYS: []
