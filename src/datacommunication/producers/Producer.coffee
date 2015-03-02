@@ -58,14 +58,18 @@ class Producer
       throw new Error "#{@NAME} is calling produce without any data"
       return false
 
-    contractKeyCount = _.keys(contract).length
-    dataKeyCount = _.keys(dataToProduce).length
+    if _.isArray(contract) and _.isArray(dataToProduce) is false
+      console.warn "#{@NAME} is supposed to produce an array but is producing #{typeof dataToProduce}"
 
-    #TODO: should below warnings be errors instead?
-    if dataKeyCount > contractKeyCount
-      console.warn "#{@NAME} is calling produce with more data then what is specified in the contract"
-    else if dataKeyCount < contractKeyCount
-      console.warn "#{@NAME} is calling produce with less data then what is specified in the contract"
+    if _.isObject(contract) and _.isArray(contract) is false
+      contractKeyCount = _.keys(contract).length
+      dataKeyCount = _.keys(dataToProduce).length
+
+      #TODO: should below warnings be errors instead?
+      if dataKeyCount > contractKeyCount
+        console.warn "#{@NAME} is calling produce with more data then what is specified in the contract"
+      else if dataKeyCount < contractKeyCount
+        console.warn "#{@NAME} is calling produce with less data then what is specified in the contract"
 
     for key, val of contract
       if val?

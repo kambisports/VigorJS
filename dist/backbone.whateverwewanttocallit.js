@@ -414,12 +414,17 @@ Backbone Poller may be freely distributed under the MIT license.
           throw new Error("" + this.NAME + " is calling produce without any data");
           return false;
         }
-        contractKeyCount = _.keys(contract).length;
-        dataKeyCount = _.keys(dataToProduce).length;
-        if (dataKeyCount > contractKeyCount) {
-          console.warn("" + this.NAME + " is calling produce with more data then what is specified in the contract");
-        } else if (dataKeyCount < contractKeyCount) {
-          console.warn("" + this.NAME + " is calling produce with less data then what is specified in the contract");
+        if (_.isArray(contract) && _.isArray(dataToProduce) === false) {
+          console.warn("" + this.NAME + " is supposed to produce an array but is producing " + (typeof dataToProduce));
+        }
+        if (_.isObject(contract) && _.isArray(contract) === false) {
+          contractKeyCount = _.keys(contract).length;
+          dataKeyCount = _.keys(dataToProduce).length;
+          if (dataKeyCount > contractKeyCount) {
+            console.warn("" + this.NAME + " is calling produce with more data then what is specified in the contract");
+          } else if (dataKeyCount < contractKeyCount) {
+            console.warn("" + this.NAME + " is calling produce with less data then what is specified in the contract");
+          }
         }
         for (key in contract) {
           val = contract[key];

@@ -34,8 +34,6 @@ var app = app || {};
 
     _buildData: function () {
       var models = HelloWorldRepository.getHelloWorlds();
-      if (models.length <= 0)
-        return
 
       models = _.without(models, undefined);
       models = this.modelsToJSON(models);
