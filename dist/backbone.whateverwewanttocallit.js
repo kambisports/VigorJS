@@ -428,7 +428,7 @@ Backbone Poller may be freely distributed under the MIT license.
               console.warn("" + this.NAME + " is producing data of the wrong type according to the contract, " + key + ", expects " + (typeof val) + " but gets " + (typeof dataToProduce[key]));
             }
           }
-          if (__indexOf.call(dataToProduce, key) < 0) {
+          if (!(key in dataToProduce)) {
             console.warn("" + this.NAME + " producing data but is missing the key: " + key);
           }
         }
@@ -783,7 +783,7 @@ Backbone Poller may be freely distributed under the MIT license.
         }
         componentIdentifier = new ComponentIdentifier(componentId, subscriptionCb, subscriptionOptions);
         keys = _.keys(this.subscriptionsWithComponentIdentifiers);
-        if (_.indexOf(keys, subscriptionKey) === -1) {
+        if (_.indexOf(keys, subscriptionKey.key) === -1) {
           this._createSubscription(subscriptionKey);
         }
         this._addComponentToSubscription(subscriptionKey, componentIdentifier);

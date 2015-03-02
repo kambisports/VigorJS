@@ -3,8 +3,20 @@ sinon = require 'sinon'
 sandbox = undefined
 
 DataCommunicationManager = Vigor.DataCommunicationManager
-SubscriptionKeys = Vigor.SubscriptionKeys.extend
-  NEW_MOST_POPULAR_EVENTS: 'new_most_popular_events'
+SubscriptionKeys = Vigor.SubscriptionKeys.extend {
+  NEW_MOST_POPULAR_EVENTS:
+    key: 'new_most_popular_events'
+    contract:
+      val1: []
+      val2: undefined
+      val3: undefined
+      val4: false
+      val5: true
+      val6: {}
+      val7: 'string'
+      val8: 123
+}
+
 
 dataCommunicationManager = undefined
 producerManager = undefined
@@ -52,6 +64,11 @@ describe 'A ProducerManager', ->
 
     describe 'given a invalid subscription key', ->
       it 'should throw an exception', ->
-        errorFn = -> producerManager.getProducer 'InvalidSubscriptionKey'
+        subscriptionKey =
+          key: 'InvalidSubscriptionKey'
+          contract:
+            key1: 'string'
+
+        errorFn = -> producerManager.getProducer subscriptionKey
         assert.throws (-> errorFn()), /No producer found for subscription InvalidSubscriptionKey!/
 

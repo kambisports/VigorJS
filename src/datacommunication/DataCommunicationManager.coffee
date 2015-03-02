@@ -33,7 +33,7 @@ class DataCommunicationManager
     componentIdentifier = new ComponentIdentifier(componentId, subscriptionCb, subscriptionOptions)
     keys = _.keys @subscriptionsWithComponentIdentifiers
 
-    if _.indexOf(keys, subscriptionKey) is -1
+    if _.indexOf(keys, subscriptionKey.key) is -1
       @_createSubscription subscriptionKey
 
     # we have the subscription key already, add component id to list of components for that subscription

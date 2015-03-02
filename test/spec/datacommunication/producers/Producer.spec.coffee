@@ -2,12 +2,15 @@ assert = require 'assert'
 sinon = require 'sinon'
 sandbox = undefined
 
-KEY = 'dummy'
+SubscriptionKey =
+  key: 'dummy'
+  contract:
+    key1: 'string'
 
 class DummyProducer extends Vigor.Producer
   subscribe: ->
   dispose: ->
-  SUBSCRIPTION_KEYS: [KEY]
+  SUBSCRIPTION_KEYS: [SubscriptionKey]
   NAME: 'DummyProducer'
 
 exampleComponent1 =
@@ -48,7 +51,7 @@ describe 'A Producer', ->
       addKeysToMap = sinon.spy DummyProducer.prototype, '_addKeysToMap'
       producer = new DummyProducer()
       sinon.assert.calledOnce(addKeysToMap)
-      assert.deepEqual(producer.subscriptionKeyToComponents[KEY], [])
+      assert.deepEqual(producer.subscriptionKeyToComponents[SubscriptionKey.key], [])
 
   describe 'when adding a component for subscription', ->
     it 'it should throw an "Unknown subscription key" error if the passed key is not registered', ->
@@ -56,21 +59,21 @@ describe 'A Producer', ->
       assert.throws (-> errorFn()), /Unknown subscription key, could not add component!/
 
     it 'it should store a component identifier on the subscription key in the subscriptionKeyToComponents map', ->
-      producer.addComponent KEY, componentIdentifier
-      assert.deepEqual(producer.subscriptionKeyToComponents[KEY], [componentIdentifier])
+      producer.addComponent SubscriptionKey, componentIdentifier
+      assert.deepEqual(producer.subscriptionKeyToComponents[SubscriptionKey.key], [componentIdentifier])
 
   describe 'when producing data for components', ->
     it 'it should call callbacks with produdced data for all components that subscribed on a key', ->
-      producer.addComponent KEY, componentIdentifier
-      producer.addComponent KEY, componentIdentifier2
+      producer.addComponent SubscriptionKey, componentIdentifier
+      producer.addComponent SubscriptionKey, componentIdentifier2
 
       dummyData =
-        dummy: 'data'
+        key1: 'string'
 
       spiedCallback = sinon.spy componentIdentifier, 'callback'
       spiedCallback2 = sinon.spy componentIdentifier2, 'callback'
 
-      producer.produce KEY, dummyData
+      producer.produce SubscriptionKey, dummyData
       sinon.assert.calledOnce(spiedCallback)
       sinon.assert.calledOnce(spiedCallback2)
       assert spiedCallback.calledWith(dummyData)

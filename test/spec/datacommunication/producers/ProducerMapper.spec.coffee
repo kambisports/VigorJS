@@ -2,8 +2,17 @@ assert = require 'assert'
 sinon = require 'sinon'
 sandbox = undefined
 
-KEY = 'dummy'
-KEY2 = 'dummy2'
+KEY =
+  key: 'dummy'
+  contract:
+    val1: true
+    val2: undefined
+
+KEY2 =
+  key: 'dummy2'
+  contract:
+    val1: 'string'
+
 
 class DummyProducer extends Vigor.Producer
   subscribe: ->
@@ -52,7 +61,7 @@ describe 'A ProducerMapper', ->
         assert.equal(producerMapper.producers.length, 0)
         producerMapper.addProducerClass DummyProducer
         assert.equal(producerMapper.producers.length, 1)
-        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY], DummyProducer)
+        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY.key], DummyProducer)
 
     describe 'to remove', ->
       it 'it should remove the producerClass', ->
@@ -63,7 +72,7 @@ describe 'A ProducerMapper', ->
         producerMapper.removeProducerClass DummyProducer
 
         assert.equal(producerMapper.producers.length, 0)
-        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY], undefined)
+        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY.key], undefined)
 
   describe 'removing all producers', ->
       it 'it should empty storage', ->
@@ -72,7 +81,7 @@ describe 'A ProducerMapper', ->
         assert.equal(producerMapper.producers.length, 1)
         do producerMapper.removeAllProducers
         assert.equal(producerMapper.producers.length, 0)
-        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY], undefined)
+        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY.key], undefined)
 
   describe 'when running _buildMap', ->
       it 'it should store the producer for each subscription key in the producer', ->
@@ -80,6 +89,6 @@ describe 'A ProducerMapper', ->
         producerMapper.addProducerClass DummyProducer2
 
         assert.equal(producerMapper.producers.length, 1)
-        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY], DummyProducer2)
-        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY2], DummyProducer2)
+        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY.key], DummyProducer2)
+        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY2.key], DummyProducer2)
         sinon.assert.calledOnce(buildMap)

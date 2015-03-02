@@ -72,7 +72,7 @@ class Producer
         unless typeof dataToProduce[key] is typeof val
           console.warn "#{@NAME} is producing data of the wrong type according to the contract, #{key}, expects #{typeof val} but gets #{typeof dataToProduce[key]}"
 
-      unless key in dataToProduce
+      unless key of dataToProduce
         console.warn "#{@NAME} producing data but is missing the key: #{key}"
 
     return true
