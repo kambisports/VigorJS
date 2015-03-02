@@ -2,16 +2,16 @@ var app = app || {};
 
 (function ($) {
   'use strict';
-  app.HelloWorldItemModel = Vigor.ViewModel.extend({
+  app.HelloWorldItemViewModel = Vigor.ViewModel.extend({
 
-    id: 'HelloWorldItemModel',
+    id: 'HelloWorldItemViewModel',
     helloWorldId: undefined,
     helloWorld: undefined,
 
     constructor: function (helloWorldId) {
       Vigor.ViewModel.prototype.constructor.call(this, arguments);
       this.helloWorldId = helloWorldId;
-      this.helloWorld = new Backbone.Model();
+      this.helloWorld = new app.HelloWorldItemModel();
     },
 
     addSubscriptions: function () {
@@ -23,6 +23,7 @@ var app = app || {};
     },
 
     _onChangedById: function (jsonData) {
+      Vigor.ViewModel.prototype.validateContract.apply(this, [this.helloWorld.defaults, jsonData]);
       this.helloWorld.set(jsonData, { add: false, remove: false, merge: true })
     }
 

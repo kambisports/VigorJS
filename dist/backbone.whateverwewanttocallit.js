@@ -978,6 +978,45 @@ Backbone Poller may be freely distributed under the MIT license.
         return DataCommunicationManager.unsubscribeAll(this.id);
       };
 
+      ViewModel.prototype.validateContract = function(contract, incommingData) {
+        var contractKeyCount, dataKeyCount, key, val;
+        if (!contract) {
+          throw new Error("The " + this.id + " does not have any contract specified");
+          return false;
+        }
+        if (!incommingData) {
+          throw new Error("" + this.id + "'s callback for subscribe is called but it does not recieve any data");
+          return false;
+        }
+        if (_.isArray(contract) && _.isArray(incommingData) === false) {
+          console.warn("" + this.id + " is supposed to recieve an array but is recieving " + (typeof incommingData));
+        }
+        if (_.isObject(contract) && _.isArray(contract) === false && _.isArray(incommingData)) {
+          console.warn("" + this.id + " is supposed to recieve an object but is recieving an array");
+        }
+        if (_.isObject(contract) && _.isArray(contract) === false) {
+          contractKeyCount = _.keys(contract).length;
+          dataKeyCount = _.keys(incommingData).length;
+          if (dataKeyCount > contractKeyCount) {
+            console.warn("" + this.id + " is recieving more data then what is specified in the contract", contract, incommingData);
+          } else if (dataKeyCount < contractKeyCount) {
+            console.warn("" + this.id + " is recieving less data then what is specified in the contract", contract, incommingData);
+          }
+        }
+        for (key in contract) {
+          val = contract[key];
+          if (val != null) {
+            if (typeof incommingData[key] !== typeof val) {
+              console.warn("" + this.id + " is recieving data of the wrong type according to the contract, " + key + ", expects " + (typeof val) + " but gets " + (typeof incommingData[key]));
+            }
+          }
+          if (!(key in incommingData)) {
+            console.warn("" + this.id + " recieving data but is missing the key: " + key);
+          }
+        }
+        return true;
+      };
+
       return ViewModel;
 
     })();

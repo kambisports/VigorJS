@@ -52,7 +52,7 @@ var app = app || {};
     },
 
     _onHelloWorldItemsAdd: function (addedItem, collection, options) {
-      var helloWorldItemModel = new app.HelloWorldItemModel(addedItem.id),
+      var helloWorldItemModel = new app.HelloWorldItemViewModel(addedItem.id),
           helloWorldItemView = new app.HelloWorldItemView({ viewModel: helloWorldItemModel });
 
       this._helloWorldItems.push(helloWorldItemView);
