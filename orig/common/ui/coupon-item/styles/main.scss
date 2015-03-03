@@ -1,0 +1,61 @@
+.bet-feedback__avatar {
+	background-color: pink;
+	border-radius: 100%;
+	text-align: center;
+	width: 88px;
+	height: 88px;
+	line-height: 88px;
+	margin: 22px auto 11px auto;
+	font-size: $font-size-mega;
+}
+
+.bet-feedback__balance {
+	color: #eee;
+	text-align: center;
+}
+
+.bet-feedback__counters {
+	width: 100%;
+	display: table;
+	table-layout: fixed;
+	text-align: center;
+	@include flexbox-supported {
+		@include flexbox();
+	}
+}
+
+.bet-feedback__counter {
+	display: table-cell;
+	width: 1px;
+	@include flexbox-supported {
+		@include flex(1 1 auto);
+	}
+}
+
+.modularized__coupon-item {
+	background-color: #eee;
+	border: 1px solid #888;
+	padding: 4px;
+}
+
+.bet-feedback-coupon__cash-in-wrapper {
+	text-align: right;
+}
+
+.bet-feedback-coupon__cash-in {
+	background-color: #ed201c;
+	color: #eee;
+	border: none;
+	font-size: $font-size-micro;
+	font-weight: bold;
+	padding: 9px 3px;
+	width: 100px;
+}
+
+.bet-feedback-outcome__live {
+	padding-right: 5px;
+	color: #E42400;
+	font-weight: bold;
+	font-style: italic;
+	font-size: $font-size-micro;
+}

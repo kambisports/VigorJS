@@ -1,0 +1,74 @@
+@mixin updateDimmerOverlay {
+	& ~ #contentWrapper:after,
+	& ~ #betslip:after {
+		@content;
+	}
+}
+
+.navigation-menu-view {
+	@include transform(translate3d(-$navigation-width * $topx, 0, 0));
+	@include transition(transform 0.2s ease-out);
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: $navigation-width * $topx;
+	background: $navigation-background-color;
+	padding: 25px 0 20px 0;
+	z-index: 300;
+
+	.touch & {
+		position: fixed;
+		bottom: 0;
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.account-page-active & {
+		right: auto!important;
+	}
+	
+	// dimmer overlay
+	@include updateDimmerOverlay {
+		@include transition(background-color 0.3s ease-out); //TODO: check performance with transition
+		display: none;
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 500;
+		background-color: rgba(0, 0, 0, 0);
+	}
+
+}
+
+.navigation-menu-view--expanded {
+	position: fixed;
+	@include transform(translate3d(0, 0, 0));
+
+	@include updateDimmerOverlay {
+		display: block;
+		background-color: rgba(0, 0, 0, 0.6);
+	}
+}
+
+.multi-column-layout {
+	@include min-screen($navigationPanel-trigger) {
+		.navigation-menu-view {
+			@include transition(none);
+			@include transform(translate3d(0, 0, 0));
+
+			@include updateDimmerOverlay {
+				display: none;
+			}
+		}
+	}
+}
+
+.no-touch {
+	.navigation-menu-view {
+		padding-top: 27px;
+	}
+}

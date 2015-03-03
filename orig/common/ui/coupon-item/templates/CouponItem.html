@@ -1,0 +1,10 @@
+<div class="coupon-item__information js-coupon-item__information"></div>
+<ul class="coupon-item__outcomes js-coupon-item__outcomes"></ul>
+
+{{#if cashInAmount}}
+	{{#unless isAwaitingApproval}}
+	<div class="bet-feedback-coupon__cash-in-wrapper">
+		<button class="bet-feedback-coupon__cash-in js-cash-in">{{formatCurrencyWithSymbolMilli cashInAmount}}</button>
+	</div>
+	{{/unless}}
+{{/if}}
