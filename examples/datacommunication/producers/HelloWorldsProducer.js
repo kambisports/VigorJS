@@ -13,6 +13,7 @@ var app = app || {};
     ],
 
     NAME: 'HelloWorldsProducer',
+    repoFetchSubscription: undefined,
 
     constructor: function (options) {
       Vigor.Producer.prototype.constructor.call(this, options);
@@ -21,10 +22,17 @@ var app = app || {};
 
     dispose: function () {
       HelloWorldRepository.off(HelloWorldRepository.REPOSITORY_DIFF, this._onDiffInRepository, this)
+      HelloWorldRepository.removeSubscription(HelloWorldRepository.ALL, this.repoFetchSubscription);
     },
 
     subscribe: function (subscriptionKey, options) {
-      HelloWorldRepository.fetchHelloWorlds();
+
+      this.repoFetchSubscription = {
+        pollingInterval: 3000
+      };
+
+      HelloWorldRepository.addSubscription(HelloWorldRepository.ALL, this.repoFetchSubscription);
+
       this._produceData();
     },
 

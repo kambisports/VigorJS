@@ -16,16 +16,24 @@ var app = app || {};
 
     constructor: function () {
       Vigor.Producer.prototype.constructor.call(this, arguments);
-      HelloWorldRepository.on(HelloWorldRepository.REPOSITORY_DIFF, this._onDiffInRepository, this)
+      HelloWorldRepository.on(HelloWorldRepository.REPOSITORY_DIFF, this._onDiffInRepository, this);
     },
 
     dispose: function () {
-      HelloWorldRepository.off(HelloWorldRepository.REPOSITORY_DIFF, this._onDiffInRepository, this)
+      HelloWorldRepository.off(HelloWorldRepository.REPOSITORY_DIFF, this._onDiffInRepository, this);
     },
 
     subscribe: function (subscriptionKey, options) {
       // If we want to send the id to the service and fetch something specific from the server
-      // model = HelloWorldRepository.fetchById options.id
+
+      // this.repoFetchSubscription = {
+      //   pollingInterval: 3000
+      //   params: {
+      //    id: options.id
+      //   }
+      // };
+
+      // HelloWorldRepository.addSubscription(HelloWorldRepository.BY_ID, this.repoFetchSubscription);
 
       // If we are only interested in already loaded models
       var model = HelloWorldRepository.get(options.id);

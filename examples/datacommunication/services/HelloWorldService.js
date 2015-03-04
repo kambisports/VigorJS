@@ -3,17 +3,14 @@ var app = app || {};
 (function ($) {
   'use strict';
 
-  var HelloWorldService = Vigor.ApiService.extend({
+  var HelloWorldService = Vigor.APIService.extend({
 
     count: 0,
-    repository: undefined,
-    url: './datacommunication/services/helloWorld.json',
-
     NAME: 'HelloWorldService',
     HELLO_WORLDS_RECEIVED: 'hello-worlds-received',
 
-    constructor: function (helloWorldRepository) {
-      Vigor.ApiService.prototype.constructor.call(this, helloWorldRepository, 5000);
+    constructor: function () {
+      Vigor.APIService.prototype.constructor.call(this);
       setTimeout(_.bind(function () {
         var response = [
           {
@@ -36,13 +33,9 @@ var app = app || {};
       }, this), 12500);
     },
 
-    run: function (options) {
-      this.startPolling();
-    },
-
     parse: function (response) {
       var models = [];
-      Vigor.ApiService.prototype.parse.call(this, response);
+      Vigor.APIService.prototype.parse.call(this, response);
       if (Array.isArray(response)) {
         models = response;
       } else {
@@ -66,9 +59,14 @@ var app = app || {};
         }
       ]
       return models;
+    },
+
+    url: function () {
+      return './datacommunication/services/helloWorld.json'
     }
+
   });
 
-  app.HelloWorldService = new HelloWorldService(app.HelloWorldRepository)
+  app.HelloWorldService = new HelloWorldService();
 
 })(jQuery);

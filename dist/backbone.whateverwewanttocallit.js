@@ -1,222 +1,8 @@
 (function() {
-  
-/*!
-(c) 2012 Uzi Kilon, Splunk Inc.
-Backbone Poller 0.3.0
-https://github.com/uzikilon/backbone-poller
-Backbone Poller may be freely distributed under the MIT license.
-*/
-(function (root, factory) {
-  'use strict';
-  if (typeof define == 'function' && define.amd) {
-    define(['underscore', 'backbone'], factory);
-  }
-  else if (typeof require === 'function' && typeof exports === 'object') {
-    module.exports = factory(require('underscore'), require('backbone'));
-  }
-  else {
-    root.Backbone.Poller = factory(root._, root.Backbone);
-  }
-}(this, function (_, Backbone) {
-  'use strict';
-
-  // Default settings
-  var defaults = {
-    delay: 1000,
-    backoff: false,
-    condition: function () {
-      return true;
-    }
-  };
-
-  // Available events
-  var events = ['start', 'stop', 'fetch', 'success', 'error', 'complete' ];
-
-  var pollers = [];
-  function findPoller(model) {
-    return _.find(pollers, function (poller) {
-      return poller.model === model;
-    });
-  }
-
-  var PollingManager = {
-
-    // **Backbone.Poller.get(model[, options])**
-    // <pre>
-    // Returns a singleton instance of a poller for a model
-    // Stops it if running
-    // If options.autostart is true, will start it
-    // Returns a poller instance
-    // </pre>
-    get: function (model, options) {
-      var poller = findPoller(model);
-      if (!poller) {
-        poller = new Poller(model, options);
-        pollers.push(poller);
-      }
-      else {
-        poller.set(options);
-      }
-      if (options && options.autostart === true) {
-        poller.start({silent: true});
-      }
-      return poller;
-    },
-
-    // **Backbone.Poller.size()**
-    // <pre>
-    // Returns the number of instantiated pollers
-    // </pre>
-    size: function () {
-      return pollers.length;
-    },
-
-    // **Backbone.Poller.reset()**
-    // <pre>
-    // Stops all pollers and removes from the pollers pool
-    // </pre>
-    reset: function () {
-      while (pollers.length) {
-        pollers.pop().stop();
-      }
-    }
-  };
-
-  function Poller(model, options) {
-    this.model = model;
-    this.set(options);
-  }
-
-  _.extend(Poller.prototype, Backbone.Events, {
-
-    // **poller.set([options])**
-    // <pre>
-    // Reset poller options and stops the poller
-    // </pre>
-    set: function (options) {
-      this.options = _.extend({}, defaults, options || {});
-      if (this.options.flush) {
-        this.off();
-      }
-      _.each(events, function (name) {
-        var callback = this.options[name];
-        if (_.isFunction(callback)) {
-          this.off(name, callback, this);
-          this.on(name, callback, this);
-        }
-      }, this);
-
-      if (this.model instanceof Backbone.Model) {
-        this.model.on('destroy', this.stop, this);
-      }
-
-      return this.stop({silent: true});
-    },
-    //
-    // **poller.start([options])**
-    // <pre>
-    // Start the poller
-    // Returns a poller instance
-    // Triggers a 'start' events unless options.silent is set to true
-    // </pre>
-    start: function (options) {
-      if (!this.active()) {
-        options && options.silent || this.trigger('start', this.model);
-        this.options.active = true;
-        if (this.options.delayed) {
-          delayedRun(this);
-        } else {
-          run(this);
-        }
-      }
-      return this;
-    },
-    // **poller.stop([options])**
-    // <pre>
-    // Stops the poller
-    // Aborts any running XHR call
-    // Returns a poller instance
-    // Triggers a 'stop' events unless options.silent is set to true
-    // </pre>
-    stop: function (options) {
-      options && options.silent || this.trigger('stop', this.model);
-      this.options.active = false;
-      this.xhr && this.xhr.abort && this.xhr.abort();
-      this.xhr = null;
-      clearTimeout(this.timeoutId);
-      this.timeoutId = null;
-      return this;
-    },
-    // **poller.active()**
-    // <pre>
-    // Returns a boolean for poller status
-    // </pre>
-    active: function () {
-      return this.options.active === true;
-    }
-  });
-
-  function run(poller) {
-    if (validate(poller)) {
-      var options = _.extend({}, poller.options, {
-        success: function (model, resp) {
-          poller.trigger('success', model, resp);
-          delayedRun(poller);
-        },
-        error: function (model, resp) {
-          if (poller.options.continueOnError) {
-            poller.trigger('error', model, resp);
-            delayedRun(poller);
-          } else {
-            poller.stop({silent: true});
-            poller.trigger('error', model, resp);
-          }
-        }
-      });
-      poller.trigger('fetch', poller.model);
-      poller.xhr = poller.model.fetch(options);
-    }
-  }
-
-  function getDelay(poller) {
-    if (!poller.options.backoff) {
-      return poller.options.delay;
-    }
-    poller._backoff = poller._backoff ? Math.min(poller._backoff * 1.1, 30) : 1;
-    return Math.round(poller.options.delay * poller._backoff);
-  }
-
-  function delayedRun(poller) {
-    if (validate(poller)) {
-      poller.timeoutId = _.delay(run, getDelay(poller), poller);
-    }
-  }
-
-  function validate(poller) {
-    if (! poller.options.active) {
-      return false;
-    }
-    if (poller.options.condition(poller.model) !== true) {
-      poller.stop({silent: true});
-      poller.trigger('complete', poller.model);
-      return false;
-    }
-    return true;
-  }
-
-  PollingManager.getDelay   = getDelay;         // test hook
-  PollingManager.prototype  = Poller.prototype; // test hook
-
-  return PollingManager;
-
-}));
-
-
-;
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
 
   (function(root, factory) {
@@ -236,7 +22,7 @@ Backbone Poller may be freely distributed under the MIT license.
       root.Vigor = factory(root, root.Backbone, root._);
     }
   })(this, function(root, Backbone, _) {
-    var ApiService, ComponentIdentifier, ComponentView, DataCommunicationManager, EventBus, EventRegistry, PackageBase, Poller, Producer, ProducerManager, ProducerMapper, Repository, ServiceRepository, ViewModel, Vigor, previousVigor;
+    var ComponentIdentifier, ComponentView, EventBus, EventRegistry, PackageBase, Producer, Repository, ServiceRepository, ViewModel, Vigor, previousVigor;
     previousVigor = root.Vigor;
     Vigor = Backbone.Vigor = {};
     Vigor.noConflict = function() {
@@ -460,267 +246,400 @@ Backbone Poller may be freely distributed under the MIT license.
     })();
     Producer.extend = Vigor.extend;
     Vigor.Producer = Producer;
-    ProducerMapper = (function() {
-      ProducerMapper.prototype.producers = [];
-
-      ProducerMapper.prototype.subscriptionKeyToProducerMap = {};
-
-      function ProducerMapper() {
-        this._buildMap();
-      }
-
-      ProducerMapper.prototype.findProducerClassForSubscription = function(subscriptionKey) {
-        var key, producerClass;
-        key = subscriptionKey.key;
-        producerClass = this.subscriptionKeyToProducerMap[key];
-        if (!(this.producers.length > 0)) {
-          throw "There are no producers registered - register producers through the DataCommunicationManager";
+    (function() {
+      var ProducerMapper, producers, subscriptionKeyToProducerMap, _buildMap;
+      producers = [];
+      subscriptionKeyToProducerMap = {};
+      ProducerMapper = {
+        findProducerClassForSubscription: function(subscriptionKey) {
+          var key, producerClass;
+          key = subscriptionKey.key;
+          producerClass = subscriptionKeyToProducerMap[key];
+          if (!(producers.length > 0)) {
+            throw "There are no producers registered - register producers through the DataCommunicationManager";
+          }
+          if (!producerClass) {
+            throw "No producer found for subscription " + key + "!";
+          }
+          return producerClass;
+        },
+        addProducerClass: function(producerClass) {
+          if (producers.indexOf(producerClass) === -1) {
+            producers.push(producerClass);
+            _buildMap();
+          }
+          return this;
+        },
+        removeProducerClass: function(producerClass) {
+          var index;
+          index = producers.indexOf(producerClass);
+          if (index !== -1) {
+            producers.splice(index, 1);
+            producerClass.prototype.SUBSCRIPTION_KEYS.forEach((function(_this) {
+              return function(subscriptionKey) {
+                var key;
+                key = subscriptionKey.key;
+                return delete subscriptionKeyToProducerMap[key];
+              };
+            })(this));
+            _buildMap();
+          }
+          return this;
+        },
+        getAllProducers: function() {
+          return producers;
+        },
+        removeAllProducers: function() {
+          producers = [];
+          return subscriptionKeyToProducerMap = {};
         }
-        if (!producerClass) {
-          throw "No producer found for subscription " + key + "!";
-        }
-        return producerClass;
       };
-
-      ProducerMapper.prototype.addProducerClass = function(producerClass) {
-        if (this.producers.indexOf(producerClass) === -1) {
-          this.producers.push(producerClass);
-          this._buildMap();
-        }
-        return this;
-      };
-
-      ProducerMapper.prototype.removeProducerClass = function(producerClass) {
-        var index;
-        index = this.producers.indexOf(producerClass);
-        if (index !== -1) {
-          this.producers.splice(index, 1);
-          producerClass.prototype.SUBSCRIPTION_KEYS.forEach((function(_this) {
-            return function(subscriptionKey) {
-              var key;
-              key = subscriptionKey.key;
-              return delete _this.subscriptionKeyToProducerMap[key];
-            };
-          })(this));
-          this._buildMap();
-        }
-        return this;
-      };
-
-      ProducerMapper.prototype.removeAllProducers = function() {
-        this.producers = [];
-        return this.subscriptionKeyToProducerMap = {};
-      };
-
-      ProducerMapper.prototype._buildMap = function() {
-        return this.producers.forEach((function(_this) {
+      _buildMap = function() {
+        return producers.forEach((function(_this) {
           return function(producer) {
             return producer.prototype.SUBSCRIPTION_KEYS.forEach(function(subscriptionKey) {
               var key;
               key = subscriptionKey.key;
-              return _this.subscriptionKeyToProducerMap[key] = producer;
+              return subscriptionKeyToProducerMap[key] = producer;
             });
           };
         })(this));
       };
-
-      return ProducerMapper;
-
+      return Vigor.ProducerMapper = ProducerMapper;
     })();
-    Vigor.ProducerMapper = ProducerMapper;
-    ProducerManager = (function() {
-      function ProducerManager() {}
-
-      ProducerManager.prototype.producerMapper = new Vigor.ProducerMapper();
-
-      ProducerManager.prototype.instansiatedProducers = {};
-
-      ProducerManager.prototype.addProducersToMap = function(producers) {
-        var producerClass, _i, _len, _results;
-        if (_.isArray(producers)) {
-          _results = [];
-          for (_i = 0, _len = producers.length; _i < _len; _i++) {
-            producerClass = producers[_i];
-            _results.push(this.producerMapper.addProducerClass(producerClass));
+    (function() {
+      var ProducerManager, instansiatedProducers, producerMapper, _instansiateProducer;
+      producerMapper = Vigor.ProducerMapper;
+      instansiatedProducers = {};
+      ProducerManager = {
+        addProducersToMap: function(producers) {
+          var producerClass, _i, _len, _results;
+          if (_.isArray(producers)) {
+            _results = [];
+            for (_i = 0, _len = producers.length; _i < _len; _i++) {
+              producerClass = producers[_i];
+              _results.push(producerMapper.addProducerClass(producerClass));
+            }
+            return _results;
+          } else {
+            return producerMapper.addProducerClass(producers);
           }
-          return _results;
-        } else {
-          return this.producerMapper.addProducerClass(producers);
-        }
-      };
-
-      ProducerManager.prototype.removeProducersFromMap = function(producers) {
-        var producerClass, _i, _len, _results;
-        if (_.isArray(producers)) {
-          _results = [];
-          for (_i = 0, _len = producers.length; _i < _len; _i++) {
-            producerClass = producers[_i];
-            _results.push(this.producerMapper.removeProducerClass(producerClass));
+        },
+        removeProducersFromMap: function(producers) {
+          var producerClass, _i, _len, _results;
+          if (_.isArray(producers)) {
+            _results = [];
+            for (_i = 0, _len = producers.length; _i < _len; _i++) {
+              producerClass = producers[_i];
+              _results.push(producerMapper.removeProducerClass(producerClass));
+            }
+            return _results;
+          } else {
+            return producerMapper.removeProducerClass(producers);
           }
-          return _results;
-        } else {
-          return this.producerMapper.removeProducerClass(producers);
+        },
+        removeAllProducersFromMap: function() {
+          return producerMapper.removeAllProducers();
+        },
+        getProducer: function(subscriptionKey) {
+          var producerClass;
+          producerClass = producerMapper.findProducerClassForSubscription(subscriptionKey);
+          return _instansiateProducer(producerClass);
+        },
+        getProducerInstanceByName: function(name) {
+          return instansiatedProducers[name];
+        },
+        removeProducer: function(subscriptionKey) {
+          var producer, producerClass;
+          producerClass = producerMapper.findProducerClassForSubscription(subscriptionKey);
+          producer = instansiatedProducers[producerClass.prototype.NAME];
+          if (producer) {
+            producer.dispose();
+            return delete instansiatedProducers[producerClass.prototype.NAME];
+          }
+        },
+        addComponentToProducer: function(subscriptionKey, componentIdentifier) {
+          var producer;
+          producer = this.getProducer(subscriptionKey);
+          return producer.addComponent(subscriptionKey, componentIdentifier);
+        },
+        subscribe: function(subscriptionKey, options) {
+          var producer, producerClass;
+          producerClass = producerMapper.findProducerClassForSubscription(subscriptionKey);
+          producer = _instansiateProducer(producerClass);
+          return producer.subscribe(subscriptionKey, options);
         }
       };
-
-      ProducerManager.prototype.removeAllProducersFromMap = function() {
-        return this.producerMapper.removeAllProducers();
-      };
-
-      ProducerManager.prototype.getProducer = function(subscriptionKey) {
-        var producerClass;
-        producerClass = this.producerMapper.findProducerClassForSubscription(subscriptionKey);
-        return this._instansiateProducer(producerClass);
-      };
-
-      ProducerManager.prototype.removeProducer = function(subscriptionKey) {
-        var producer, producerClass;
-        producerClass = this.producerMapper.findProducerClassForSubscription(subscriptionKey);
-        producer = this.instansiatedProducers[producerClass.prototype.NAME];
-        if (producer) {
-          producer.dispose();
-          return delete this.instansiatedProducers[producerClass.prototype.NAME];
-        }
-      };
-
-      ProducerManager.prototype.addComponentToProducer = function(subscriptionKey, componentIdentifier) {
+      _instansiateProducer = function(producerClass) {
         var producer;
-        producer = this.getProducer(subscriptionKey);
-        return producer.addComponent(subscriptionKey, componentIdentifier);
-      };
-
-      ProducerManager.prototype.subscribe = function(subscriptionKey, options) {
-        var producer, producerClass;
-        producerClass = this.producerMapper.findProducerClassForSubscription(subscriptionKey);
-        producer = this._instansiateProducer(producerClass);
-        return producer.subscribe(subscriptionKey, options);
-      };
-
-      ProducerManager.prototype._instansiateProducer = function(producerClass) {
-        var producer;
-        if (!this.instansiatedProducers[producerClass.prototype.NAME]) {
+        if (!instansiatedProducers[producerClass.prototype.NAME]) {
           producer = new producerClass();
-          this.instansiatedProducers[producerClass.prototype.NAME] = producer;
+          instansiatedProducers[producerClass.prototype.NAME] = producer;
         }
-        return this.instansiatedProducers[producerClass.prototype.NAME];
+        return instansiatedProducers[producerClass.prototype.NAME];
       };
-
-      return ProducerManager;
-
+      return Vigor.ProducerManager = ProducerManager;
     })();
-    Vigor.ProducerManager = ProducerManager;
+    (function() {
+      var APIService, ServiceChannel;
+      ServiceChannel = (function() {
+        ServiceChannel.prototype.subscribers = void 0;
 
-    /*
-      Base class for services interacting with the API (polling)
-      Each service is bound to a repository and whenever that repository has a listener
-      for data, the service will start polling. If the repository has no active listeners the
-      service will stop polling for data.
-     */
-    Poller = Backbone.Poller;
-    ServiceRepository = Vigor.ServiceRepository;
-    ApiService = (function() {
-      ApiService.prototype.service = void 0;
+        ServiceChannel.prototype.pollingInterval = void 0;
 
-      ApiService.prototype.poller = void 0;
+        ServiceChannel.prototype.lastPollTime = void 0;
 
-      ApiService.prototype.pollerOptions = void 0;
+        ServiceChannel.prototype.timeout = void 0;
 
-      ApiService.prototype.shouldStop = false;
+        ServiceChannel.prototype.name = void 0;
 
-      ApiService.prototype.url = void 0;
-
-      function ApiService(repository, pollInterval) {
-        this.repository = repository;
-        if (pollInterval == null) {
-          pollInterval = 10000;
+        function ServiceChannel(_window, name, service, subscribers) {
+          this._window = _window;
+          this.name = name;
+          this.service = service;
+          this.subscribers = subscribers;
+          this.params = this.getParams();
+          this.restart();
         }
-        this.stopPolling = __bind(this.stopPolling, this);
-        this.startPolling = __bind(this.startPolling, this);
-        this.parse = __bind(this.parse, this);
-        this.service = new Backbone.Model();
-        this.service.url = this.url;
-        this.service.parse = this.parse;
-        this.pollerOptions = {
-          delay: pollInterval,
-          delayed: false,
-          continueOnError: true,
-          autostart: false
+
+        ServiceChannel.prototype.restart = function() {
+          var elapsedWait, wait;
+          this.pollingInterval = this.getPollingInterval();
+          if (this.lastPollTime != null) {
+            elapsedWait = this._window.Date.now() - this.lastPollTime;
+            wait = this.pollingInterval - elapsedWait;
+            if (wait < 0) {
+              wait = 0;
+            }
+          } else {
+            wait = 0;
+          }
+          return this.setupNextFetch(wait);
         };
-        this._createPoller(this.pollerOptions);
-      }
 
-      ApiService.prototype.dispose = function() {
-        this._unbindPollerListeners();
-        this.service = void 0;
-        return this.poller = void 0;
-      };
+        ServiceChannel.prototype.stop = function() {
+          this._window.clearTimeout(this.timeout);
+          this.timeout = void 0;
+          this.subscribers = void 0;
+          this.params = void 0;
+          return this.service.removeChannel(this);
+        };
 
-      ApiService.prototype.parse = function(response) {
-        this._validateResponse(response !== true);
-        if (this.shouldStop) {
-          return this.poller.stop();
+        ServiceChannel.prototype.setupNextFetch = function(wait) {
+          if (wait == null) {
+            wait = this.pollingInterval;
+          }
+          this._window.clearTimeout(this.timeout);
+          return this.timeout = this._window.setTimeout(_.bind(function() {
+            this.lastPollTime = this._window.Date.now();
+            this.service.fetch(this.params);
+            this.cullImmediateRequests();
+            if (this.subscribers != null) {
+              if (this.pollingInterval > 0) {
+                return this.setupNextFetch();
+              } else {
+                return this.timeout = void 0;
+              }
+            }
+          }, this), wait);
+        };
+
+        ServiceChannel.prototype.addSubscription = function(subscriber) {
+          if (!_.contains(this.subscribers, subscriber)) {
+            this.subscribers.push(subscriber);
+            return this.onSubscriptionsChanged();
+          }
+        };
+
+        ServiceChannel.prototype.removeSubscription = function(subscriber) {
+          if (_.contains(this.subscribers, subscriber)) {
+            this.subscribers = _.without(this.subscribers, subscriber);
+            if (this.subscribers.length === 0) {
+              return this.stop();
+            } else {
+              return this.onSubscriptionsChanged();
+            }
+          }
+        };
+
+        ServiceChannel.prototype.onSubscriptionsChanged = function() {
+          var didParamsChange, oldParams, params, shouldFetchImmediately;
+          params = this.getParams();
+          didParamsChange = !_.isEqual(params, this.params);
+          oldParams = this.params;
+          this.params = params;
+          shouldFetchImmediately = false;
+          if (didParamsChange) {
+            shouldFetchImmediately = this.service.shouldFetchOnParamsUpdate(this.params, oldParams, this.name);
+          }
+          if (shouldFetchImmediately) {
+            this.lastPollTime = void 0;
+            return this.restart();
+          } else if (this.getPollingInterval() !== this.pollingInterval) {
+            return this.restart();
+          }
+        };
+
+        ServiceChannel.prototype.getPollingInterval = function() {
+          var pollingInterval;
+          pollingInterval = _.min(_.map(this.subscribers, function(subscriber) {
+            return subscriber.pollingInterval;
+          }));
+          if (pollingInterval === Infinity) {
+            return 0;
+          } else {
+            return pollingInterval;
+          }
+        };
+
+        ServiceChannel.prototype.getParams = function() {
+          return this.service.consolidateParams(_.filter(_.map(this.subscribers, function(subscriber) {
+            return subscriber.params;
+          })), this.name);
+        };
+
+        ServiceChannel.prototype.cullImmediateRequests = function() {
+          var immediateRequests;
+          immediateRequests = _.filter(this.subscribers, function(subscriber) {
+            return (subscriber.pollingInterval === void 0) || (subscriber.pollingInterval === 0);
+          });
+          _.each(immediateRequests, function(immediateRequest) {
+            return this.removeSubscription(immediateRequest);
+          }, this);
+          return this.pollingInterval = this.getPollingInterval();
+        };
+
+        return ServiceChannel;
+
+      })();
+      APIService = (function() {
+        APIService.prototype.consolidateParams = function(paramsArray, channelName) {
+          return paramsArray[0];
+        };
+
+        APIService.prototype.channelForParams = function(params) {
+          return (JSON.stringify(params)) || "{}";
+        };
+
+        APIService.prototype.shouldFetchOnParamsUpdate = function(newParams, oldParams, channelName) {
+          return true;
+        };
+
+        APIService.prototype.onFetchSuccess = function() {};
+
+        APIService.prototype.onFetchError = function() {};
+
+        APIService.prototype.onPostSuccess = function() {};
+
+        APIService.prototype.onPostError = function() {};
+
+        APIService.prototype.sync = function(method, model, options) {
+          return Backbone.Model.prototype.sync.call(model, method, model, options);
+        };
+
+        APIService.prototype.url = function(model) {
+          return Backbone.Model.prototype.url.call(model);
+        };
+
+        APIService.prototype.parse = function(resp, options, model) {
+          return Backbone.Model.prototype.parse.call(model);
+        };
+
+        APIService.prototype.channels = void 0;
+
+        function APIService(_window) {
+          var service;
+          this._window = _window != null ? _window : window;
+          this.channels = {};
+          service = this;
+          this.Model = Backbone.Model.extend({
+            sync: function(method, model, options) {
+              return service.sync(method, model, options);
+            },
+            url: function() {
+              return service.url(this);
+            },
+            parse: function(resp, options) {
+              return service.parse(resp, options, this);
+            }
+          });
         }
-      };
 
-      ApiService.prototype.run = function() {
-        throw 'ApiService->run must be overriden.';
-      };
+        APIService.prototype.removeChannel = function(channel) {
+          return this.channels = _.without(this.channels, channel);
+        };
 
-      ApiService.prototype.startPolling = function() {
-        var _ref;
-        return (_ref = this.poller) != null ? _ref.start() : void 0;
-      };
+        APIService.prototype.addSubscription = function(subscriber) {
+          var method;
+          method = subscriber.method || 'GET';
+          switch (method) {
+            case 'GET':
+              return this.addGetSubscription(subscriber);
+            case 'POST':
+              return this.post(subscriber.postParams);
+            case 'PUT':
+              throw 'PUT not yet implemented';
+              break;
+            case 'DELETE':
+              throw 'DELETE not yet implemented';
+          }
+        };
 
-      ApiService.prototype.stopPolling = function() {
-        if (this.poller.active()) {
-          return this.shouldStop = true;
-        } else {
-          return this.poller.stop();
-        }
-      };
+        APIService.prototype.addGetSubscription = function(subscriber) {
+          var channel, channelName;
+          channelName = this.channelForParams(subscriber.params);
+          channel = this.channels[channelName];
+          if (channel != null) {
+            return channel.addSubscription(subscriber);
+          } else {
+            return this.channels[channelName] = new ServiceChannel(this._window, channelName, this, [subscriber]);
+          }
+        };
 
-      ApiService.prototype.propagateResponse = function(key, responseData) {
-        return this.trigger(key, responseData);
-      };
+        APIService.prototype.removeSubscription = function(subscriber) {
+          var channel, channelId;
+          if (subscriber != null) {
+            channelId = this.channelForParams(subscriber.params);
+            channel = this.channels[channelId];
+            if (channel != null) {
+              return channel.removeSubscription(subscriber);
+            }
+          }
+        };
 
-      ApiService.prototype._createPoller = function(options) {
-        this.poller = Poller.get(this.service, options);
-        this._unbindPollerListeners();
-        return this._bindPollerListeners();
-      };
+        APIService.prototype.getModelInstance = function(params) {
+          return new this.Model(params);
+        };
 
-      ApiService.prototype._bindPollerListeners = function() {
+        APIService.prototype.propagateResponse = function(key, responseData) {
+          return this.trigger(key, responseData);
+        };
 
-        /*
-        @poller.on 'success',  ->
-          window.console.log 'Api service poller success'
-          
-        @poller.on 'complete', ->
-          window.console.log 'Api service poller complete'
-         */
-        return this.poller.on('error', function(e) {
-          return window.console.log('Api service poller error', arguments, this);
-        });
-      };
+        APIService.prototype.fetch = function(params) {
+          var model;
+          model = this.getModelInstance(params);
+          return model.fetch({
+            success: this.onFetchSuccess,
+            error: this.onFetchError
+          });
+        };
 
-      ApiService.prototype._unbindPollerListeners = function() {
-        var _ref;
-        return (_ref = this.poller) != null ? _ref.off() : void 0;
-      };
+        APIService.prototype.post = function(params) {
+          var model;
+          model = this.getModelInstance(params);
+          return model.save(void 0, {
+            success: this.onPostSuccess,
+            error: this.onPostError
+          });
+        };
 
-      ApiService.prototype._validateResponse = function(response) {
-        var removeThisLineOfCode;
-        removeThisLineOfCode = response;
-        return true;
-      };
+        return APIService;
 
-      _.extend(ApiService.prototype, Backbone.Events);
-
-      return ApiService;
-
+      })();
+      _.extend(APIService.prototype, Backbone.Events);
+      APIService.extend = Vigor.extend;
+      return Vigor.APIService = APIService;
     })();
-    ApiService.extend = Vigor.extend;
-    Vigor.ApiService = ApiService;
     Vigor.SubscriptionKeys = {
       extend: function(object) {
         return _.extend(this, object);
@@ -750,99 +669,88 @@ Backbone Poller may be freely distributed under the MIT license.
 
     })();
     Vigor.ComponentIdentifier = ComponentIdentifier;
-    DataCommunicationManager = (function() {
-      ProducerManager = Vigor.ProducerManager;
-
+    (function() {
+      var DataCommunicationManager, producerManager, subscriptionsWithComponentIdentifiers, subscriptionsWithProducers, _addComponentToSubscription, _createSubscription, _isSubscriptionValid, _removeComponentFromSubscription, _removeSubscription;
       ComponentIdentifier = Vigor.ComponentIdentifier;
-
-      DataCommunicationManager.prototype.subscriptionsWithComponentIdentifiers = void 0;
-
-      DataCommunicationManager.prototype.subscriptionsWithProducers = void 0;
-
-      DataCommunicationManager.prototype.producerManager = void 0;
-
-      DataCommunicationManager.prototype.apiServices = void 0;
-
-      function DataCommunicationManager() {
-        this.subscriptionsWithComponentIdentifiers = {};
-        this.subscriptionsWithProducers = {};
-        this.producerManager = new ProducerManager();
-      }
-
-      DataCommunicationManager.prototype.registerProducers = function(producers) {
-        return this.producerManager.addProducersToMap(producers);
-      };
-
-      DataCommunicationManager.prototype.unregisterProducers = function(producers) {
-        return this.producerManager.removeProducersFromMap(producers);
-      };
-
-      DataCommunicationManager.prototype.unregisterAllProducers = function() {
-        return this.producerManager.removeAllProducersFromMap();
-      };
-
-      DataCommunicationManager.prototype.subscribe = function(componentId, subscriptionKey, subscriptionCb, subscriptionOptions) {
-        var componentIdentifier, keys;
-        if (subscriptionOptions == null) {
-          subscriptionOptions = {};
+      producerManager = Vigor.ProducerManager;
+      subscriptionsWithComponentIdentifiers = {};
+      subscriptionsWithProducers = {};
+      DataCommunicationManager = {
+        registerProducers: function(producers) {
+          return producerManager.addProducersToMap(producers);
+        },
+        unregisterProducers: function(producers) {
+          return producerManager.removeProducersFromMap(producers);
+        },
+        unregisterAllProducers: function() {
+          return producerManager.removeAllProducersFromMap();
+        },
+        subscribe: function(componentId, subscriptionKey, subscriptionCb, subscriptionOptions) {
+          var componentIdentifier, keys;
+          if (subscriptionOptions == null) {
+            subscriptionOptions = {};
+          }
+          componentIdentifier = new ComponentIdentifier(componentId, subscriptionCb, subscriptionOptions);
+          keys = _.keys(subscriptionsWithComponentIdentifiers);
+          if (_.indexOf(keys, subscriptionKey.key) === -1) {
+            _createSubscription(subscriptionKey);
+          }
+          _addComponentToSubscription(subscriptionKey, componentIdentifier);
+          return producerManager.subscribe(subscriptionKey, subscriptionOptions);
+        },
+        unsubscribe: function(componentId, subscriptionKey) {
+          return _removeComponentFromSubscription(subscriptionKey, componentId);
+        },
+        unsubscribeAll: function(componentId) {
+          var keys, len, _results;
+          keys = _.keys(subscriptionsWithComponentIdentifiers);
+          len = keys.length;
+          _results = [];
+          while (len--) {
+            _results.push(_removeComponentFromSubscription(keys[len], componentId));
+          }
+          return _results;
+        },
+        getSubscriptionsWithSubscriptionKey: function(subscriptionKey) {
+          var key;
+          key = subscriptionKey.key;
+          return subscriptionsWithComponentIdentifiers[key];
+        },
+        reset: function() {
+          subscriptionsWithComponentIdentifiers = {};
+          return subscriptionsWithProducers = {};
         }
-        componentIdentifier = new ComponentIdentifier(componentId, subscriptionCb, subscriptionOptions);
-        keys = _.keys(this.subscriptionsWithComponentIdentifiers);
-        if (_.indexOf(keys, subscriptionKey.key) === -1) {
-          this._createSubscription(subscriptionKey);
-        }
-        this._addComponentToSubscription(subscriptionKey, componentIdentifier);
-        return this.producerManager.subscribe(subscriptionKey, subscriptionOptions);
       };
-
-      DataCommunicationManager.prototype.unsubscribe = function(componentId, subscriptionKey) {
-        return this._removeComponentFromSubscription(subscriptionKey, componentId);
-      };
-
-      DataCommunicationManager.prototype.unsubscribeAll = function(componentId) {
-        var keys, len, _results;
-        keys = _.keys(this.subscriptionsWithComponentIdentifiers);
-        len = keys.length;
-        _results = [];
-        while (len--) {
-          _results.push(this._removeComponentFromSubscription(keys[len], componentId));
-        }
-        return _results;
-      };
-
-      DataCommunicationManager.prototype._createSubscription = function(subscriptionKey) {
+      _createSubscription = function(subscriptionKey) {
         var key, producer;
         key = subscriptionKey.key;
-        this.subscriptionsWithComponentIdentifiers[key] = [];
-        producer = this.producerManager.getProducer(subscriptionKey);
-        return this.subscriptionsWithProducers[key] = producer;
+        subscriptionsWithComponentIdentifiers[key] = [];
+        producer = producerManager.getProducer(subscriptionKey);
+        return subscriptionsWithProducers[key] = producer;
       };
-
-      DataCommunicationManager.prototype._removeSubscription = function(subscriptionKey) {
+      _removeSubscription = function(subscriptionKey) {
         var key;
         key = subscriptionKey.key;
-        delete this.subscriptionsWithComponentIdentifiers[key];
-        delete this.subscriptionsWithProducers[key];
-        return this.producerManager.removeProducer(subscriptionKey);
+        delete subscriptionsWithComponentIdentifiers[key];
+        delete subscriptionsWithProducers[key];
+        return producerManager.removeProducer(subscriptionKey);
       };
-
-      DataCommunicationManager.prototype._addComponentToSubscription = function(subscriptionKey, componentIdentifier) {
+      _addComponentToSubscription = function(subscriptionKey, componentIdentifier) {
         var existingComponent, key, subscriptionComponents;
         key = subscriptionKey.key;
-        subscriptionComponents = this.subscriptionsWithComponentIdentifiers[key];
+        subscriptionComponents = subscriptionsWithComponentIdentifiers[key];
         existingComponent = _.find(subscriptionComponents, function(component) {
           return component.id === componentIdentifier.id;
         });
         if (!existingComponent) {
           subscriptionComponents.push(componentIdentifier);
-          return this.producerManager.addComponentToProducer(subscriptionKey, componentIdentifier);
+          return producerManager.addComponentToProducer(subscriptionKey, componentIdentifier);
         }
       };
-
-      DataCommunicationManager.prototype._removeComponentFromSubscription = function(subscriptionKey, componentId) {
+      _removeComponentFromSubscription = function(subscriptionKey, componentId) {
         var component, componentIndex, components, index, key, _i, _len;
         key = subscriptionKey.key;
-        components = this.subscriptionsWithComponentIdentifiers[key];
+        components = subscriptionsWithComponentIdentifiers[key];
         componentIndex = -1;
         for (index = _i = 0, _len = components.length; _i < _len; index = ++_i) {
           component = components[index];
@@ -853,30 +761,22 @@ Backbone Poller may be freely distributed under the MIT license.
         if (componentIndex > -1) {
           components.splice(componentIndex, 1);
         }
-        if (!this._isSubscriptionValid(subscriptionKey)) {
-          return this._removeSubscription(subscriptionKey);
+        if (!_isSubscriptionValid(subscriptionKey)) {
+          return _removeSubscription(subscriptionKey);
         }
       };
-
-      DataCommunicationManager.prototype._isSubscriptionValid = function(subscriptionKey) {
+      _isSubscriptionValid = function(subscriptionKey) {
         var componentIdentifiers, key;
         key = subscriptionKey.key;
-        componentIdentifiers = this.subscriptionsWithComponentIdentifiers[key];
+        componentIdentifiers = subscriptionsWithComponentIdentifiers[key];
         if (_.isEmpty(componentIdentifiers)) {
           return false;
         } else {
           return true;
         }
       };
-
-      DataCommunicationManager.prototype.makeTestInstance = function() {
-        return new DataCommunicationManager();
-      };
-
-      return DataCommunicationManager;
-
+      return Vigor.DataCommunicationManager = DataCommunicationManager;
     })();
-    Vigor.DataCommunicationManager = new DataCommunicationManager();
     ComponentView = (function(_super) {
       __extends(ComponentView, _super);
 
@@ -948,6 +848,8 @@ Backbone Poller may be freely distributed under the MIT license.
     })(Backbone.View);
     Vigor.ComponentView = ComponentView;
     ViewModel = (function() {
+      var DataCommunicationManager;
+
       DataCommunicationManager = Vigor.DataCommunicationManager;
 
       ViewModel.prototype.id = 'ViewModel';
@@ -1167,6 +1069,20 @@ Backbone Poller may be freely distributed under the MIT license.
       function ServiceRepository() {
         return ServiceRepository.__super__.constructor.apply(this, arguments);
       }
+
+      ServiceRepository.prototype.services = {};
+
+      ServiceRepository.prototype.addSubscription = function(type, subscription) {
+        if (this.services[type]) {
+          return this.services[type].addSubscription(subscription);
+        }
+      };
+
+      ServiceRepository.prototype.removeSubscription = function(type, subscription) {
+        if (this.services[type]) {
+          return this.services[type].removeSubscription(subscription);
+        }
+      };
 
       return ServiceRepository;
 
