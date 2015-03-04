@@ -1,7 +1,3 @@
-`
-//= require ../node_modules/backbone-poller/backbone.poller.js
-`
-
 ((root, factory) ->
   if typeof define is "function" and define.amd
 
@@ -45,7 +41,7 @@
   #= include ./datacommunication/producers/ProducerManager.coffee
 
   # DATACOMMUNICATION/APISERVICES
-  #= include ./datacommunication/apiservices/ApiService.coffee
+  #= include ./datacommunication/apiservices/APIService.coffee
 
   # DATACOMMUNICATION
   #= include ./datacommunication/SubscriptionKeys.coffee

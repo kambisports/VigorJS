@@ -18,7 +18,7 @@ requireHelper 'datacommunication/producers/ProducerMapper'
 requireHelper 'datacommunication/producers/ProducerManager'
 
   # DATACOMMUNICATION/APISERVICES
-requireHelper 'datacommunication/apiservices/ApiService'
+requireHelper 'datacommunication/apiservices/APIService'
 
   # DATACOMMUNICATION
 requireHelper 'datacommunication/SubscriptionKeys'
