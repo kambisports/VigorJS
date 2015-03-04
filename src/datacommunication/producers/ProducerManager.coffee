@@ -1,55 +1,61 @@
-class ProducerManager
+do ->
 
-  producerMapper: new Vigor.ProducerMapper()
-  instansiatedProducers: {}
+  producerMapper = Vigor.ProducerMapper
+  instansiatedProducers = {}
 
-  addProducersToMap: (producers) ->
-    if _.isArray producers
-      for producerClass in producers
-        @producerMapper.addProducerClass producerClass
-    else
-      @producerMapper.addProducerClass producers
+  ProducerManager =
+    addProducersToMap: (producers) ->
+      if _.isArray producers
+        for producerClass in producers
+          producerMapper.addProducerClass producerClass
+      else
+        producerMapper.addProducerClass producers
 
-  removeProducersFromMap: (producers) ->
-    if _.isArray producers
-      for producerClass in producers
-        @producerMapper.removeProducerClass producerClass
-    else
-      @producerMapper.removeProducerClass producers
+    removeProducersFromMap: (producers) ->
+      if _.isArray producers
+        for producerClass in producers
+          producerMapper.removeProducerClass producerClass
+      else
+        producerMapper.removeProducerClass producers
 
-  removeAllProducersFromMap: ->
-    do @producerMapper.removeAllProducers
+    removeAllProducersFromMap: ->
+      do producerMapper.removeAllProducers
 
-  getProducer: (subscriptionKey) ->
-    producerClass = @producerMapper.findProducerClassForSubscription subscriptionKey
-    @_instansiateProducer producerClass
+    getProducer: (subscriptionKey) ->
+      producerClass = producerMapper.findProducerClassForSubscription subscriptionKey
+      _instansiateProducer producerClass
 
-  removeProducer: (subscriptionKey) ->
-    producerClass = @producerMapper.findProducerClassForSubscription subscriptionKey
+    getProducerInstanceByName: (name) ->
+      instansiatedProducers[name]
 
-    producer = @instansiatedProducers[producerClass.prototype.NAME]
-    if producer
-      do producer.dispose
-      delete @instansiatedProducers[producerClass.prototype.NAME]
+    removeProducer: (subscriptionKey) ->
+      producerClass = producerMapper.findProducerClassForSubscription subscriptionKey
 
-  addComponentToProducer: (subscriptionKey, componentIdentifier) ->
-    producer = @getProducer subscriptionKey
+      producer = instansiatedProducers[producerClass.prototype.NAME]
+      if producer
+        do producer.dispose
+        delete instansiatedProducers[producerClass.prototype.NAME]
 
-    # add sub key so producer know what components to call produce for!
-    producer.addComponent subscriptionKey, componentIdentifier
+    addComponentToProducer: (subscriptionKey, componentIdentifier) ->
+      producer = @getProducer subscriptionKey
 
-  subscribe: (subscriptionKey, options) ->
-    producerClass = @producerMapper.findProducerClassForSubscription subscriptionKey
-    producer = @_instansiateProducer producerClass
+      # add sub key so producer know what components to call produce for!
+      producer.addComponent subscriptionKey, componentIdentifier
 
-    # synchronous call
-    producer.subscribe subscriptionKey, options
+    subscribe: (subscriptionKey, options) ->
+      producerClass = producerMapper.findProducerClassForSubscription subscriptionKey
+      producer = _instansiateProducer producerClass
 
-  _instansiateProducer: (producerClass) ->
-    if not @instansiatedProducers[producerClass.prototype.NAME]
+      # synchronous call
+      producer.subscribe subscriptionKey, options
+
+
+  _instansiateProducer = (producerClass) ->
+    if not instansiatedProducers[producerClass.prototype.NAME]
       producer = new producerClass()
-      @instansiatedProducers[producerClass.prototype.NAME] = producer
+      instansiatedProducers[producerClass.prototype.NAME] = producer
 
-    @instansiatedProducers[producerClass.prototype.NAME]
+    instansiatedProducers[producerClass.prototype.NAME]
 
-Vigor.ProducerManager = ProducerManager
+  Vigor.ProducerManager = ProducerManager
+

@@ -26,17 +26,15 @@ class DummyProducer2 extends Vigor.Producer
   SUBSCRIPTION_KEYS: [KEY, KEY2]
   NAME: 'DummyProducer2'
 
-producerMapper = undefined
+producerMapper = Vigor.ProducerMapper
 
 describe 'A ProducerMapper', ->
   beforeEach ->
     sandbox = sinon.sandbox.create()
-    producerMapper = new Vigor.ProducerMapper()
-    do producerMapper.removeAllProducers
 
   afterEach ->
+    do producerMapper.removeAllProducers
     do sandbox.restore
-    producerMapper = undefined
 
   describe 'given a registered subscription key', ->
     it 'it should return a producerClass', ->
@@ -58,37 +56,40 @@ describe 'A ProducerMapper', ->
   describe 'given a producerClass', ->
     describe 'to add', ->
       it 'it should store the producerClass', ->
-        assert.equal(producerMapper.producers.length, 0)
+        assert.equal(producerMapper.getAllProducers().length, 0)
         producerMapper.addProducerClass DummyProducer
-        assert.equal(producerMapper.producers.length, 1)
-        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY.key], DummyProducer)
+        assert.equal(producerMapper.getAllProducers().length, 1)
+        assert.equal(producerMapper.findProducerClassForSubscription(KEY), DummyProducer)
 
     describe 'to remove', ->
       it 'it should remove the producerClass', ->
-        assert.equal(producerMapper.producers.length, 0)
+        assert.equal(producerMapper.getAllProducers().length, 0)
         producerMapper.addProducerClass DummyProducer
-        assert.equal(producerMapper.producers.length, 1)
+        assert.equal(producerMapper.getAllProducers().length, 1)
 
         producerMapper.removeProducerClass DummyProducer
 
-        assert.equal(producerMapper.producers.length, 0)
-        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY.key], undefined)
+        assert.equal(producerMapper.getAllProducers().length, 0)
+        errorFn = -> producerMapper.findProducerClassForSubscription KEY
+        assert.throws (-> errorFn()), /There are no producers registered - register producers through the DataCommunicationManager/
 
   describe 'removing all producers', ->
       it 'it should empty storage', ->
-        assert.equal(producerMapper.producers.length, 0)
+        assert.equal(producerMapper.getAllProducers().length, 0)
         producerMapper.addProducerClass DummyProducer
-        assert.equal(producerMapper.producers.length, 1)
+        assert.equal(producerMapper.getAllProducers().length, 1)
         do producerMapper.removeAllProducers
-        assert.equal(producerMapper.producers.length, 0)
-        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY.key], undefined)
+        assert.equal(producerMapper.getAllProducers().length, 0)
+        errorFn = -> producerMapper.findProducerClassForSubscription KEY
+        assert.throws (-> errorFn()), /There are no producers registered - register producers through the DataCommunicationManager/
 
-  describe 'when running _buildMap', ->
-      it 'it should store the producer for each subscription key in the producer', ->
-        buildMap = sinon.spy producerMapper, '_buildMap'
-        producerMapper.addProducerClass DummyProducer2
 
-        assert.equal(producerMapper.producers.length, 1)
-        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY.key], DummyProducer2)
-        assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY2.key], DummyProducer2)
-        sinon.assert.calledOnce(buildMap)
+  # describe 'when running _buildMap', ->
+  #     it 'it should store the producer for each subscription key in the producer', ->
+  #       buildMap = sinon.spy producerMapper, '_buildMap'
+  #       producerMapper.addProducerClass DummyProducer2
+
+  #       assert.equal(producerMapper.getAllProducers().length, 1)
+  #       assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY.key], DummyProducer2)
+  #       assert.equal(producerMapper.subscriptionKeyToProducerMap[KEY2.key], DummyProducer2)
+  #       sinon.assert.calledOnce(buildMap)

@@ -2,7 +2,6 @@ assert = require 'assert'
 sinon = require 'sinon'
 sandbox = undefined
 
-DataCommunicationManager = Vigor.DataCommunicationManager
 SubscriptionKeys = Vigor.SubscriptionKeys.extend {
   NEW_MOST_POPULAR_EVENTS:
     key: 'new_most_popular_events'
@@ -30,14 +29,14 @@ describe 'A ProducerManager', ->
 
   beforeEach ->
     sandbox = sinon.sandbox.create()
-    dataCommunicationManager = DataCommunicationManager.makeTestInstance()
-    producerManager = dataCommunicationManager.producerManager
+    dataCommunicationManager = Vigor.DataCommunicationManager
+    producerManager = Vigor.ProducerManager
     dataCommunicationManager.registerProducers DummyProducer
 
   afterEach ->
-    do dataCommunicationManager.unregisterAllProducers
     do sandbox.restore
-    producerManager = undefined
+    do dataCommunicationManager.unregisterAllProducers
+    do dataCommunicationManager.reset
 
   describe 'given a valid subscription key', ->
     describe 'to create', ->
@@ -60,7 +59,7 @@ describe 'A ProducerManager', ->
 
         producerManager.removeProducer key
         sinon.assert.calledOnce(producer.dispose)
-        assert.equal(producerManager.instansiatedProducers[producer.NAME], undefined)
+        assert.equal(producerManager.getProducerInstanceByName(producer.NAME), undefined)
 
     describe 'given a invalid subscription key', ->
       it 'should throw an exception', ->

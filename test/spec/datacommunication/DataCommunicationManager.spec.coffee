@@ -1,8 +1,6 @@
 assert = require 'assert'
 sinon = require 'sinon'
 
-DataCommunicationManager = Vigor.DataCommunicationManager
-
 SubscriptionKeys = Vigor.SubscriptionKeys.extend {
   NEW_MOST_POPULAR_EVENTS:
     key: 'new_most_popular_events'
@@ -29,7 +27,7 @@ class DummyProducer extends Vigor.Producer
 
 describe 'A DataCommunicationManager', ->
   beforeEach ->
-    dataCommunicationManager = DataCommunicationManager.makeTestInstance()
+    dataCommunicationManager = Vigor.DataCommunicationManager
     dataCommunicationManager.registerProducers DummyProducer
 
     exampleComponent1 =
@@ -42,7 +40,7 @@ describe 'A DataCommunicationManager', ->
 
   afterEach ->
     do dataCommunicationManager.unregisterAllProducers
-    dataCommunicationManager = undefined
+    dataCommunicationManager.reset()
 
   describe 'using subscribe', ->
     it 'should add unique component to subscription map', ->
@@ -54,7 +52,7 @@ describe 'A DataCommunicationManager', ->
 
       dataCommunicationManager.subscribe id, key, callback, options
 
-      subscriptionComponentList = dataCommunicationManager.subscriptionsWithComponentIdentifiers[key.key]
+      subscriptionComponentList = dataCommunicationManager.getSubscriptionsWithSubscriptionKey key
       assert.ok(subscriptionComponentList)
       assert.equal(subscriptionComponentList.length, 1)
 
@@ -75,7 +73,7 @@ describe 'A DataCommunicationManager', ->
       dataCommunicationManager.subscribe id, key, callback, options
       dataCommunicationManager.subscribe id2, key, callback2, options
 
-      subscriptionComponentList = dataCommunicationManager.subscriptionsWithComponentIdentifiers[key.key]
+      subscriptionComponentList = dataCommunicationManager.getSubscriptionsWithSubscriptionKey key
       assert.ok(subscriptionComponentList)
       assert.equal(subscriptionComponentList.length, 2)
 
@@ -96,7 +94,7 @@ describe 'A DataCommunicationManager', ->
       dataCommunicationManager.subscribe id, key, callback, options
       dataCommunicationManager.subscribe id, key, callback, options
 
-      subscriptionComponentList = dataCommunicationManager.subscriptionsWithComponentIdentifiers[key.key]
+      subscriptionComponentList = dataCommunicationManager.getSubscriptionsWithSubscriptionKey key
       assert.ok(subscriptionComponentList)
       assert.equal(subscriptionComponentList.length, 1)
 
@@ -119,7 +117,7 @@ describe 'A DataCommunicationManager', ->
       dataCommunicationManager.subscribe id, key, callback, options
       dataCommunicationManager.subscribe id2, key, callback2, options
 
-      subscriptionComponentList = dataCommunicationManager.subscriptionsWithComponentIdentifiers[key.key]
+      subscriptionComponentList = dataCommunicationManager.getSubscriptionsWithSubscriptionKey key
       assert.ok(subscriptionComponentList)
       assert.equal(subscriptionComponentList.length, 2)
 
@@ -139,11 +137,11 @@ describe 'A DataCommunicationManager', ->
 
       dataCommunicationManager.subscribe id, key, callback, options
 
-      subscriptionComponentList = dataCommunicationManager.subscriptionsWithComponentIdentifiers[key.key]
+      subscriptionComponentList = dataCommunicationManager.getSubscriptionsWithSubscriptionKey key
       assert.ok(subscriptionComponentList)
       assert.equal(subscriptionComponentList.length, 1)
 
       dataCommunicationManager.unsubscribe id, key
-      subscriptionComponentList = dataCommunicationManager.subscriptionsWithComponentIdentifiers[key.key]
+      subscriptionComponentList = dataCommunicationManager.getSubscriptionsWithSubscriptionKey key
       assert.equal(subscriptionComponentList, undefined)
 
