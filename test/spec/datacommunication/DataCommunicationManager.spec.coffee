@@ -1,3 +1,4 @@
+Vigor = require '../../../dist/backbone.vigor'
 assert = require 'assert'
 sinon = require 'sinon'
 
