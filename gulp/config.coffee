@@ -1,6 +1,6 @@
 config =
   bootstrap: './src/bootstrap.coffee'
-  outputName: 'backbone.whateverwewanttocallit.js'
+  outputName: 'backbone.vigor.js'
   serverTarget: './examples'
   dest: './dist'
   src: './src/'
