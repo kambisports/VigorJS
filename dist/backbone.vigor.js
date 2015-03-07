@@ -513,6 +513,24 @@
 
       })();
       APIService = (function() {
+        function APIService(_window) {
+          var service;
+          this._window = _window != null ? _window : window;
+          this.channels = {};
+          service = this;
+          this.Model = Backbone.Model.extend({
+            sync: function(method, model, options) {
+              return service.sync(method, model, options);
+            },
+            url: function() {
+              return service.url(this);
+            },
+            parse: function(resp, options) {
+              return service.parse(resp, options, this);
+            }
+          });
+        }
+
         APIService.prototype.consolidateParams = function(paramsArray, channelName) {
           return paramsArray[0];
         };
@@ -546,24 +564,6 @@
         };
 
         APIService.prototype.channels = void 0;
-
-        function APIService(_window) {
-          var service;
-          this._window = _window != null ? _window : window;
-          this.channels = {};
-          service = this;
-          this.Model = Backbone.Model.extend({
-            sync: function(method, model, options) {
-              return service.sync(method, model, options);
-            },
-            url: function() {
-              return service.url(this);
-            },
-            parse: function(resp, options) {
-              return service.parse(resp, options, this);
-            }
-          });
-        }
 
         APIService.prototype.removeChannel = function(channel) {
           return this.channels = _.without(this.channels, channel);
@@ -617,6 +617,7 @@
 
         APIService.prototype.fetch = function(params) {
           var model;
+          console.trace();
           model = this.getModelInstance(params);
           return model.fetch({
             success: this.onFetchSuccess,

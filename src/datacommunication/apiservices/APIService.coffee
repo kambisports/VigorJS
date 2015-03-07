@@ -136,6 +136,26 @@ do ->
 
   class APIService
 
+    # optionally pass in a window object to stub Date, set/clearTimeout for testing
+    constructor: (@_window = window) ->
+      @channels = {}
+
+      service = @
+
+      # sync is called with the model as context
+      # url and parse are called with the service as the context
+      # url is passed the model
+      # parse is passed the sync response and options but not the model
+      @Model = Backbone.Model.extend
+        sync: (method, model, options) ->
+          service.sync method, model, options
+
+        url: ->
+          service.url @
+
+        parse: (resp, options) ->
+          service.parse resp, options, @
+
     # overridable
     # convert an array of params for the subscribers on this channel into
     # a single params object
@@ -183,26 +203,6 @@ do ->
     # an object referencing the channels owned by this service
     channels: undefined
 
-    # optionally pass in a window object to stub Date, set/clearTimeout for testing
-    constructor: (@_window = window) ->
-      @channels = {}
-
-      service = @
-
-      # sync is called with the model as context
-      # url and parse are called with the service as the context
-      # url is passed the model
-      # parse is passed the sync response and options but not the model
-      @Model = Backbone.Model.extend
-        sync: (method, model, options) ->
-          service.sync method, model, options
-
-        url: ->
-          service.url @
-
-        parse: (resp, options) ->
-          service.parse resp, options, @
-
 
     removeChannel: (channel) ->
       @channels = _.without @channels, channel
@@ -249,6 +249,7 @@ do ->
 
 
     fetch: (params) ->
+      console.trace()
       model = @getModelInstance params
       model.fetch
         success: @onFetchSuccess
