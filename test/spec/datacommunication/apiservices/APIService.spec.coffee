@@ -136,7 +136,7 @@ describe 'An ApiService', ->
 
       assert spy.calledOnce
 
-      args = spy.getCall(0).args
+      args = spy.lastCall.args
 
       # args are params array, channel name
       assert.equal args.length, 2
@@ -163,7 +163,7 @@ describe 'An ApiService', ->
 
       # one call for each time a subscription was added
       assert spy.calledTwice
-      args = spy.getCall(1).args
+      args = spy.lastCall.args
 
       # check params
       assert.equal args[0].length, 2
@@ -184,14 +184,14 @@ describe 'An ApiService', ->
     it 'does one-off fetches', ->
       params = {}
 
-      sinon.stub apiService, 'consolidateParams', -> params
+      consolidateParams = sinon.stub apiService, 'consolidateParams', -> params
       fetch = sinon.stub apiService, 'fetch'
 
       apiService.addSubscription
         params: params
 
       assert windowStub.setTimeout.calledOnce
-      args = windowStub.setTimeout.getCall(0).args
+      args = windowStub.setTimeout.lastCall.args
 
       assert.equal args.length, 2
       assert.equal args[1], 0
@@ -206,7 +206,7 @@ describe 'An ApiService', ->
       params = {}
       pollingInterval = 100
 
-      sinon.stub apiService, 'consolidateParams', -> params
+      consolidateParams = sinon.stub apiService, 'consolidateParams', -> params
       fetch = sinon.stub apiService, 'fetch'
 
       apiService.addSubscription
@@ -214,7 +214,7 @@ describe 'An ApiService', ->
         params: params
 
       assert windowStub.setTimeout.calledOnce
-      args = windowStub.setTimeout.getCall(0).args
+      args = windowStub.setTimeout.lastCall.args
 
       assert.equal args.length, 2
       assert.equal args[1], 0
@@ -223,7 +223,7 @@ describe 'An ApiService', ->
       callback()
 
       assert windowStub.setTimeout.calledTwice
-      args = windowStub.setTimeout.getCall(1).args
+      args = windowStub.setTimeout.lastCall.args
 
       assert.equal args.length, 2
       assert.equal args[1], pollingInterval
@@ -251,7 +251,7 @@ describe 'An ApiService', ->
       ]
 
       # params must change
-      sinon.stub apiService, 'consolidateParams', (params) ->
+      consolidateParams = sinon.stub apiService, 'consolidateParams', (params) ->
         consolidatedParams[params.length - 1]
 
       channelForParams = sinon.stub apiService, 'channelForParams', -> channelName
@@ -262,7 +262,7 @@ describe 'An ApiService', ->
         pollingInterval: pollingInterval
         params: params1
 
-      callback = windowStub.setTimeout.getCall(0).args[0]
+      callback = windowStub.setTimeout.lastCall.args[0]
       callback()
 
       apiService.addSubscription
@@ -271,8 +271,300 @@ describe 'An ApiService', ->
 
       assert shouldFetchOnParamsUpdate.calledOnce
 
-      args = apiService.shouldFetchOnParamsUpdate.getCall(0).args
+      args = apiService.shouldFetchOnParamsUpdate.lastCall.args
       assert.ok _.isEqual(args[0], consolidatedParams[1])
       assert.ok _.isEqual(args[1], consolidatedParams[0])
       assert.equal args[2], channelName
+
+    it 'fetches immediately when params change if shouldFetchOnParamsUpdate is true', ->
+      params1 = {}
+      params2 = {}
+      pollingInterval = 100
+      channelName = 'test'
+
+      consolidatedParams = [
+        {
+          foo: 'bar'
+        },
+        {
+          baz: 'qux'
+        }
+      ]
+
+      # params must change
+      consolidateParams = sinon.stub apiService, 'consolidateParams', (params) ->
+        consolidatedParams[params.length - 1]
+
+      channelForParams = sinon.stub apiService, 'channelForParams', -> channelName
+      fetch = sinon.stub apiService, 'fetch'
+      shouldFetchOnParamsUpdate = sinon.stub apiService, 'shouldFetchOnParamsUpdate', -> true
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval
+        params: params1
+
+      callback = windowStub.setTimeout.lastCall.args[0]
+      callback()
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval
+        params: params2
+
+      timeout = windowStub.setTimeout.lastCall.args[1]
+      assert.equal timeout, 0
+
+    it 'does not fetch immediately when params change if shouldFetchOnParamsUpdate is false', ->
+      params1 = {}
+      params2 = {}
+      pollingInterval = 100
+      channelName = 'test'
+
+      consolidatedParams = [
+        {
+          foo: 'bar'
+        },
+        {
+          baz: 'qux'
+        }
+      ]
+
+      # params must change
+      consolidateParams = sinon.stub apiService, 'consolidateParams', (params) ->
+        consolidatedParams[params.length - 1]
+
+      channelForParams = sinon.stub apiService, 'channelForParams', -> channelName
+      fetch = sinon.stub apiService, 'fetch'
+      shouldFetchOnParamsUpdate = sinon.stub apiService, 'shouldFetchOnParamsUpdate', -> false
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval
+        params: params1
+
+
+      callback = windowStub.setTimeout.lastCall.args[0]
+      callback()
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval
+        params: params2
+
+      timeout = windowStub.setTimeout.lastCall.args[1]
+      assert.equal timeout, 100
+
+    it 'does not ask to fetch immediately if params did not change', ->
+      params1 = {}
+      params2 = {}
+      pollingInterval = 100
+      channelName = 'test'
+
+      consolidatedParams = sinon.stub apiService, 'consolidateParams', (params) -> {}
+      channelForParams = sinon.stub apiService, 'channelForParams', -> channelName
+      fetch = sinon.stub apiService, 'fetch'
+      shouldFetchOnParamsUpdate = sinon.stub apiService, 'shouldFetchOnParamsUpdate', -> false
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval
+        params: params1
+
+
+      callback = windowStub.setTimeout.lastCall.args[0]
+      callback()
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval
+        params: params2
+
+      assert.equal shouldFetchOnParamsUpdate.callCount, 0
+
+    it 'does not ask to fetch immediately if params change on different channels', ->
+
+      params1 = {}
+      params2 = {}
+      pollingInterval = 100
+      channelName = 'test'
+
+      consolidateParams = sinon.stub apiService, 'consolidateParams', (params) ->
+        switch params[0]
+          when params1 then { foo: 'bar' }
+          when params2 then { baz: 'qux' }
+          else {}
+
+      channelForParams = sinon.stub apiService, 'channelForParams', (params) ->
+        switch params
+          when params1 then '1'
+          when params2 then '2'
+          else ''
+
+      fetch = sinon.stub apiService, 'fetch'
+      shouldFetchOnParamsUpdate = sinon.stub apiService, 'shouldFetchOnParamsUpdate', -> false
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval
+        params: params1
+
+      callback = windowStub.setTimeout.lastCall.args[0]
+      callback()
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval
+        params: params2
+
+        assert.equal shouldFetchOnParamsUpdate.callCount, 0
+
+    it 'updates the polling interval to the most frequent rate', ->
+
+      params1 = {}
+      params2 = {}
+      pollingInterval1 = 100
+      pollingInterval2 = 50
+
+      consolidateParams = sinon.stub apiService, 'consolidateParams', -> params1
+      channelForParams = sinon.stub apiService, 'channelForParams', -> 'test'
+      fetch = sinon.stub apiService, 'fetch'
+      shouldFetchOnParamsUpdate = sinon.stub apiService, 'shouldFetchOnParamsUpdate', -> true
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval1
+        params: params1
+
+      callback = windowStub.setTimeout.lastCall.args[0]
+      callback()
+
+      # the timeout for the first callback is always 0. Repetition sidesteps that case
+      callback = windowStub.setTimeout.lastCall.args[0]
+      callback()
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval2
+        params: params2
+
+      timeout = windowStub.setTimeout.lastCall.args[1]
+      assert.equal timeout, 50
+
+    it 'does not update the polling interval if the new value is less frequent', ->
+
+      params1 = {}
+      params2 = {}
+      pollingInterval1 = 50
+      pollingInterval2 = 100
+
+      consolidateParams = sinon.stub apiService, 'consolidateParams', -> params1
+      channelForParams = sinon.stub apiService, 'channelForParams', -> 'test'
+      fetch = sinon.stub apiService, 'fetch'
+      shouldFetchOnParamsUpdate = sinon.stub apiService, 'shouldFetchOnParamsUpdate', -> true
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval1
+        params: params1
+
+      callback = windowStub.setTimeout.lastCall.args[0]
+      callback()
+
+      # the timeout for the first callback is always 0. Repetition sidesteps that case
+      callback = windowStub.setTimeout.lastCall.args[0]
+      callback()
+
+      timeout = windowStub.setTimeout.lastCall.args[1]
+      assert.equal timeout, 50
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval2
+        params: params2
+
+      timeout = windowStub.setTimeout.lastCall.args[1]
+      assert.equal timeout, 50
+
+    it 'passes the correct remaining timeout when the polling interval changes', ->
+
+      params1 = {}
+      params2 = {}
+      pollingInterval1 = 100
+      pollingInterval2 = 50
+
+      elapsedTime = 20
+      remainingTime = pollingInterval2 - elapsedTime
+
+      consolidateParams = sinon.stub apiService, 'consolidateParams', -> params1
+      channelForParams = sinon.stub apiService, 'channelForParams', -> 'test'
+      fetch = sinon.stub apiService, 'fetch'
+      shouldFetchOnParamsUpdate = sinon.stub apiService, 'shouldFetchOnParamsUpdate', -> true
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval1
+        params: params1
+
+      callback = windowStub.setTimeout.lastCall.args[0]
+      callback()
+
+      # the timeout for the first callback is always 0. Repetition sidesteps that case
+      callback = windowStub.setTimeout.lastCall.args[0]
+      callback()
+
+      windowStub.Date.setNow 20
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval2
+        params: params2
+
+      timeout = windowStub.setTimeout.lastCall.args[1]
+      assert.equal timeout, remainingTime
+
+    it 'passes the correct remaining timeout when interval does not update', ->
+
+      params1 = {}
+      params2 = {}
+      pollingInterval = 100
+
+      remainingTime = pollingInterval
+
+      consolidateParams = sinon.stub apiService, 'consolidateParams', (params) ->
+        switch params[0]
+          when params1 then { foo: 'bar' }
+          when params2 then { baz: 'qux' }
+          else {}
+
+      channelForParams = sinon.stub apiService, 'channelForParams', -> 'test'
+      fetch = sinon.stub apiService, 'fetch'
+      shouldFetchOnParamsUpdate = sinon.stub apiService, 'shouldFetchOnParamsUpdate', -> true
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval
+        params: params1
+
+      callback = windowStub.setTimeout.lastCall.args[0]
+      callback()
+
+      # the timeout for the first callback is always 0. Repetition sidesteps that case
+      callback = windowStub.setTimeout.lastCall.args[0]
+      callback()
+
+      windowStub.Date.setNow 20
+
+      apiService.addSubscription
+        pollingInterval: pollingInterval
+        params: params2
+
+      timeout = windowStub.setTimeout.lastCall.args[1]
+      assert.equal timeout, remainingTime
+
+  describe 'fetches data', ->
+    describe 'default model', ->
+      it 'syncs', ->
+        model = new apiService.Model()
+        sync = sinon.stub apiService, 'sync'
+
+        method = 'GET'
+        model = model
+        options = {}
+
+        model.sync method, model, options
+
+        assert.equal sync.callCount, 1
+        args = sync.lastCall.args
+        assert.equal args.length, 3
+        assert.equal args[0], method
+        assert.equal args[1], model
+        assert.equal args[2], options
+        # assert.equal sync.lastCall
+        # (expect apiService.sync.mostRecentCall.object).toBe apiService
 
