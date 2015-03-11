@@ -34,6 +34,8 @@
   # COMMON
   #= include ./common/EventBus.coffee
   #= include ./common/PackageBase.coffee
+  #= include ./common/SubscriptionKeys.coffee
+  #= include ./common/EventKeys.coffee
 
   # DATACOMMUNICATION/PRODUCERS
   #= include ./datacommunication/producers/Producer.coffee
@@ -44,8 +46,6 @@
   #= include ./datacommunication/apiservices/APIService.coffee
 
   # DATACOMMUNICATION
-  #= include ./datacommunication/SubscriptionKeys.coffee
-  #= include ./datacommunication/EventKeys.coffee
   #= include ./datacommunication/ComponentIdentifier.coffee
   #= include ./datacommunication/DataCommunicationManager.coffee
 

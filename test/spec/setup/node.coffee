@@ -6,26 +6,26 @@ global.Backbone = require 'backbone'
 global.Backbone.$ = global.$
 global.Vigor = {}
 
-  # COMMON
-requireHelper 'common/EventBus'
-requireHelper 'common/ComponentView'
-requireHelper 'common/PackageBase'
-requireHelper 'common/ViewModel'
+#   # COMMON
+# requireHelper 'common/EventBus'
+# requireHelper 'common/ComponentView'
+# requireHelper 'common/PackageBase'
+# requireHelper 'common/ViewModel'
+# requireHelper 'common/SubscriptionKeys'
+# requireHelper 'common/EventKeys'
 
-  # DATACOMMUNICATION/PRODUCERS
-requireHelper 'datacommunication/producers/Producer'
-requireHelper 'datacommunication/producers/ProducerMapper'
-requireHelper 'datacommunication/producers/ProducerManager'
+#   # DATACOMMUNICATION/PRODUCERS
+# requireHelper 'datacommunication/producers/Producer'
+# requireHelper 'datacommunication/producers/ProducerMapper'
+# requireHelper 'datacommunication/producers/ProducerManager'
 
-  # DATACOMMUNICATION/APISERVICES
-requireHelper 'datacommunication/apiservices/APIService'
+#   # DATACOMMUNICATION/APISERVICES
+# requireHelper 'datacommunication/apiservices/APIService'
 
-  # DATACOMMUNICATION
-requireHelper 'datacommunication/SubscriptionKeys'
-requireHelper 'datacommunication/EventKeys'
-requireHelper 'datacommunication/ComponentIdentifier'
-requireHelper 'datacommunication/DataCommunicationManager'
+#   # DATACOMMUNICATION
+# requireHelper 'datacommunication/ComponentIdentifier'
+# requireHelper 'datacommunication/DataCommunicationManager'
 
-  # REPOSITORIES
-requireHelper 'datacommunication/repositories/Repository'
-requireHelper 'datacommunication/repositories/ServiceRepository'
+#   # REPOSITORIES
+# requireHelper 'datacommunication/repositories/Repository'
+# requireHelper 'datacommunication/repositories/ServiceRepository'

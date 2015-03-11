@@ -115,6 +115,18 @@
     })();
     PackageBase.extend = Vigor.extend;
     Vigor.PackageBase = PackageBase;
+    Vigor.SubscriptionKeys = {
+      extend: function(object) {
+        return _.extend(this, object);
+      }
+    };
+    Vigor.EventKeys = {
+      ALL_EVENTS: 'all',
+      extend: function(object) {
+        _.extend(this, object);
+        return this;
+      }
+    };
     Producer = (function() {
       Producer.prototype.subscriptionKeyToComponents = {};
 
@@ -641,18 +653,6 @@
       APIService.extend = Vigor.extend;
       return Vigor.APIService = APIService;
     })();
-    Vigor.SubscriptionKeys = {
-      extend: function(object) {
-        return _.extend(this, object);
-      }
-    };
-    Vigor.EventKeys = {
-      ALL_EVENTS: 'all',
-      extend: function(object) {
-        _.extend(this, object);
-        return this;
-      }
-    };
     ComponentIdentifier = (function() {
       ComponentIdentifier.prototype.id = void 0;
 
