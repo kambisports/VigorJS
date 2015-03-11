@@ -565,6 +565,96 @@ describe 'An ApiService', ->
         assert.equal args[0], method
         assert.equal args[1], model
         assert.equal args[2], options
-        # assert.equal sync.lastCall
-        # (expect apiService.sync.mostRecentCall.object).toBe apiService
+        assert.equal sync.lastCall.thisValue, apiService
 
+      it 'gets the URL', ->
+        model = new apiService.Model()
+        url = sinon.stub apiService, 'url'
+
+        model.url()
+
+        assert url.calledOnce
+        args = url.lastCall.args
+        assert.equal args.length, 1
+        assert.equal args[0], model
+        assert.equal url.lastCall.thisValue, apiService
+
+      it 'parses the response', ->
+        model = new apiService.Model()
+        parse = sinon.stub apiService, 'parse'
+
+        response = {}
+        options = {}
+        model.parse response, options
+
+        assert parse.calledOnce
+        args = parse.lastCall.args
+        assert.equal args.length, 3
+        assert.equal args[0], response
+        assert.equal args[1], options
+        assert.equal args[2], model
+        assert.equal parse.lastCall.thisValue, apiService
+
+      it 'can be overridden by getModelInstance', ->
+        model = new Backbone.Model
+        model.fetch = sinon.spy()
+
+        apiService.getModelInstance = -> model
+
+        consolidatedParams = {}
+
+        apiService.onFetchSuccess = ->
+        apiService.onFetchError = ->
+
+        callbacks =
+          success: apiService.onFetchSuccess
+          error: apiService.onFetchError
+
+        apiService.fetch consolidatedParams
+
+        assert model.fetch.calledOnce
+
+        args = model.fetch.lastCall.args
+        assert.ok _.isEqual(args[0], callbacks)
+
+    it 'calls fetch on the service', ->
+
+      consolidatedParams = {}
+
+      consolidateParams = sinon.stub apiService, 'consolidateParams', -> consolidatedParams
+      fetch = sinon.stub apiService, 'fetch'
+
+      apiService.addSubscription {}
+
+      callback = windowStub.setTimeout.lastCall.args[0]
+      callback()
+
+      assert fetch.calledOnce
+
+      args = fetch.lastCall.args
+      assert.equal args[0], consolidatedParams
+
+    it 'calls fetch on the model', ->
+
+      consolidatedParams = {}
+
+      modelFetch = sinon.spy()
+
+      getModelInstance = sinon.stub apiService, 'getModelInstance', (params) ->
+        assert.equal params, consolidatedParams
+        model = new Backbone.Model params
+        model.fetch = modelFetch
+        model
+
+      apiService.onFetchSuccess = ->
+      apiService.onFetchError = ->
+
+      callbacks =
+        success: apiService.onFetchSuccess
+        error: apiService.onFetchError
+
+      apiService.fetch consolidatedParams
+
+      assert modelFetch.calledOnce
+      args = modelFetch.lastCall.args
+      assert.ok _.isEqual(args[0], callbacks)
