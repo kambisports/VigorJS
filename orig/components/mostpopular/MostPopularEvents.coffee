@@ -1,3 +1,0 @@
-define ->
-	MostPopularEvents =
-		EMPTY: 'empty'
