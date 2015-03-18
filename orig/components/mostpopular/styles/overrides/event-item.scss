@@ -1,0 +1,26 @@
+.modularized__event-link {
+	padding: 8px 50% 8px 8px;
+}
+
+.modularized__event-link__event-name {
+	font-size: $font-size-centi;
+	color: $mostpopular-event-name-text-color;
+	width: 50%;
+	span {
+		display: block;
+
+		&.modularized__event-name-divider {
+			display: none;
+		}
+	}
+}
+
+.modularized__event-link__group,
+.modularized__event-name-home,
+.modularized__event-name-away {
+	display: block;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	padding-right: 20px;
+}

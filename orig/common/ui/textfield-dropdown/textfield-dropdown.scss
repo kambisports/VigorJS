@@ -1,0 +1,46 @@
+$textFieldDropDownItemHeight: 40px; //this value is also hardcoded in TextfieldDropdownView.coffee
+
+.textfield-dropdown {
+	overflow: hidden;
+	height: $textFieldDropDownItemHeight;
+}
+.textfield-dropdown__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.textfield-dropdown__item {
+	color: rgb(255, 255, 255);
+	line-height: $textFieldDropDownItemHeight;
+	text-align: left;
+	//margin-top: 0px; //is set by JavaScript on this selector
+}
+
+.textfield-dropdown--expanded {
+	overflow: visible;
+	position: absolute;
+
+	.textfield-dropdown__list {
+		background: rgb(255, 255, 255);
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.26);
+		border-radius: 2px;
+		margin-left: -20px;
+	}
+	.textfield-dropdown__item {
+		color: #666;
+		padding: 0 20px;
+		border-radius: 2px;
+		white-space: nowrap;
+
+		@include transition(color 0.2s ease-out);
+		@include mouse-hover-style {
+			color: rgb(206, 206, 206);
+		}
+		@include mouse-down-style {
+			color: rgb(206, 206, 206);
+		}
+	}
+	.textfield-dropdown__item--selected {
+		color: rgb(0, 0, 0);
+	}
+}

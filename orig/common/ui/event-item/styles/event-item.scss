@@ -1,0 +1,55 @@
+.modularized__event-item {
+	position: relative;
+	@extend %streaming-eventlist-item;
+	background-color: $event-group-event-background-color;
+	border-top: $event-group-event-border-top;
+	overflow: hidden;
+
+	.outcomes-container {
+		position: absolute;
+		right: 10px;
+		width: 48%;
+		min-width: 100px;
+		padding: 0;
+		top: 50%;
+		@include transform(translate(0,-50%));
+		background-color: transparent;
+	}
+}
+
+.modularized__event-link {
+	position: relative;
+	display: block;
+	cursor: pointer;
+	padding: 8px 10px 4px 8px;
+	text-decoration: none;
+	background: $event-background-color;
+
+	@include transition("background 0.15s ease-out"); //this should be synced with starttime-ticker.scss
+	@include mouse-hover-style {
+		background: $event-group-hover-background-color;
+	}
+	@include mouse-down-style {
+		background: $event-group-touch-background-color;
+	}
+
+}
+
+.modularized__event-link__event-name {
+	cursor: pointer;
+	font-family: $font-family-narrow;
+	font-size: $font-size-deci;
+	font-weight: bold;
+	line-height: 14px;
+	text-decoration: none;
+	color: $eventlist-eventname-text-color;
+}
+
+.modularized__event-link__group {
+	display: block;
+	padding: 0 0 2px 0;
+	font-size: $font-size-micro;
+	color:#888;
+	font-family: $font-family-primary;
+	white-space: normal;
+}

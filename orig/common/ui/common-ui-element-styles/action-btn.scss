@@ -1,0 +1,43 @@
+.modularized__action-btn {
+	font-size: $font-size-large;
+	font-family: $font-family-narrow;
+	font-weight: bold;
+	line-height: 35px;
+	padding-top: 2px;
+	height: auto;
+	width: 90%;
+	display:block;
+	margin:10px auto;
+
+	@include transition(background-color 0.15s ease-out);
+	@include border-radius($btn-addtobetslip-border-radius);
+	@include box-shadow($btn-addtobetslip-box-shadow);
+	@include text-shadow($btn-addtobetslip-text-shadow);
+	@include gradient-linear-vertical($modularized-btn-addtobetslip-background-gradient...);
+
+	@include mouse-hover-style {
+		@include gradient-linear-vertical($modularized-btn-addtobetslip-hover-background-gradient...);
+	}
+	@include mouse-down-style {
+		@include gradient-linear-vertical($modularized-btn-addtobetslip-touch-background-gradient...);
+	}
+
+	border: $btn-addtobetslip-border;
+	color: $btn-addtobetslip-text-color;
+
+	&.disabled {
+		@include gradient-linear-vertical($modularized-btn-addtobetslip-disabled-background-gradient...);
+		@include box-shadow(none);
+		@include text-shadow(none);
+		color: $btn-addtobetslip-disabled-text-color;
+		border: $btn-addtobetslip-disabled-border;
+		cursor: default;
+
+		@include mouse-hover-style {
+			@include gradient-linear-vertical($modularized-btn-addtobetslip-disabled-background-gradient...);
+		}
+		@include mouse-down-style {
+			@include gradient-linear-vertical($modularized-btn-addtobetslip-disabled-background-gradient...);
+		}
+	}
+}

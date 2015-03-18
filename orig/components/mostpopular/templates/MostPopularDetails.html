@@ -1,0 +1,17 @@
+{{#if supportsSelect}}
+	<div class="modularized__most-popular__details-label">
+		<span class="modularized__most-popular__stake-label">{{getTranslation stakeLabel}}</span>
+		<span>{{getTranslation potentialPayoutLabel}}</span>
+	</div>
+
+	<div class="modularized__most-popular__details-value">
+		<select class="modularized__select-menu modularized__most-popular__stake-selector modularized__js-most-popular__stake-selector" data-touch-feedback="true"></select>
+		<span class="modularized__most-popular__potential-payout modularized__js-most-popular__potential-payout">
+			{{formatCurrencyWithSymbol potentialPayout}}
+		</span>
+	</div>
+{{/if}}
+
+<button data-name="add-to-betslip" data-touch-feedback="true" class="modularized__js-most-popular__add-to-betslip-btn modularized__action-btn">
+	{{getUpperCaseTranslation addToBetslipLabel}}
+</button>

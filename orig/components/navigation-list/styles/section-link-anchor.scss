@@ -1,0 +1,127 @@
+// Navigation links
+.navigation-menu__section-link-anchor {
+	color: $navigation-event-path-text-color;
+	text-decoration: none;
+	font-family: $font-family-narrow;
+	font-weight: normal;
+	font-size: $font-size-normal;
+	background-color: $navigation-link-background-color;
+	padding: 0 45px 0 14px;
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	position: relative;
+	line-height: 30px;
+
+	@include transition("color 0.2s ease-out, background 0.2s ease-out");
+	@include mouse-hover-style {
+		background-color: $navigation-link-hover-background-color;
+		.navigation-menu__section-link-event-label {
+			color: lighten($navigation-link-text-color, 15%);
+		}
+	}
+	@include mouse-down-style {
+		background-color: $navigation-link-touch-background-color;
+		.navigation-menu__section-link-event-label {
+			color: lighten($navigation-link-text-color, 30%);
+		}
+	}
+
+	&:focus {
+		outline: 0;
+	}
+
+	&:hover {
+		border-left: 2px solid #444;
+		padding-left: 12px;
+	}
+	// Active and hover states
+	&.navigation-menu__section-link-anchor--active:hover,
+	&.navigation-menu__section-link-anchor--active {
+		border-left: 2px solid #FFF;
+		padding-left: 12px;
+	}
+}
+
+// Extra margin to the top for the all sports link
+.navigation-menu__section-link-anchor--allsports {
+	margin: 12px 0 0 0;
+}
+
+
+.navigation-menu__section-link-event-label {
+	color: $navigation-link-text-color;
+}
+
+.NAVIGATION-MENU__SECTION-LINK-EVENT-LABEL__NOW { //we uppercase innerHtml so class name too
+	color: $navigation-link-live-text-color;
+	font-style: normal;
+}
+
+
+.navigation-menu__section-link-event-path {
+	font-family: $font-family-primary;
+	font-size: $font-size-nano;
+	color: $navigation-event-path-text-color;
+	padding: 0 0 0 6px;
+	vertical-align: bottom;
+	line-height: 28px;
+}
+
+.navigation-menu__section-link-event-count {
+	color: $navigation-event-count-text-color;
+	font-family: $font-family-primary;
+	font-size: $font-size-nano;
+	position: absolute;
+	right: 11px;
+	bottom: 0;
+	line-height: 28px;
+}
+
+.navigation-menu__section-link-anchor--liverightnow,
+.navigation-menu__section-link-anchor--allsports {
+	padding: 0 14px;
+
+	.navigation-menu__section-link-event-count {
+		font-size: $font-size-normal;
+		padding: 0 0 0 6px;
+		position: static;
+		line-height: 30px;
+
+		&:before {
+			content: "(";
+		}
+		&:after {
+			content: ")";
+		}
+	}
+}
+
+.navigation-menu__section--browse {
+	.navigation-menu__section-link-anchor {
+		padding-right: 14px;
+	}
+}
+
+// Desktop styling
+.no-touch {
+	.navigation-menu__section-header,
+	.navigation-menu__section-link-anchor {
+		line-height: 24px;
+	}
+	.navigation-menu__section-link-anchor {
+		font-size: $font-size-deci;
+	}
+	.navigation-menu__section-link-event-count,
+	.navigation-menu__section-link-event-path {
+		line-height: 22px;
+	}
+	.navigation-menu__section-link-anchor--liverightnow,
+	.navigation-menu__section-link-anchor--allsports {
+		.navigation-menu__section-link-event-count {
+			font-size: $font-size-deci;
+			line-height: 24px;
+		}
+	}
+}
