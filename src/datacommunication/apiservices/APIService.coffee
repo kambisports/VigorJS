@@ -249,7 +249,6 @@ do ->
 
 
     fetch: (params) ->
-      console.trace()
       model = @getModelInstance params
       model.fetch
         success: @onFetchSuccess

@@ -4,9 +4,6 @@ class ComponentIdentifier
   callback: undefined
   options: undefined
 
-  constructor: (componentId, componentCb, componentOptions) ->
-    @id = componentId
-    @callback = componentCb
-    @options = componentOptions
+  constructor: (@id, @callback, @options) ->
 
 Vigor.ComponentIdentifier = ComponentIdentifier

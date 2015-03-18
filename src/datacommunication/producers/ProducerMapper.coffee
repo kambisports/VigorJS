@@ -1,45 +1,47 @@
 do ->
 
   producers = []
-  subscriptionKeyToProducerMap = {}
+  producersByKey = {}
+
+  NO_PRODUCERS_ERROR = "There are no producers registered - register producers through the DataCommunicationManager"
+  NO_PRODUCER_FOUND_ERROR = (key) ->
+    "No producer found for subscription #{key}!"
 
   ProducerMapper =
-    findProducerClassForSubscription: (subscriptionKey) ->
+
+    producerClassForKey: (subscriptionKey) ->
       key = subscriptionKey.key
-      producerClass = subscriptionKeyToProducerMap[key]
-      throw "There are no producers registered - register producers through the DataCommunicationManager" unless producers.length > 0
-      throw "No producer found for subscription #{key}!" unless producerClass
+      if producers.length is 0
+        throw NO_PRODUCERS_ERROR
+
+      producerClass = producersByKey[key]
+
+      unless producerClass
+        throw NO_PRODUCER_FOUND_ERROR key
+
       return producerClass
 
-    addProducerClass: (producerClass) ->
-      if producers.indexOf(producerClass) is -1
+    producerForKey: (subscriptionKey) ->
+      producerClass = @producerClassForKey subscriptionKey
+      producerClass::getInstance()
+
+    register: (producerClass) ->
+      if (producers.indexOf producerClass) is -1
         producers.push producerClass
-        do _buildMap
-      return @
 
-    removeProducerClass: (producerClass) ->
-      index = producers.indexOf(producerClass)
-      if index isnt -1
-        producers.splice index, 1
-
-        producerClass.prototype.SUBSCRIPTION_KEYS.forEach (subscriptionKey) =>
+        for subscriptionKey in producerClass.prototype.SUBSCRIPTION_KEYS
           key = subscriptionKey.key
-          delete subscriptionKeyToProducerMap[key]
+          producersByKey[key] = producerClass
 
-        do _buildMap
-      return @
-
-    getAllProducers: ->
-      return producers
-
-    removeAllProducers: ->
+    # used for testing puposes
+    reset: ->
       producers = []
-      subscriptionKeyToProducerMap = {}
+      producersByKey = {}
 
-  _buildMap = ->
-    producers.forEach (producer) =>
-      producer.prototype.SUBSCRIPTION_KEYS.forEach (subscriptionKey) =>
-        key = subscriptionKey.key
-        subscriptionKeyToProducerMap[key] = producer
+    # getProducers: ->
+    #   return producers
+
+    # getProducersByKey: ->
+    #   return producersByKey
 
   Vigor.ProducerMapper = ProducerMapper

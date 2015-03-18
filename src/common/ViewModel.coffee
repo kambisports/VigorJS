@@ -1,26 +1,21 @@
 class ViewModel
-  DataCommunicationManager = Vigor.DataCommunicationManager
 
-  id: 'ViewModel'
-  subscriptionIds: []
+  dataCommunicationManager = Vigor.DataCommunicationManager
 
   constructor: ->
-    @id = @getUniqueId()
-
-  getUniqueId: ->
-    return "#{@id}_#{_.uniqueId()}"
+    @id = "ViewModel_#{_.uniqueId()}"
 
   dispose: ->
     do @unsubscribeAll
 
   subscribe: (key, callback, options) ->
-    return DataCommunicationManager.subscribe @id, key, callback, options
+    return dataCommunicationManager.subscribe @id, key, callback, options
 
   unsubscribe: (key) ->
-    return DataCommunicationManager.unsubscribe @id, key
+    return dataCommunicationManager.unsubscribe @id, key
 
   unsubscribeAll: ->
-    return DataCommunicationManager.unsubscribeAll @id
+    return dataCommunicationManager.unsubscribeAll @id
 
   validateContract: (contract, incommingData) ->
     unless contract

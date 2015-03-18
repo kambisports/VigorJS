@@ -1,20 +1,57 @@
 class Producer
 
+  _isSubscribedToRepositories: false
   subscriptionKeyToComponents: {}
 
   constructor: ->
     do @_addKeysToMap
 
-  addComponent: (subscriptionKey, componentIdentifier) ->
+  getInstance: ->
+    unless @instance?
+      @instance = new @constructor()
+    @instance
+
+  addComponent: (subscriptionKey, subscription) ->
     key = subscriptionKey.key
     registeredComponents = @subscriptionKeyToComponents[key]
-    unless registeredComponents
-      throw new Error('Unknown subscription key, could not add component!')
 
-    @subscriptionKeyToComponents[key].push componentIdentifier
+    unless registeredComponents
+      throw new Error("Unknown subscription key: #{key}, could not add component!")
+
+    existingSubscription = registeredComponents[subscription.id]
+    if existingSubscription?
+      throw "Component #{subscription.id} is already subscribed to the key #{subscriptionKey.key}"
+
+    registeredComponents[subscription.id] = subscription
+    @subscribe subscriptionKey, subscription.options
+
+    unless @_isSubscribedToRepositories
+      @subscribeToRepositories()
+      @_isSubscribedToRepositories = true
+
+  removeComponent: (subscriptionKey, componentId) ->
+    key = subscriptionKey.key
+    # handle call with only componentId; remove component for all keys
+    unless componentId?
+      componentId = subscriptionKey
+      _.each @SUBSCRIPTION_KEYS, (subscriptionKey) ->
+        @removeComponent subscriptionKey, componentId
+      , @
+      return
+
+    registeredComponents = @subscriptionKeyToComponents[key]
+
+    subscription = registeredComponents[componentId]
+
+    if subscription?
+      @unsubscribe subscriptionKey, subscription.options
+      delete registeredComponents[subscription.id]
+
+      if @shouldUnsubscribeFromRepositories()
+        @unsubscribeFromRepositories()
+        @_isSubscribedToRepositories = false
 
   produce: (subscriptionKey, data, filterFn = ->) ->
-
     key = subscriptionKey.key
     @_validateContract(subscriptionKey, data)
 
@@ -27,12 +64,27 @@ class Producer
   subscribe: (subscriptionKey, options) ->
     throw new Error("Subscription handler should be overriden in subclass! Implement for subscription #{subscriptionKey} with options #{options}")
 
-  dispose: ->
-    throw new Error("Dispose shuld be overriden in subclass!")
+  unsubscribe: (subscriptionKey, options) ->
+
+  subscribeToRepositories: ->
+    throw 'subscribeToRepositories should be overridden in subclass!'
+
+  unsubscribeFromRepositories: ->
+    throw 'unsubscribeFromRepositories should be overridden in subclass!'
+
+  shouldUnsubscribeFromRepositories: ->
+    # for..in finds out whether there are any keys
+    # faster than checking whether the length of the keys is 0
+    for key, components of @subscriptionKeyToComponents
+      for component of components
+        return false
+
+    return true
+
 
   extend: (obj, mixin) ->
     obj[name] = method for name, method of mixin
-    obj
+    return obj
 
   mixin: (instance, mixin) ->
     @extend instance, mixin
@@ -42,10 +94,11 @@ class Producer
       decorator(data)
     return data
 
+  modelToJSON: (model) ->
+    return model.toJSON()
+
   modelsToJSON: (models) ->
-    modelsJSON = _.map models, (model) ->
-      return model.toJSON()
-    return modelsJSON
+    _.map models, @modelToJSON
 
   _validateContract: (subscriptionKey, dataToProduce) ->
     contract = subscriptionKey.contract
@@ -84,11 +137,10 @@ class Producer
   # add valid subscription keys to map (keys listed in subclass)
   _addKeysToMap: ->
     for subscriptionKey in @SUBSCRIPTION_KEYS
-      @subscriptionKeyToComponents[subscriptionKey.key] = []
+      @subscriptionKeyToComponents[subscriptionKey.key] = {}
 
   # Default
   SUBSCRIPTION_KEYS: []
-  NAME: 'Producer'
 
 Producer.extend = Vigor.extend
 Vigor.Producer = Producer

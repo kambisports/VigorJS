@@ -12,14 +12,11 @@ var app = app || {};
       SubscriptionKeys.HELLO_WORLD
     ],
 
-    NAME: 'HelloWorldProducer',
-
-    constructor: function () {
-      Vigor.Producer.prototype.constructor.call(this, arguments);
+    subscribeToRepositories: function () {
       HelloWorldRepository.on(HelloWorldRepository.REPOSITORY_DIFF, this._onDiffInRepository, this);
     },
 
-    dispose: function () {
+    unsubscribeFromRepositories: function () {
       HelloWorldRepository.off(HelloWorldRepository.REPOSITORY_DIFF, this._onDiffInRepository, this);
     },
 

@@ -2,12 +2,18 @@ class ServiceRepository extends Vigor.Repository
 
   services: {}
 
+  addSubscriptionToService: (service, subscription) ->
+    service.addSubscription subscription
+
+  removeSubscriptionFromService: (service, subscription) ->
+    service.removeSubscription subscription
+
   addSubscription: (type, subscription) ->
     if @services[type]
-      @services[type].addSubscription subscription
+      @addSubscriptionToService @services[type], subscription
 
   removeSubscription: (type, subscription) ->
     if @services[type]
-      @services[type].removeSubscription subscription
+      @removeSubscriptionFromService @services[type], subscription
 
 Vigor.ServiceRepository = ServiceRepository

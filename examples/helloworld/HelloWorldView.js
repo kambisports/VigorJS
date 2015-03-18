@@ -8,16 +8,12 @@ var app = app || {};
     $helloWorldItemsList: undefined,
     _helloWorldItems: undefined,
 
-    constructor: function (options) {
-      Vigor.ComponentView.prototype.constructor.call(this, options);
+    initialize: function (options) {
+      Vigor.ComponentView.prototype.initialize.call(this, options);
       this._helloWorldItems = [];
 
       this.listenTo(this.viewModel.helloWorldItems, 'add', this._onHelloWorldItemsAdd);
       this.listenTo(this.viewModel.helloWorldItems, 'remove', this._onHelloWorldItemsRemove);
-    },
-
-    initialize: function (options) {
-      Vigor.ComponentView.prototype.initialize.call(this, options);
     },
 
     renderStaticContent: function () {
@@ -27,12 +23,16 @@ var app = app || {};
       this.$el.html(tmpl);
 
       this.$helloWorldItemsList = $('.modularized__hello-world-items-list', this.$el);
+
+      return this;
     },
 
     renderDynamicContent: function () {
       _.each(this._helloWorldItems, function (helloWorldItemView) {
-        this.$helloWorldItemsList.append(helloWorldItemView.render().el);
+        this.$helloWorldItemsList.append(helloWorldItemView.el);
       }, this);
+
+      return this;
     },
 
     addSubscriptions: function () {
@@ -55,6 +55,7 @@ var app = app || {};
       var helloWorldItemModel = new app.HelloWorldItemViewModel(addedItem.id),
           helloWorldItemView = new app.HelloWorldItemView({ viewModel: helloWorldItemModel });
 
+      helloWorldItemView.render();
       this._helloWorldItems.push(helloWorldItemView);
       this.renderDynamicContent();
     },
