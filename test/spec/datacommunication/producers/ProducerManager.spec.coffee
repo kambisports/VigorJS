@@ -4,6 +4,7 @@ sinon = require 'sinon'
 
 dataCommunicationManager = Vigor.DataCommunicationManager
 producerManager = Vigor.ProducerManager
+producerMapper = Vigor.ProducerMapper
 
 SubscriptionKeys = Vigor.SubscriptionKeys.extend {
 
@@ -43,62 +44,59 @@ describe 'A ProducerManager', ->
   beforeEach ->
     dataCommunicationManager.registerProducers [DummyProducer1, DummyProducer2]
 
-  # afterEach ->
-  #   do dataCommunicationManager.reset
+  afterEach ->
+    do producerMapper.reset
 
   describe 'given a valid subscription key', ->
 
     it 'should return the producer', ->
       producer = producerManager.producerForKey SubscriptionKeys.EXAMPLE_KEY1
-      assert.equal producer instanceof DummyProducer1, true
+      assert.ok producer instanceof DummyProducer1
 
     it 'should return the correct producer', ->
       producer1 = producerManager.producerForKey SubscriptionKeys.EXAMPLE_KEY1
       producer2 = producerManager.producerForKey SubscriptionKeys.EXAMPLE_KEY2
       assert.notEqual producer2, producer1
 
-    # describe 'to subscribe', ->
-    #   it 'should call the producer\'s addComponent method', ->
+    describe 'to subscribe', ->
+      it 'should call the producer\'s addComponent method', ->
 
-    #     options = {}
-    #     spyOn MostPopularProducerStub.prototype, 'addComponent'
-    #     ProducerManager.subscribeComponentToKey MOST_POPULAR_EVENTS_KEY, options
-    #     (expect MostPopularProducerStub.prototype.addComponent.calls.length).toBe 1
-    #     (expect MostPopularProducerStub.prototype.addComponent.calls[0].object instanceof MostPopularProducerStub).toBe true
-    #     args = MostPopularProducerStub.prototype.addComponent.calls[0].args
-    #     (expect args.length).toBe 2
-    #     (expect args[0]).toBe MOST_POPULAR_EVENTS
-    #     (expect args[1]).toBe options
+        options = {}
 
-    # describe 'to create', ->
-    #   it 'should return a new instance of producer if one has not been instansiated', ->
-    #     key = SubscriptionKeysEXAMPLE_KEY.
-    #     producer = producerManager.getProducer key
-    #     assert.ok(producer)
+        addComponent = sinon.spy DummyProducer1.prototype, 'addComponent'
+        producerManager.subscribeComponentToKey SubscriptionKeys.EXAMPLE_KEY1, options
 
-    #   it 'should return exisiting producer if one has already been instansiated', ->
-    #     key = SubscriptionKeysEXAMPLE_KEY.
-    #     producer1 = producerManager.getProducer key
-    #     producer2 = producerManager.getProducer key
-    #     assert.equal(producer2, producer1)
+        instance = addComponent.thisValues[0]
+        args = addComponent.args[0]
 
-    # describe 'to remove', ->
-    #   it 'should dispose the producer and remove it from list of producers', ->
-    #     key = SubscriptionKeysEXAMPLE_KEY.
-    #     producer = producerManager.getProducer key
-    #     sandbox.stub(producer, 'dispose')
+        assert addComponent.calledOnce
+        assert.ok instance instanceof DummyProducer1
 
-    #     producerManager.removeProducer key
-    #     sinon.assert.calledOnce(producer.dispose)
-    #     assert.equal(producerManager.getProducerInstanceByName(producer.NAME), undefined)
+        assert.equal args.length, 2
+        assert.equal args[0], SubscriptionKeys.EXAMPLE_KEY1
+        assert.equal args[1], options
 
-    # describe 'given a invalid subscription key', ->
-    #   it 'should throw an exception', ->
-    #     subscriptionKey =
-    #       key: 'InvalidSubscriptionKey'
-    #       contract:
-    #         key1: 'string'
+    describe 'to unsubscribe', ->
+      it 'should call the producer\'s removeComponent method', ->
+        componentId = 'dummy'
 
-    #     errorFn = -> producerManager.getProducer subscriptionKey
-    #     assert.throws (-> errorFn()), /No producer found for subscription InvalidSubscriptionKey!/
+        removeComponent = sinon.spy DummyProducer1.prototype, 'removeComponent'
+
+        producerManager.unsubscribeComponentFromKey SubscriptionKeys.EXAMPLE_KEY1, componentId
+
+        instance = removeComponent.thisValues[0]
+        args = removeComponent.args[0]
+
+        assert removeComponent.calledOnce
+        assert.ok instance instanceof DummyProducer1
+
+        assert.equal args.length, 2
+        assert.equal args[0], SubscriptionKeys.EXAMPLE_KEY1
+        assert.equal args[1], componentId
+
+  # This method doesn't seem to exist
+  # describe 'given a invalid subscription key', ->
+  #   it 'should throw an exception', ->
+  #     errorFn = -> producerManager.getProducer INVALID_SUBSCRIPTION_KEY
+  #     assert.throws (-> errorFn()), /Unknown subscription key, could not add component!/
 

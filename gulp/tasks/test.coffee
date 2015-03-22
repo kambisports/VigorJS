@@ -2,9 +2,13 @@ gulp = require 'gulp'
 istanbul = require 'gulp-coffee-istanbul'
 mocha = require 'gulp-mocha'
 
+global.extend = (obj, mixin) ->
+  obj[name] = method for name, method of mixin
+  obj
+
 distFile = ['dist/backbone.vigor.js']
-coffeeFiles = ['src/**/*.coffee']
-specFiles = ['test/**/*.coffee']
+# coffeeFiles = ['src/**/*.coffee']
+specFiles = ['test/spec/**/*.coffee']
 
 gulp.task 'test', ->
   gulp.src distFile

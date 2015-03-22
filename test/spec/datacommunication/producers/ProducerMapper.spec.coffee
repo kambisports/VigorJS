@@ -1,7 +1,8 @@
 Vigor = require '../../../../dist/backbone.vigor'
 assert = require 'assert'
 sinon = require 'sinon'
-# sandbox = undefined
+
+producerMapper = Vigor.ProducerMapper
 
 KEY =
   key: 'dummy'
@@ -26,11 +27,9 @@ class DummyProducer2 extends Vigor.Producer
   subscribeToRepositories: ->
   SUBSCRIPTION_KEYS: [KEY, KEY2]
 
-producerMapper = Vigor.ProducerMapper
-
 describe 'A ProducerMapper', ->
 
-  beforeEach ->
+  afterEach ->
     do producerMapper.reset
 
   describe 'given a registered subscription key', ->
