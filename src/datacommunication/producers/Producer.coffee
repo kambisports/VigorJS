@@ -53,7 +53,8 @@ class Producer
 
   produce: (subscriptionKey, data, filterFn = ->) ->
     key = subscriptionKey.key
-    @_validateContract(subscriptionKey, data)
+    type = Object.prototype.toString.call(@).slice(8, -1)
+    @_validateContract subscriptionKey, data, type
 
     componentsForSubscription = @subscriptionKeyToComponents[key]
     componentsInterestedInChange = _.filter componentsForSubscription, (componentIdentifier) ->
@@ -102,37 +103,10 @@ class Producer
 
   _validateContract: (subscriptionKey, dataToProduce) ->
     contract = subscriptionKey.contract
-
     unless contract
-      throw new Error "The #{subscriptionKey.key} does not have any contract specified"
-      return false
+      throw new Error "The subscriptionKey #{subscriptionKey.key} doesn't have a contract specified"
 
-    unless dataToProduce
-      throw new Error "#{@NAME} is calling produce without any data"
-      return false
-
-    if _.isArray(contract) and _.isArray(dataToProduce) is false
-      console.warn "#{@NAME} is supposed to produce an array but is producing #{typeof dataToProduce}"
-
-    if _.isObject(contract) and _.isArray(contract) is false
-      contractKeyCount = _.keys(contract).length
-      dataKeyCount = _.keys(dataToProduce).length
-
-      #TODO: should below warnings be errors instead?
-      if dataKeyCount > contractKeyCount
-        console.warn "#{@NAME} is calling produce with more data then what is specified in the contract"
-      else if dataKeyCount < contractKeyCount
-        console.warn "#{@NAME} is calling produce with less data then what is specified in the contract"
-
-    for key, val of contract
-      if val?
-        unless typeof dataToProduce[key] is typeof val
-          console.warn "#{@NAME} is producing data of the wrong type according to the contract, #{key}, expects #{typeof val} but gets #{typeof dataToProduce[key]}"
-
-      unless key of dataToProduce
-        console.warn "#{@NAME} producing data but is missing the key: #{key}"
-
-    return true
+    return Vigor.helpers.validateContract(contract, dataToProduce, @, 'producing')
 
   # add valid subscription keys to map (keys listed in subclass)
   _addKeysToMap: ->

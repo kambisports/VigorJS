@@ -50,6 +50,7 @@ var app = app || {};
 
       for (var i = 0; i < models.length; i ++) {
         var model = models[i];
+        model.hej = 'hej';
         this.produce(SubscriptionKeys.HELLO_WORLD, model, function (componentOptions) {
           return model.id === componentOptions.id
         });

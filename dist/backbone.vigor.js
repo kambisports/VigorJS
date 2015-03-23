@@ -22,13 +22,76 @@
       root.Vigor = factory(root, root.Backbone, root._);
     }
   })(this, function(root, Backbone, _) {
-    var ComponentIdentifier, ComponentView, EventBus, EventRegistry, PackageBase, Producer, Repository, ServiceRepository, ViewModel, Vigor, previousVigor;
+    var ComponentIdentifier, ComponentView, EventBus, EventRegistry, PackageBase, Producer, Repository, ServiceRepository, ViewModel, Vigor, previousVigor, setup, validateContract;
     previousVigor = root.Vigor;
     Vigor = Backbone.Vigor = {};
+    Vigor.helpers = {};
+    Vigor.settings = {};
     Vigor.noConflict = function() {
       return root.Vigor = previousVigor;
     };
     Vigor.extend = Backbone.Model.extend;
+    Vigor.settings = {
+      validateContract: false
+    };
+    setup = function(configObj) {
+      var settings;
+      settings = {};
+      settings.validateContract = configObj.validateContract || false;
+      return _.extend(Vigor.settings, settings);
+    };
+    Vigor.setup = setup;
+    validateContract = function(contract, dataToCompare, comparatorId, verb) {
+      var contractKeyCount, dataKeyCount, key, val;
+      if (verb == null) {
+        verb = 'recieving';
+      }
+      if (!Vigor.settings.validateContract) {
+        return;
+      }
+      if (!contract) {
+        throw new Error("The " + comparatorId + " does not have any contract specified");
+        return false;
+      }
+      if (!dataToCompare) {
+        throw new Error(comparatorId + " is trying to validate the contract but does not recieve any data to compare against the contract");
+        return false;
+      }
+      if (_.isArray(contract) && _.isArray(dataToCompare) === false) {
+        throw new Error(comparatorId + "'s compared data is supposed to be an array but is a " + (typeof dataToCompare));
+        return false;
+      }
+      if (_.isObject(contract) && _.isArray(contract) === false && _.isArray(dataToCompare)) {
+        throw new Error(comparatorId + "'s compared data is supposed to be an object but is an array");
+        return false;
+      }
+      if (_.isObject(contract) && _.isArray(contract) === false) {
+        contractKeyCount = _.keys(contract).length;
+        dataKeyCount = _.keys(dataToCompare).length;
+        if (dataKeyCount > contractKeyCount) {
+          throw new Error(comparatorId + " is " + verb + " more data then what is specified in the contract", contract, dataToCompare);
+          return false;
+        } else if (dataKeyCount < contractKeyCount) {
+          throw new Error(comparatorId + " is " + verb + " less data then what is specified in the contract", contract, dataToCompare);
+          return false;
+        }
+      }
+      for (key in contract) {
+        val = contract[key];
+        if (val != null) {
+          if (typeof dataToCompare[key] !== typeof val) {
+            throw new Error(comparatorId + " is " + verb + " data of the wrong type according to the contract, " + key + ", expects " + (typeof val) + " but gets " + (typeof dataToCompare[key]));
+            return false;
+          }
+        }
+        if (!(key in dataToCompare)) {
+          throw new Error(comparatorId + " has data but is missing the key: " + key);
+          return false;
+        }
+      }
+      return true;
+    };
+    Vigor.helpers.validateContract = validateContract;
     EventRegistry = (function() {
       function EventRegistry() {
         _.extend(this, Backbone.Events);
@@ -185,12 +248,13 @@
       };
 
       Producer.prototype.produce = function(subscriptionKey, data, filterFn) {
-        var component, componentsForSubscription, componentsInterestedInChange, i, key, len, results;
+        var component, componentsForSubscription, componentsInterestedInChange, i, key, len, results, type;
         if (filterFn == null) {
           filterFn = function() {};
         }
         key = subscriptionKey.key;
-        this._validateContract(subscriptionKey, data);
+        type = Object.prototype.toString.call(this).slice(8, -1);
+        this._validateContract(subscriptionKey, data, type);
         componentsForSubscription = this.subscriptionKeyToComponents[key];
         componentsInterestedInChange = _.filter(componentsForSubscription, function(componentIdentifier) {
           return _.isEmpty(componentIdentifier.options) || filterFn(componentIdentifier.options);
@@ -260,40 +324,12 @@
       };
 
       Producer.prototype._validateContract = function(subscriptionKey, dataToProduce) {
-        var contract, contractKeyCount, dataKeyCount, key, val;
+        var contract;
         contract = subscriptionKey.contract;
         if (!contract) {
-          throw new Error("The " + subscriptionKey.key + " does not have any contract specified");
-          return false;
+          throw new Error("The subscriptionKey " + subscriptionKey.key + " doesn't have a contract specified");
         }
-        if (!dataToProduce) {
-          throw new Error(this.NAME + " is calling produce without any data");
-          return false;
-        }
-        if (_.isArray(contract) && _.isArray(dataToProduce) === false) {
-          console.warn(this.NAME + " is supposed to produce an array but is producing " + (typeof dataToProduce));
-        }
-        if (_.isObject(contract) && _.isArray(contract) === false) {
-          contractKeyCount = _.keys(contract).length;
-          dataKeyCount = _.keys(dataToProduce).length;
-          if (dataKeyCount > contractKeyCount) {
-            console.warn(this.NAME + " is calling produce with more data then what is specified in the contract");
-          } else if (dataKeyCount < contractKeyCount) {
-            console.warn(this.NAME + " is calling produce with less data then what is specified in the contract");
-          }
-        }
-        for (key in contract) {
-          val = contract[key];
-          if (val != null) {
-            if (typeof dataToProduce[key] !== typeof val) {
-              console.warn(this.NAME + " is producing data of the wrong type according to the contract, " + key + ", expects " + (typeof val) + " but gets " + (typeof dataToProduce[key]));
-            }
-          }
-          if (!(key in dataToProduce)) {
-            console.warn(this.NAME + " producing data but is missing the key: " + key);
-          }
-        }
-        return true;
+        return Vigor.helpers.validateContract(contract, dataToProduce, this, 'producing');
       };
 
       Producer.prototype._addKeysToMap = function() {
@@ -792,42 +828,7 @@
       };
 
       ViewModel.prototype.validateContract = function(contract, incommingData) {
-        var contractKeyCount, dataKeyCount, key, val;
-        if (!contract) {
-          throw new Error("The " + this.id + " does not have any contract specified");
-          return false;
-        }
-        if (!incommingData) {
-          throw new Error(this.id + "'s callback for subscribe is called but it does not recieve any data");
-          return false;
-        }
-        if (_.isArray(contract) && _.isArray(incommingData) === false) {
-          console.warn(this.id + " is supposed to recieve an array but is recieving " + (typeof incommingData));
-        }
-        if (_.isObject(contract) && _.isArray(contract) === false && _.isArray(incommingData)) {
-          console.warn(this.id + " is supposed to recieve an object but is recieving an array");
-        }
-        if (_.isObject(contract) && _.isArray(contract) === false) {
-          contractKeyCount = _.keys(contract).length;
-          dataKeyCount = _.keys(incommingData).length;
-          if (dataKeyCount > contractKeyCount) {
-            console.warn(this.id + " is recieving more data then what is specified in the contract", contract, incommingData);
-          } else if (dataKeyCount < contractKeyCount) {
-            console.warn(this.id + " is recieving less data then what is specified in the contract", contract, incommingData);
-          }
-        }
-        for (key in contract) {
-          val = contract[key];
-          if (val != null) {
-            if (typeof incommingData[key] !== typeof val) {
-              console.warn(this.id + " is recieving data of the wrong type according to the contract, " + key + ", expects " + (typeof val) + " but gets " + (typeof incommingData[key]));
-            }
-          }
-          if (!(key in incommingData)) {
-            console.warn(this.id + " recieving data but is missing the key: " + key);
-          }
-        }
-        return true;
+        return Vigor.helpers.validateContract(contract, incommingData, this.id);
       };
 
       return ViewModel;

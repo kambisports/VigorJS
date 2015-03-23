@@ -5,7 +5,7 @@ Vigor.SubscriptionKeys.extend({
       id: 'String',
       message: 'String',
       count: 0
-    },
+    }
   },
 
   HELLO_WORLDS: {
