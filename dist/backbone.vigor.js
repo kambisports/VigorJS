@@ -388,7 +388,7 @@
         },
         unsubscribeComponent: function(componentId) {
           return producerMapper.producers.forEach(function(producer) {
-            return producer.removeComponent(componentId);
+            return producer.prototype.getInstance().removeComponent(componentId);
           });
         }
       };

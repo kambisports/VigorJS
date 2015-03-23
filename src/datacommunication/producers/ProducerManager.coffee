@@ -21,6 +21,6 @@ do ->
 
     unsubscribeComponent: (componentId) ->
       producerMapper.producers.forEach (producer) ->
-        producer.removeComponent componentId
+        producer::getInstance().removeComponent componentId
 
   Vigor.ProducerManager = ProducerManager
