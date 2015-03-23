@@ -1,7 +1,6 @@
 Vigor = require '../../../../dist/backbone.vigor'
 assert = require 'assert'
 sinon = require 'sinon'
-# sandbox = undefined
 
 KEY1 =
   key: 'dummy'
