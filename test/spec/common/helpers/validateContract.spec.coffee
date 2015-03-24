@@ -95,18 +95,7 @@ describe 'When vaildating a contract', ->
         valid = Vigor.helpers.validateContract contract, dataToCompare, 'id123', 'producing'
         assert.ok
 
-      it 'it should throw an error if the compared data types does not match the contract', ->
-        Vigor.setup { validateContract: true }
-        contract =
-          key1: 'val1'
-
-        dataToCompare =
-          key1: 123
-
-        errorFn = -> Vigor.helpers.validateContract contract, dataToCompare, 'id123', 'producing'
-        assert.throws (-> errorFn()), /id123 is producing data of the wrong type according to the contract, key1, expects string but gets number/
-
-      it 'it should throw an error if the compared data has the correct number of keys but is missing a specific keyt', ->
+      it 'it should throw an error if the compared data has the correct number of keys but is missing a specific key', ->
         Vigor.setup { validateContract: true }
         contract =
           key1: 'val1'
@@ -117,4 +106,13 @@ describe 'When vaildating a contract', ->
         errorFn = -> Vigor.helpers.validateContract contract, dataToCompare, 'id123', 'producing'
         assert.throws (-> errorFn()), /id123 has data but is missing the key: key1/
 
+      it 'it should throw an error if the compared data types does not match the contract', ->
+        Vigor.setup { validateContract: true }
+        contract =
+          key1: 'val1'
 
+        dataToCompare =
+          key1: 123
+
+        errorFn = -> Vigor.helpers.validateContract contract, dataToCompare, 'id123', 'producing'
+        assert.throws (-> errorFn()), /id123 is producing data of the wrong type according to the contract, key1, expects string but gets number/
