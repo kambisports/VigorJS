@@ -1,6 +1,6 @@
 class EventRegistry
-	constructor: ->
-		_.extend @, Backbone.Events
+
+_.extend EventRegistry.prototype, Backbone.Events
 
 # A global EventBus for the entire application
 #
