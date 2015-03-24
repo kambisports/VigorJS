@@ -20,7 +20,6 @@ validateContract = (contract, dataToCompare, comparatorId, verb = 'recieving') -
     contractKeyCount = _.keys(contract).length
     dataKeyCount = _.keys(dataToCompare).length
 
-    #TODO: should below warnings be errors instead?
     if dataKeyCount > contractKeyCount
       throw new Error "#{comparatorId} is #{verb} more data then what is specified in the contract", contract,dataToCompare
       return false
@@ -29,14 +28,16 @@ validateContract = (contract, dataToCompare, comparatorId, verb = 'recieving') -
       return false
 
   for key, val of contract
+
+    unless key of dataToCompare
+      throw new Error "#{comparatorId} has data but is missing the key: #{key}"
+      return false
+
     if val?
       unless typeof dataToCompare[key] is typeof val
         throw new Error "#{comparatorId} is #{verb} data of the wrong type according to the contract, #{key}, expects #{typeof val} but gets #{typeof dataToCompare[key]}"
         return false
 
-    unless key of dataToCompare
-      throw new Error "#{comparatorId} has data but is missing the key: #{key}"
-      return false
 
   return true
 

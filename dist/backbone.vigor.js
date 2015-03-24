@@ -78,15 +78,15 @@
       }
       for (key in contract) {
         val = contract[key];
+        if (!(key in dataToCompare)) {
+          throw new Error(comparatorId + " has data but is missing the key: " + key);
+          return false;
+        }
         if (val != null) {
           if (typeof dataToCompare[key] !== typeof val) {
             throw new Error(comparatorId + " is " + verb + " data of the wrong type according to the contract, " + key + ", expects " + (typeof val) + " but gets " + (typeof dataToCompare[key]));
             return false;
           }
-        }
-        if (!(key in dataToCompare)) {
-          throw new Error(comparatorId + " has data but is missing the key: " + key);
-          return false;
         }
       }
       return true;
