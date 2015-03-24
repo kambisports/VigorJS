@@ -32,9 +32,9 @@ describe 'A DataCommunicationManager', ->
   beforeEach ->
     dataCommunicationManager.registerProducers [DummyProducer]
 
-    producerManager.subscribeComponentToKey = sinon.spy()
-    producerManager.unsubscribeComponentFromKey = sinon.spy()
-    producerManager.unsubscribeComponent = sinon.spy()
+    sinon.stub producerManager, 'subscribeComponentToKey'
+    sinon.stub producerManager, 'unsubscribeComponentFromKey'
+    sinon.stub producerManager, 'unsubscribeComponent'
 
     exampleComponent1 =
       id: 'ComponentId1'
@@ -43,6 +43,11 @@ describe 'A DataCommunicationManager', ->
     exampleComponent2 =
       id: 'ComponentId2'
       callback: ->
+
+  afterEach ->
+    do producerManager.subscribeComponentToKey.restore
+    do producerManager.unsubscribeComponentFromKey.restore
+    do producerManager.unsubscribeComponent.restore
 
   describe 'using subscribe', ->
     it 'should add unique component to subscription map', ->
@@ -90,24 +95,6 @@ describe 'A DataCommunicationManager', ->
       assert.equal subscription.callback, callback2
       assert.equal subscription.options, options2
 
-    # it 'should not add same component (same id) to subscription if it is already present', ->
-    #   id = exampleComponent1.id
-    #   key = SubscriptionKeys.EXAMPLE_KEY
-    #   callback = exampleComponent1.callback
-    #   options = {}
-
-    #   dataCommunicationManager.subscribe id, key, callback, options
-    #   dataCommunicationManager.subscribe id, key, callback, options
-
-    #   subscriptionComponentList = dataCommunicationManager.getSubscriptionsWithSubscriptionKey key
-    #   assert.ok(subscriptionComponentList)
-    #   assert.equal(subscriptionComponentList.length, 1)
-
-    #   component = subscriptionComponentList[0]
-    #   assert.equal(component.id, id)
-    #   assert.equal(component.callback, callback)
-
-
   describe 'using unsubscribe', ->
     it 'should remove component from subscription map', ->
       id = exampleComponent1.id
@@ -132,20 +119,3 @@ describe 'A DataCommunicationManager', ->
 
       assert.equal args.length, 1
       assert.equal args[0], id
-
-  #   it 'should remove subscription if there are no components registered for that subscription', ->
-  #     id = exampleComponent1.id
-  #     key = SubscriptionKeys.EXAMPLE_KEY
-  #     callback = exampleComponent1.callback
-  #     options = {}
-
-  #     dataCommunicationManager.subscribe id, key, callback, options
-
-  #     subscriptionComponentList = dataCommunicationManager.getSubscriptionsWithSubscriptionKey key
-  #     assert.ok(subscriptionComponentList)
-  #     assert.equal(subscriptionComponentList.length, 1)
-
-  #     dataCommunicationManager.unsubscribe id, key
-  #     subscriptionComponentList = dataCommunicationManager.getSubscriptionsWithSubscriptionKey key
-  #     assert.equal(subscriptionComponentList, undefined)
-

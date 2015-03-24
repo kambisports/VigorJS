@@ -33,15 +33,8 @@ do ->
           key = subscriptionKey.key
           producersByKey[key] = producerClass
 
-    # used for testing puposes
     reset: ->
       producers = []
       producersByKey = {}
-
-    # getProducers: ->
-    #   return producers
-
-    # getProducersByKey: ->
-    #   return producersByKey
 
   Vigor.ProducerMapper = ProducerMapper

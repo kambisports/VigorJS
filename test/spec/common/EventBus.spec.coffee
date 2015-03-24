@@ -1,7 +1,6 @@
 Vigor = require '../../../dist/backbone.vigor'
 assert = require 'assert'
 sinon = require 'sinon'
-sandbox = undefined
 
 EventBus = Vigor.EventBus
 
@@ -19,15 +18,10 @@ callbacks = {}
 
 describe 'An eventbus', ->
   beforeEach ->
-    sandbox = sinon.sandbox.create()
-
     callbacks.subscriber1 = sinon.spy()
     callbacks.subscriber2 = sinon.spy()
     callbacks.subscriberOnce = sinon.spy()
     callbacks.subscriberToAll = sinon.spy()
-
-  afterEach ->
-    do sandbox.restore
 
   it 'should subscribe a callback to an event key that exists', ->
     EventBus.subscribe EventKeys.ADD_OUTCOMES_TO_BETSLIP_REQUESTED, ->

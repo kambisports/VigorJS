@@ -25,11 +25,18 @@
 
   previousVigor = root.Vigor
   Vigor = Backbone.Vigor = {}
+  Vigor.helpers = {}
+  Vigor.settings = {}
 
   Vigor.noConflict = ->
     root.Vigor = previousVigor
 
   Vigor.extend = Backbone.Model.extend
+
+  #= include ./setup.coffee
+
+  # HELPERS
+  #= include ./helpers/validateContract.coffee
 
   # COMMON
   #= include ./common/EventBus.coffee
