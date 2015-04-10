@@ -40,6 +40,10 @@ class DummyProducer1 extends ProducerStub
 class DummyProducer2 extends ProducerStub
   PRODUCTION_KEY: SubscriptionKeys.EXAMPLE_KEY2
 
+addComponent = sinon.spy DummyProducer1.prototype, 'addComponent'
+removeComponent = sinon.spy DummyProducer1.prototype, 'removeComponent'
+removeComponent2 = sinon.spy DummyProducer2.prototype, 'removeComponent'
+
 describe 'A ProducerManager', ->
   beforeEach ->
     dataCommunicationManager.registerProducers [DummyProducer1, DummyProducer2]
@@ -63,7 +67,7 @@ describe 'A ProducerManager', ->
 
         options = {}
 
-        addComponent = sinon.spy DummyProducer1.prototype, 'addComponent'
+        addComponent.reset()
         producerManager.subscribeComponentToKey SubscriptionKeys.EXAMPLE_KEY1, options
 
         instance = addComponent.thisValues[0]
@@ -79,8 +83,7 @@ describe 'A ProducerManager', ->
       it 'should call the producer\'s removeComponent method', ->
         componentId = 'dummy'
 
-        removeComponent = sinon.spy DummyProducer1.prototype, 'removeComponent'
-
+        removeComponent.reset()
         producerManager.unsubscribeComponentFromKey SubscriptionKeys.EXAMPLE_KEY1, componentId
 
         instance = removeComponent.thisValues[0]
@@ -92,9 +95,28 @@ describe 'A ProducerManager', ->
         assert.equal args.length, 1
         assert.equal args[0], componentId
 
-  # This method doesn't seem to exist
-  # describe 'given a invalid subscription key', ->
-  #   it 'should throw an exception', ->
-  #     errorFn = -> producerManager.getProducer INVALID_SUBSCRIPTION_KEY
-  #     assert.throws (-> errorFn()), /Unknown subscription key, could not add component!/
+    describe 'to unsubscribe component completely', ->
+      it 'should call all producers\' removeComponent method', ->
+        componentId = 'dummy'
 
+        removeComponent.reset()
+        producerManager.unsubscribeComponent componentId
+
+        instance = removeComponent.thisValues[0]
+        args = removeComponent.args[0]
+
+        assert removeComponent.calledOnce
+        assert.ok instance instanceof DummyProducer1
+
+        assert.equal args.length, 1
+        assert.equal args[0], componentId
+
+        # make the same checks for the second producer
+        instance = removeComponent2.thisValues[0]
+        args = removeComponent2.args[0]
+
+        assert removeComponent2.calledOnce
+        assert.ok instance instanceof DummyProducer2
+
+        assert.equal args.length, 1
+        assert.equal args[0], componentId

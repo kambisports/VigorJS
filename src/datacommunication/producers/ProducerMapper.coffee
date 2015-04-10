@@ -6,8 +6,12 @@ do ->
   NO_PRODUCERS_ERROR = "There are no producers registered - register producers through the DataCommunicationManager"
   NO_PRODUCER_FOUND_ERROR = (key) ->
     "No producer found for subscription #{key}!"
+  KEY_ALREADY_REGISTERED = (key) ->
+    "A producer for the key #{key} is already registered"
 
   ProducerMapper =
+
+    producers: producers
 
     producerClassForKey: (subscriptionKey) ->
       key = subscriptionKey.key
@@ -31,10 +35,15 @@ do ->
 
         subscriptionKey = producerClass::PRODUCTION_KEY
         key = subscriptionKey.key
+
+        if producersByKey[key]?
+          throw KEY_ALREADY_REGISTERED key
+
         producersByKey[key] = producerClass
 
+
     reset: ->
-      producers = []
+      producers.length = 0
       producersByKey = {}
 
   Vigor.ProducerMapper = ProducerMapper

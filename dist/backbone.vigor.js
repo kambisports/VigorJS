@@ -317,14 +317,18 @@
     Producer.extend = Vigor.extend;
     Vigor.Producer = Producer;
     (function() {
-      var NO_PRODUCERS_ERROR, NO_PRODUCER_FOUND_ERROR, ProducerMapper, producers, producersByKey;
+      var KEY_ALREADY_REGISTERED, NO_PRODUCERS_ERROR, NO_PRODUCER_FOUND_ERROR, ProducerMapper, producers, producersByKey;
       producers = [];
       producersByKey = {};
       NO_PRODUCERS_ERROR = "There are no producers registered - register producers through the DataCommunicationManager";
       NO_PRODUCER_FOUND_ERROR = function(key) {
         return "No producer found for subscription " + key + "!";
       };
+      KEY_ALREADY_REGISTERED = function(key) {
+        return "A producer for the key " + key + " is already registered";
+      };
       ProducerMapper = {
+        producers: producers,
         producerClassForKey: function(subscriptionKey) {
           var key, producerClass;
           key = subscriptionKey.key;
@@ -348,11 +352,14 @@
             producers.push(producerClass);
             subscriptionKey = producerClass.prototype.PRODUCTION_KEY;
             key = subscriptionKey.key;
+            if (producersByKey[key] != null) {
+              throw KEY_ALREADY_REGISTERED(key);
+            }
             return producersByKey[key] = producerClass;
           }
         },
         reset: function() {
-          producers = [];
+          producers.length = 0;
           return producersByKey = {};
         }
       };
