@@ -72,9 +72,8 @@ describe 'A ProducerManager', ->
         assert addComponent.calledOnce
         assert.ok instance instanceof DummyProducer1
 
-        assert.equal args.length, 2
-        assert.equal args[0], SubscriptionKeys.EXAMPLE_KEY1
-        assert.equal args[1], options
+        assert.equal args.length, 1
+        assert.equal args[0], options
 
     describe 'to unsubscribe', ->
       it 'should call the producer\'s removeComponent method', ->
@@ -90,9 +89,8 @@ describe 'A ProducerManager', ->
         assert removeComponent.calledOnce
         assert.ok instance instanceof DummyProducer1
 
-        assert.equal args.length, 2
-        assert.equal args[0], SubscriptionKeys.EXAMPLE_KEY1
-        assert.equal args[1], componentId
+        assert.equal args.length, 1
+        assert.equal args[0], componentId
 
   # This method doesn't seem to exist
   # describe 'given a invalid subscription key', ->
