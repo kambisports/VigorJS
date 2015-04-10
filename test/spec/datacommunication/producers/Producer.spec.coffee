@@ -17,11 +17,11 @@ INVALID_SUBSCRIPTION_KEY =
   contract:
     key1: 'string'
 
+
 class DummyProducer extends Vigor.Producer
   PRODUCTION_KEY: KEY1
-  subscribe: sinon.spy()
-  subscribeToRepositories: sinon.spy()
-  unsubscribeFromRepositories: sinon.spy()
+
+class DummyRepository extends Vigor.Repository
 
 describe 'A Producer', ->
 
@@ -50,12 +50,61 @@ describe 'A Producer', ->
 
   it 'calls subscribeToRepositories when the first component is added', ->
     producer = new DummyProducer()
+
     producer.subscribeToRepositories = sinon.spy()
     componentIdentifier = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
 
-    producer.addComponent KEY1, componentIdentifier
+    producer.addComponent componentIdentifier
 
     assert producer.subscribeToRepositories.calledOnce
+
+
+  it 'subscribes to repositories', ->
+    producer = new DummyProducer()
+    producer.onDiffInRepository = sinon.spy()
+    dummyRepository = new DummyRepository()
+    producer.repositories = [
+      dummyRepository
+    ]
+
+    data = {}
+
+    producer.subscribeToRepositories()
+    dummyRepository.trigger Vigor.Repository::REPOSITORY_DIFF, data
+
+    assert producer.onDiffInRepository.calledOnce
+
+
+  it 'subscribes to repositories with custom callbacks', ->
+    producer = new DummyProducer()
+    producer.dummyRepositoryCallback = sinon.spy()
+    dummyRepository = new DummyRepository()
+    producer.repositories = [
+      {
+        repository: dummyRepository,
+        callback: 'dummyRepositoryCallback'
+      }
+    ]
+
+    data = {}
+
+    producer.subscribeToRepositories()
+    dummyRepository.trigger Vigor.Repository::REPOSITORY_DIFF, data
+
+    assert producer.dummyRepositoryCallback.calledOnce
+
+
+  it 'throws an error on unexpected format of producer repositories definitions', ->
+    producer = new DummyProducer()
+    producer.repositories = [
+      {
+        repo: 'foo',
+        call: 'dummyRepositoryCallback'
+      }
+    ]
+
+    errorFn = -> producer.subscribeToRepositories()
+    assert.throws (-> errorFn()), "unexpected format of producer repositories definition"
 
   it 'does not call subscribeToRepositories when a second component is added', ->
     producer = new DummyProducer()
@@ -100,6 +149,41 @@ describe 'A Producer', ->
     assert producer.unsubscribeFromRepositories.notCalled
 
 
+  it 'unsubscribes from repositories', ->
+    producer = new DummyProducer()
+    producer.onDiffInRepository = sinon.spy()
+    producer.dummyRepositoryCallback = sinon.spy()
+    dummyRepository = new DummyRepository()
+    dummyRepository2 = new DummyRepository()
+
+    producer.repositories = [
+      dummyRepository,
+      {
+        repository: dummyRepository2,
+        callback: 'dummyRepositoryCallback'
+      }
+    ]
+
+    data = {}
+
+    producer.subscribeToRepositories()
+    producer.unsubscribeFromRepositories()
+
+    dummyRepository.trigger Vigor.Repository::REPOSITORY_DIFF, data
+    dummyRepository2.trigger Vigor.Repository::REPOSITORY_DIFF, data
+
+    assert producer.onDiffInRepository.notCalled
+    assert producer.dummyRepositoryCallback.notCalled
+
+
+  it 'produces data on repository diff', ->
+    producer = new DummyProducer()
+    producer.produceData = sinon.spy()
+
+    producer.onDiffInRepository()
+
+    assert producer.produceData.calledOnce
+
   it 'removes a component', ->
     producer = new DummyProducer()
     componentIdentifier = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
@@ -137,90 +221,14 @@ describe 'A Producer', ->
     producedData = {}
     componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, {}
 
+    data = { key1: '' }
+    currentData = sinon.stub(producer, "currentData", -> data)
     producer.addComponent componentIdentifier
-
-    producer.produce producedData
 
     assert callback.calledOnce
-    args = callback.args[0]
-
-    assert.equal args.length, 1
-    assert.equal args[0], producedData
-
-
-  it 'does not call filter if the options was empty', ->
-    producer = new DummyProducer()
-    callback = sinon.spy()
-    filter = sinon.spy()
-    producedData = {}
-    componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, {}
-
-    producer.addComponent componentIdentifier
-
-    producer.produce producedData, filter
-
-    assert callback.calledOnce
-    args = callback.args[0]
-
-    assert.equal args.length, 1
-    assert.equal args[0], producedData
-    assert filter.notCalled
-
-
-  it 'calls filter if the options were not empty', ->
-    producer = new DummyProducer()
-    callback = sinon.spy()
-    filter = sinon.spy()
-    options =
-      foo: 'bar'
-
-    producedData = {}
-
-    componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, options
-
-    producer.addComponent componentIdentifier
-
-    producer.produce producedData, filter
-
-    args = filter.args[0]
-
-    assert filter.calledOnce
-    assert.equal args.length, 1
-    assert.equal args[0], options
-
-
-  it 'calls the callback if the filter returns true', ->
-    producer = new DummyProducer()
-    callback = sinon.spy()
-    filter = sinon.spy(-> return true)
-    options =
-      foo: 'bar'
-
-    producedData = {}
-    componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, options
-
-    producer.addComponent componentIdentifier
-
-    producer.produce producedData, filter
 
     args = callback.args[0]
-
-    assert callback.calledOnce
     assert.equal args.length, 1
-    assert.equal args[0], producedData
+    assert.equal args[0], data
 
 
-  it 'does not call the callback if the filter returns false', ->
-    producer = new DummyProducer()
-    callback = sinon.spy()
-    filter = sinon.spy(-> return false)
-    options =
-      foo: 'bar'
-
-    producedData = {}
-    componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, options
-
-    producer.addComponent componentIdentifier
-    producer.produce producedData, filter
-
-    assert callback.notCalled

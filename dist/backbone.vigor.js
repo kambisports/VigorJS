@@ -1,8 +1,8 @@
 (function() {
   var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     hasProp = {}.hasOwnProperty,
-    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     slice = [].slice;
 
   (function(root, factory) {
@@ -193,10 +193,14 @@
     Producer = (function() {
       Producer.prototype.PRODUCTION_KEY = void 0;
 
+      Producer.prototype.repositories = [];
+
       Producer.prototype._isSubscribedToRepositories = false;
 
       function Producer() {
+        this.onDiffInRepository = bind(this.onDiffInRepository, this);
         this.registeredComponents = {};
+        this.produceData = _.throttle(this.produceDataSync, 100);
       }
 
       Producer.prototype.getInstance = function() {
@@ -225,64 +229,98 @@
         if (subscription != null) {
           this.unsubscribe(subscription.options);
           delete this.registeredComponents[subscription.id];
-          if (this.shouldUnsubscribeFromRepositories()) {
+          if (this._shouldUnsubscribeFromRepositories()) {
             this.unsubscribeFromRepositories();
             return this._isSubscribedToRepositories = false;
           }
         }
       };
 
-      Producer.prototype.produce = function(data, filterFn) {
-        var component, componentsInterestedInChange, i, len, results, type;
-        if (filterFn == null) {
-          filterFn = function() {};
-        }
-        type = Object.prototype.toString.call(this).slice(8, -1);
-        this._validateContract(data, type);
-        componentsInterestedInChange = _.filter(this.registeredComponents, function(componentIdentifier) {
-          return _.isEmpty(componentIdentifier.options) || filterFn(componentIdentifier.options);
-        });
+      Producer.prototype.subscribeToRepositories = function() {
+        var i, len, ref, repository, results;
+        ref = this.repositories;
         results = [];
-        for (i = 0, len = componentsInterestedInChange.length; i < len; i++) {
-          component = componentsInterestedInChange[i];
+        for (i = 0, len = ref.length; i < len; i++) {
+          repository = ref[i];
+          if (repository instanceof Vigor.Repository) {
+            results.push(this.subscribeToRepository(repository));
+          } else if (repository.repository instanceof Vigor.Repository && typeof repository.callback === 'string') {
+            results.push(this.subscribeToRepository(repository.repository, this[repository.callback]));
+          } else {
+            throw 'unexpected format of producer repositories definition';
+          }
+        }
+        return results;
+      };
+
+      Producer.prototype.unsubscribeFromRepositories = function() {
+        var i, len, ref, repository, results;
+        ref = this.repositories;
+        results = [];
+        for (i = 0, len = ref.length; i < len; i++) {
+          repository = ref[i];
+          if (repository instanceof Vigor.Repository) {
+            results.push(this.unsubscribeFromRepository(repository));
+          } else if (repository.repository instanceof Vigor.Repository && typeof repository.callback === 'string') {
+            results.push(this.unsubscribeFromRepository(repository.repository));
+          } else {
+            results.push(void 0);
+          }
+        }
+        return results;
+      };
+
+      Producer.prototype.subscribeToRepository = function(repository, callback) {
+        callback = callback || (function(_this) {
+          return function(diff) {
+            return _this.onDiffInRepository(repository, diff);
+          };
+        })(this);
+        return this.listenTo(repository, Vigor.Repository.prototype.REPOSITORY_DIFF, callback);
+      };
+
+      Producer.prototype.unsubscribeFromRepository = function(repository) {
+        return this.stopListening(repository, Vigor.Repository.prototype.REPOSITORY_DIFF);
+      };
+
+      Producer.prototype.subscribe = function(options) {
+        return this.produceDataSync();
+      };
+
+      Producer.prototype.onDiffInRepository = function() {
+        return this.produceData();
+      };
+
+      Producer.prototype.produceDataSync = function() {
+        return this.produce(this.currentData());
+      };
+
+      Producer.prototype.produce = function(data) {
+        var component, i, len, ref, results;
+        this._validateContract(data);
+        ref = this.getProduceTargets();
+        results = [];
+        for (i = 0, len = ref.length; i < len; i++) {
+          component = ref[i];
           results.push(component.callback(data));
         }
         return results;
       };
 
-      Producer.prototype.subscribe = function(options) {
-        throw new Error("Subscription handler should be overriden in subclass! Implement for subscription " + subscriptionKey + " with options " + options);
+      Producer.prototype.getProduceTargets = function() {
+        return _.filter(this.registeredComponents);
       };
+
+      Producer.prototype.currentData = function() {};
 
       Producer.prototype.unsubscribe = function(options) {};
 
-      Producer.prototype.subscribeToRepositories = function() {
-        throw 'subscribeToRepositories should be overridden in subclass!';
-      };
-
-      Producer.prototype.unsubscribeFromRepositories = function() {
-        throw 'unsubscribeFromRepositories should be overridden in subclass!';
-      };
-
-      Producer.prototype.shouldUnsubscribeFromRepositories = function() {
+      Producer.prototype._shouldUnsubscribeFromRepositories = function() {
         var component;
         for (component in this.registeredComponents) {
           return false;
         }
         return true;
-      };
-
-      Producer.prototype.extend = function(obj, mixin) {
-        var method, name;
-        for (name in mixin) {
-          method = mixin[name];
-          obj[name] = method;
-        }
-        return obj;
-      };
-
-      Producer.prototype.mixin = function(instance, mixin) {
-        return this.extend(instance, mixin);
       };
 
       Producer.prototype.decorate = function(data, decoratorList) {
@@ -311,9 +349,23 @@
         return Vigor.helpers.validateContract(contract, dataToProduce, this, 'producing');
       };
 
+      Producer.prototype.extend = function(obj, mixin) {
+        var method, name;
+        for (name in mixin) {
+          method = mixin[name];
+          obj[name] = method;
+        }
+        return obj;
+      };
+
+      Producer.prototype.mixin = function(instance, mixin) {
+        return this.extend(instance, mixin);
+      };
+
       return Producer;
 
     })();
+    _.extend(Producer.prototype, Backbone.Events);
     Producer.extend = Vigor.extend;
     Vigor.Producer = Producer;
     (function() {
