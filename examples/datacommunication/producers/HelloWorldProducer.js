@@ -8,9 +8,7 @@ var app = app || {};
 
   app.HelloWorldProducer = Vigor.Producer.extend({
 
-    SUBSCRIPTION_KEYS: [
-      SubscriptionKeys.HELLO_WORLD
-    ],
+    PRODUCTION_KEY: SubscriptionKeys.HELLO_WORLD,
 
     subscribeToRepositories: function () {
       HelloWorldRepository.on(HelloWorldRepository.REPOSITORY_DIFF, this._onDiffInRepository, this);
@@ -20,7 +18,7 @@ var app = app || {};
       HelloWorldRepository.off(HelloWorldRepository.REPOSITORY_DIFF, this._onDiffInRepository, this);
     },
 
-    subscribe: function (subscriptionKey, options) {
+    subscribe: function (options) {
       // If we want to send the id to the service and fetch something specific from the server
 
       // this.repoFetchSubscription = {
@@ -51,7 +49,7 @@ var app = app || {};
       for (var i = 0; i < models.length; i ++) {
         var model = models[i];
         model.hej = 'hej';
-        this.produce(SubscriptionKeys.HELLO_WORLD, model, function (componentOptions) {
+        this.produce(model, function (componentOptions) {
           return model.id === componentOptions.id
         });
       }

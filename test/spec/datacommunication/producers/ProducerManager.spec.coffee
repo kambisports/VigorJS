@@ -35,10 +35,10 @@ class ProducerStub extends Vigor.Producer
   dispose: ->
 
 class DummyProducer1 extends ProducerStub
-  SUBSCRIPTION_KEYS: [SubscriptionKeys.EXAMPLE_KEY1]
+  PRODUCTION_KEY: SubscriptionKeys.EXAMPLE_KEY1
 
 class DummyProducer2 extends ProducerStub
-  SUBSCRIPTION_KEYS: [SubscriptionKeys.EXAMPLE_KEY2]
+  PRODUCTION_KEY: SubscriptionKeys.EXAMPLE_KEY2
 
 describe 'A ProducerManager', ->
   beforeEach ->

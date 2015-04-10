@@ -8,9 +8,7 @@ var app = app || {};
 
   app.HelloWorldsProducer = Vigor.Producer.extend({
 
-    SUBSCRIPTION_KEYS: [
-      SubscriptionKeys.HELLO_WORLDS
-    ],
+    PRODUCTION_KEY: SubscriptionKeys.HELLO_WORLDS,
 
     repoFetchSubscription: undefined,
 
@@ -34,7 +32,7 @@ var app = app || {};
     },
 
     _produceData: function () {
-      this.produce(SubscriptionKeys.HELLO_WORLDS, this._buildData());
+      this.produce(this._buildData());
     },
 
     _buildData: function () {

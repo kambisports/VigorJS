@@ -26,7 +26,7 @@ class DummyProducer extends Vigor.Producer
   dispose: ->
   subscribe: ->
   subscribeToRepositories: ->
-  SUBSCRIPTION_KEYS: [SubscriptionKeys.EXAMPLE_KEY]
+  PRODUCTION_KEY: SubscriptionKeys.EXAMPLE_KEY
 
 describe 'A DataCommunicationManager', ->
   beforeEach ->

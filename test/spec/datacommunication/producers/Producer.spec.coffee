@@ -18,27 +18,32 @@ INVALID_SUBSCRIPTION_KEY =
     key1: 'string'
 
 class DummyProducer extends Vigor.Producer
-  SUBSCRIPTION_KEYS: [KEY1, KEY2]
+  PRODUCTION_KEY: KEY1
   subscribe: sinon.spy()
   subscribeToRepositories: sinon.spy()
   unsubscribeFromRepositories: sinon.spy()
 
 describe 'A Producer', ->
-  it 'creates subscriptionKeyToComponents for each key', ->
-    producer = new DummyProducer()
-
-    _.each producer.SUBSCRIPTION_KEYS, (subscriptionKey) ->
-      componentsMap = producer.subscriptionKeyToComponents[subscriptionKey.key]
-      assert.equal typeof componentsMap, 'object'
-      assert.equal Object.keys(componentsMap).length, 0
 
   it 'adds a component', ->
     producer = new DummyProducer()
     componentIdentifier = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
 
-    producer.addComponent KEY1, componentIdentifier
+    producer.addComponent componentIdentifier
 
-    componentsForKey = producer.subscriptionKeyToComponents[KEY1.key]
+    componentsForKey = producer.registeredComponents
+    assert.equal Object.keys(componentsForKey).length, 1
+    assert.equal componentsForKey[componentIdentifier.id], componentIdentifier
+
+
+  it 'ignores calls to add a component more than once', ->
+    producer = new DummyProducer()
+    componentIdentifier = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
+
+    producer.addComponent componentIdentifier
+    producer.addComponent componentIdentifier
+
+    componentsForKey = producer.registeredComponents
     assert.equal Object.keys(componentsForKey).length, 1
     assert.equal componentsForKey[componentIdentifier.id], componentIdentifier
 
@@ -58,10 +63,11 @@ describe 'A Producer', ->
     componentIdentifier = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
     componentIdentifier2 = new Vigor.ComponentIdentifier 'bar', sinon.spy(), {}
 
-    producer.addComponent KEY1, componentIdentifier
-    producer.addComponent KEY1, componentIdentifier2
+    producer.addComponent componentIdentifier
+    producer.addComponent componentIdentifier2
 
     assert producer.subscribeToRepositories.calledOnce
+
 
   it 'calls unsubscribeFromRepositories when the last component is removed', ->
     producer = new DummyProducer()
@@ -71,10 +77,11 @@ describe 'A Producer', ->
 
     componentIdentifier = new Vigor.ComponentIdentifier componentId, sinon.spy(), {}
 
-    producer.addComponent KEY1, componentIdentifier
-    producer.removeComponent KEY1, componentId
+    producer.addComponent componentIdentifier
+    producer.removeComponent componentId
 
     assert producer.unsubscribeFromRepositories.calledOnce
+
 
   it 'does not call unsubscribeFromRepositories when there are still components subscribed', ->
     producer = new DummyProducer()
@@ -86,75 +93,43 @@ describe 'A Producer', ->
     componentIdentifier = new Vigor.ComponentIdentifier componentId, sinon.spy(), {}
     componentIdentifier2 = new Vigor.ComponentIdentifier componentId2, sinon.spy(), {}
 
-    producer.addComponent KEY1, componentIdentifier
-    producer.addComponent KEY1, componentIdentifier2
-    producer.removeComponent KEY1, componentId
+    producer.addComponent componentIdentifier
+    producer.addComponent componentIdentifier2
+    producer.removeComponent componentId
 
     assert producer.unsubscribeFromRepositories.notCalled
 
 
-  it 'throws an error if the key is not known', ->
-    producer = new DummyProducer()
-
-    errorFn = -> producer.addComponent INVALID_SUBSCRIPTION_KEY
-    assert.throws (-> errorFn()), /Unknown subscription key: invalid-key, could not add component!/
-
-
-  it 'removes a component from a key', ->
+  it 'removes a component', ->
     producer = new DummyProducer()
     componentIdentifier = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
 
-    producer.addComponent KEY1, componentIdentifier
-    producer.removeComponent KEY1, componentIdentifier.id
+    producer.addComponent componentIdentifier
+    producer.removeComponent componentIdentifier.id
 
-    assert.equal Object.keys(producer.subscriptionKeyToComponents[KEY1.key]).length, 0
+    assert.equal Object.keys(producer.registeredComponents).length, 0
 
-
-  it 'removes a component entirely', ->
-    componentId = 'foo'
-
-    producer = new DummyProducer()
-
-    componentIdentifier1 = new Vigor.ComponentIdentifier componentId, sinon.spy(), {}
-    componentIdentifier2 = new Vigor.ComponentIdentifier componentId, sinon.spy(), {}
-
-    producer.addComponent KEY1, componentIdentifier1
-    producer.addComponent KEY2, componentIdentifier2
-
-    producer.removeComponent componentId
-
-    assert.equal Object.keys(producer.subscriptionKeyToComponents[KEY1.key]).length, 0
-    assert.equal Object.keys(producer.subscriptionKeyToComponents[KEY2.key]).length, 0
 
   it 'does not remove components if they are not added', ->
     producer = new DummyProducer()
     componentIdentifier = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
 
-    producer.removeComponent KEY1, componentIdentifier.id
-    assert.equal Object.keys(producer.subscriptionKeyToComponents[KEY1.key]).length, 0
+    producer.removeComponent componentIdentifier.id
+    assert.equal Object.keys(producer.registeredComponents).length, 0
+
 
   it 'does not remove unrelated components', ->
     producer = new DummyProducer()
     componentIdentifier1 = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
     componentIdentifier2 = new Vigor.ComponentIdentifier 'bar', sinon.spy(), {}
 
-    producer.addComponent KEY1, componentIdentifier1
-    producer.addComponent KEY1, componentIdentifier2
-    producer.removeComponent KEY1, componentIdentifier2.id
+    producer.addComponent componentIdentifier1
+    producer.addComponent componentIdentifier2
+    producer.removeComponent componentIdentifier2.id
 
-    assert.equal Object.keys(producer.subscriptionKeyToComponents[KEY1.key]).length, 1
-    assert.equal producer.subscriptionKeyToComponents[KEY1.key][componentIdentifier1.id], componentIdentifier1
+    assert.equal Object.keys(producer.registeredComponents).length, 1
+    assert.equal producer.registeredComponents[componentIdentifier1.id], componentIdentifier1
 
-  it 'does not remove subscriptions on different keys', ->
-    producer = new DummyProducer()
-    componentIdentifier = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
-
-    producer.addComponent KEY1, componentIdentifier
-    producer.addComponent KEY2, componentIdentifier
-    producer.removeComponent KEY1, componentIdentifier.id
-
-    assert.equal Object.keys(producer.subscriptionKeyToComponents[KEY1.key]).length, 0
-    assert.equal Object.keys(producer.subscriptionKeyToComponents[KEY2.key]).length, 1
 
   it 'produces data', ->
     producer = new DummyProducer()
@@ -162,9 +137,9 @@ describe 'A Producer', ->
     producedData = {}
     componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, {}
 
-    producer.addComponent KEY1, componentIdentifier
+    producer.addComponent componentIdentifier
 
-    producer.produce KEY1, producedData
+    producer.produce producedData
 
     assert callback.calledOnce
     args = callback.args[0]
@@ -172,17 +147,6 @@ describe 'A Producer', ->
     assert.equal args.length, 1
     assert.equal args[0], producedData
 
-  it 'does not produce data on the wrong key', ->
-    producer = new DummyProducer()
-    callback = sinon.spy()
-    producedData = {}
-    componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, {}
-
-    producer.addComponent KEY1, componentIdentifier
-
-    producer.produce KEY2, producedData
-
-    assert callback.notCalled
 
   it 'does not call filter if the options was empty', ->
     producer = new DummyProducer()
@@ -191,9 +155,9 @@ describe 'A Producer', ->
     producedData = {}
     componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, {}
 
-    producer.addComponent KEY1, componentIdentifier
+    producer.addComponent componentIdentifier
 
-    producer.produce KEY1, producedData, filter
+    producer.produce producedData, filter
 
     assert callback.calledOnce
     args = callback.args[0]
@@ -201,6 +165,7 @@ describe 'A Producer', ->
     assert.equal args.length, 1
     assert.equal args[0], producedData
     assert filter.notCalled
+
 
   it 'calls filter if the options were not empty', ->
     producer = new DummyProducer()
@@ -213,9 +178,9 @@ describe 'A Producer', ->
 
     componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, options
 
-    producer.addComponent KEY1, componentIdentifier
+    producer.addComponent componentIdentifier
 
-    producer.produce KEY1, producedData, filter
+    producer.produce producedData, filter
 
     args = filter.args[0]
 
@@ -234,15 +199,16 @@ describe 'A Producer', ->
     producedData = {}
     componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, options
 
-    producer.addComponent KEY1, componentIdentifier
+    producer.addComponent componentIdentifier
 
-    producer.produce KEY1, producedData, filter
+    producer.produce producedData, filter
 
     args = callback.args[0]
 
     assert callback.calledOnce
     assert.equal args.length, 1
     assert.equal args[0], producedData
+
 
   it 'does not call the callback if the filter returns false', ->
     producer = new DummyProducer()
@@ -254,7 +220,7 @@ describe 'A Producer', ->
     producedData = {}
     componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, options
 
-    producer.addComponent KEY1, componentIdentifier
-    producer.produce KEY1, producedData, filter
+    producer.addComponent componentIdentifier
+    producer.produce producedData, filter
 
     assert callback.notCalled

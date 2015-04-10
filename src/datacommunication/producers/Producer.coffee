@@ -1,71 +1,52 @@
 class Producer
+  
+  # the production key should be overridden in the subclass
+  PRODUCTION_KEY: undefined
 
   _isSubscribedToRepositories: false
-  subscriptionKeyToComponents: {}
 
   constructor: ->
-    do @_addKeysToMap
+    @registeredComponents = {}
 
   getInstance: ->
     unless @instance?
       @instance = new @constructor()
     @instance
 
-  addComponent: (subscriptionKey, subscription) ->
-    key = subscriptionKey.key
-    registeredComponents = @subscriptionKeyToComponents[key]
+  addComponent: (subscription) ->
+    existingSubscription = @registeredComponents[subscription.id]
+    unless existingSubscription?
+      @registeredComponents[subscription.id] = subscription
+      @subscribe subscription.options
 
-    unless registeredComponents
-      throw new Error("Unknown subscription key: #{key}, could not add component!")
+      unless @_isSubscribedToRepositories
+        @subscribeToRepositories()
+        @_isSubscribedToRepositories = true
 
-    existingSubscription = registeredComponents[subscription.id]
-    if existingSubscription?
-      throw "Component #{subscription.id} is already subscribed to the key #{subscriptionKey.key}"
-
-    registeredComponents[subscription.id] = subscription
-    @subscribe subscriptionKey, subscription.options
-
-    unless @_isSubscribedToRepositories
-      @subscribeToRepositories()
-      @_isSubscribedToRepositories = true
-
-  removeComponent: (subscriptionKey, componentId) ->
-    key = subscriptionKey.key
-    # handle call with only componentId; remove component for all keys
-    unless componentId?
-      componentId = subscriptionKey
-      _.each @SUBSCRIPTION_KEYS, (subscriptionKey) ->
-        @removeComponent subscriptionKey, componentId
-      , @
-      return
-
-    registeredComponents = @subscriptionKeyToComponents[key]
-
-    subscription = registeredComponents[componentId]
+  removeComponent: (componentId) ->
+    subscription = @registeredComponents[componentId]
 
     if subscription?
-      @unsubscribe subscriptionKey, subscription.options
-      delete registeredComponents[subscription.id]
+      @unsubscribe subscription.options
+      delete @registeredComponents[subscription.id]
 
       if @shouldUnsubscribeFromRepositories()
         @unsubscribeFromRepositories()
         @_isSubscribedToRepositories = false
 
-  produce: (subscriptionKey, data, filterFn = ->) ->
-    key = subscriptionKey.key
+  produce: (data, filterFn = ->) ->
     type = Object.prototype.toString.call(@).slice(8, -1)
-    @_validateContract subscriptionKey, data, type
+    @_validateContract data, type
 
-    componentsForSubscription = @subscriptionKeyToComponents[key]
-    componentsInterestedInChange = _.filter componentsForSubscription, (componentIdentifier) ->
+    componentsInterestedInChange = _.filter @registeredComponents, (componentIdentifier) ->
       _.isEmpty(componentIdentifier.options) or filterFn(componentIdentifier.options)
 
     component.callback(data) for component in componentsInterestedInChange
 
-  subscribe: (subscriptionKey, options) ->
+  subscribe: (options) ->
     throw new Error("Subscription handler should be overriden in subclass! Implement for subscription #{subscriptionKey} with options #{options}")
 
-  unsubscribe: (subscriptionKey, options) ->
+  unsubscribe: (options) ->
 
   subscribeToRepositories: ->
     throw 'subscribeToRepositories should be overridden in subclass!'
@@ -76,9 +57,8 @@ class Producer
   shouldUnsubscribeFromRepositories: ->
     # for..in finds out whether there are any keys
     # faster than checking whether the length of the keys is 0
-    for key, components of @subscriptionKeyToComponents
-      for component of components
-        return false
+    for component of @registeredComponents
+      return false
 
     return true
 
@@ -101,20 +81,12 @@ class Producer
   modelsToJSON: (models) ->
     _.map models, @modelToJSON
 
-  _validateContract: (subscriptionKey, dataToProduce) ->
-    contract = subscriptionKey.contract
+  _validateContract: (dataToProduce) ->
+    contract = @PRODUCTION_KEY.contract
     unless contract
       throw new Error "The subscriptionKey #{subscriptionKey.key} doesn't have a contract specified"
 
     return Vigor.helpers.validateContract(contract, dataToProduce, @, 'producing')
-
-  # add valid subscription keys to map (keys listed in subclass)
-  _addKeysToMap: ->
-    for subscriptionKey in @SUBSCRIPTION_KEYS
-      @subscriptionKeyToComponents[subscriptionKey.key] = {}
-
-  # Default
-  SUBSCRIPTION_KEYS: []
 
 Producer.extend = Vigor.extend
 Vigor.Producer = Producer

@@ -191,12 +191,12 @@
       }
     };
     Producer = (function() {
+      Producer.prototype.PRODUCTION_KEY = void 0;
+
       Producer.prototype._isSubscribedToRepositories = false;
 
-      Producer.prototype.subscriptionKeyToComponents = {};
-
       function Producer() {
-        this._addKeysToMap();
+        this.registeredComponents = {};
       }
 
       Producer.prototype.getInstance = function() {
@@ -206,40 +206,25 @@
         return this.instance;
       };
 
-      Producer.prototype.addComponent = function(subscriptionKey, subscription) {
-        var existingSubscription, key, registeredComponents;
-        key = subscriptionKey.key;
-        registeredComponents = this.subscriptionKeyToComponents[key];
-        if (!registeredComponents) {
-          throw new Error("Unknown subscription key: " + key + ", could not add component!");
-        }
-        existingSubscription = registeredComponents[subscription.id];
-        if (existingSubscription != null) {
-          throw "Component " + subscription.id + " is already subscribed to the key " + subscriptionKey.key;
-        }
-        registeredComponents[subscription.id] = subscription;
-        this.subscribe(subscriptionKey, subscription.options);
-        if (!this._isSubscribedToRepositories) {
-          this.subscribeToRepositories();
-          return this._isSubscribedToRepositories = true;
+      Producer.prototype.addComponent = function(subscription) {
+        var existingSubscription;
+        existingSubscription = this.registeredComponents[subscription.id];
+        if (existingSubscription == null) {
+          this.registeredComponents[subscription.id] = subscription;
+          this.subscribe(subscription.options);
+          if (!this._isSubscribedToRepositories) {
+            this.subscribeToRepositories();
+            return this._isSubscribedToRepositories = true;
+          }
         }
       };
 
-      Producer.prototype.removeComponent = function(subscriptionKey, componentId) {
-        var key, registeredComponents, subscription;
-        key = subscriptionKey.key;
-        if (componentId == null) {
-          componentId = subscriptionKey;
-          _.each(this.SUBSCRIPTION_KEYS, function(subscriptionKey) {
-            return this.removeComponent(subscriptionKey, componentId);
-          }, this);
-          return;
-        }
-        registeredComponents = this.subscriptionKeyToComponents[key];
-        subscription = registeredComponents[componentId];
+      Producer.prototype.removeComponent = function(componentId) {
+        var subscription;
+        subscription = this.registeredComponents[componentId];
         if (subscription != null) {
-          this.unsubscribe(subscriptionKey, subscription.options);
-          delete registeredComponents[subscription.id];
+          this.unsubscribe(subscription.options);
+          delete this.registeredComponents[subscription.id];
           if (this.shouldUnsubscribeFromRepositories()) {
             this.unsubscribeFromRepositories();
             return this._isSubscribedToRepositories = false;
@@ -247,16 +232,14 @@
         }
       };
 
-      Producer.prototype.produce = function(subscriptionKey, data, filterFn) {
-        var component, componentsForSubscription, componentsInterestedInChange, i, key, len, results, type;
+      Producer.prototype.produce = function(data, filterFn) {
+        var component, componentsInterestedInChange, i, len, results, type;
         if (filterFn == null) {
           filterFn = function() {};
         }
-        key = subscriptionKey.key;
         type = Object.prototype.toString.call(this).slice(8, -1);
-        this._validateContract(subscriptionKey, data, type);
-        componentsForSubscription = this.subscriptionKeyToComponents[key];
-        componentsInterestedInChange = _.filter(componentsForSubscription, function(componentIdentifier) {
+        this._validateContract(data, type);
+        componentsInterestedInChange = _.filter(this.registeredComponents, function(componentIdentifier) {
           return _.isEmpty(componentIdentifier.options) || filterFn(componentIdentifier.options);
         });
         results = [];
@@ -267,11 +250,11 @@
         return results;
       };
 
-      Producer.prototype.subscribe = function(subscriptionKey, options) {
+      Producer.prototype.subscribe = function(options) {
         throw new Error("Subscription handler should be overriden in subclass! Implement for subscription " + subscriptionKey + " with options " + options);
       };
 
-      Producer.prototype.unsubscribe = function(subscriptionKey, options) {};
+      Producer.prototype.unsubscribe = function(options) {};
 
       Producer.prototype.subscribeToRepositories = function() {
         throw 'subscribeToRepositories should be overridden in subclass!';
@@ -282,13 +265,9 @@
       };
 
       Producer.prototype.shouldUnsubscribeFromRepositories = function() {
-        var component, components, key, ref;
-        ref = this.subscriptionKeyToComponents;
-        for (key in ref) {
-          components = ref[key];
-          for (component in components) {
-            return false;
-          }
+        var component;
+        for (component in this.registeredComponents) {
+          return false;
         }
         return true;
       };
@@ -323,27 +302,14 @@
         return _.map(models, this.modelToJSON);
       };
 
-      Producer.prototype._validateContract = function(subscriptionKey, dataToProduce) {
+      Producer.prototype._validateContract = function(dataToProduce) {
         var contract;
-        contract = subscriptionKey.contract;
+        contract = this.PRODUCTION_KEY.contract;
         if (!contract) {
           throw new Error("The subscriptionKey " + subscriptionKey.key + " doesn't have a contract specified");
         }
         return Vigor.helpers.validateContract(contract, dataToProduce, this, 'producing');
       };
-
-      Producer.prototype._addKeysToMap = function() {
-        var i, len, ref, results, subscriptionKey;
-        ref = this.SUBSCRIPTION_KEYS;
-        results = [];
-        for (i = 0, len = ref.length; i < len; i++) {
-          subscriptionKey = ref[i];
-          results.push(this.subscriptionKeyToComponents[subscriptionKey.key] = {});
-        }
-        return results;
-      };
-
-      Producer.prototype.SUBSCRIPTION_KEYS = [];
 
       return Producer;
 
@@ -377,17 +343,12 @@
           return producerClass.prototype.getInstance();
         },
         register: function(producerClass) {
-          var i, key, len, ref, results, subscriptionKey;
+          var key, subscriptionKey;
           if ((producers.indexOf(producerClass)) === -1) {
             producers.push(producerClass);
-            ref = producerClass.prototype.SUBSCRIPTION_KEYS;
-            results = [];
-            for (i = 0, len = ref.length; i < len; i++) {
-              subscriptionKey = ref[i];
-              key = subscriptionKey.key;
-              results.push(producersByKey[key] = producerClass);
-            }
-            return results;
+            subscriptionKey = producerClass.prototype.PRODUCTION_KEY;
+            key = subscriptionKey.key;
+            return producersByKey[key] = producerClass;
           }
         },
         reset: function() {
@@ -402,11 +363,9 @@
       producerMapper = Vigor.ProducerMapper;
       ProducerManager = {
         registerProducers: function(producers) {
-          return producers.forEach((function(_this) {
-            return function(producer) {
-              return producerMapper.register(producer);
-            };
-          })(this));
+          return producers.forEach(function(producer) {
+            return producerMapper.register(producer);
+          });
         },
         producerForKey: function(subscriptionKey) {
           var producer;
@@ -415,12 +374,12 @@
         subscribeComponentToKey: function(subscriptionKey, subscription) {
           var producer;
           producer = this.producerForKey(subscriptionKey);
-          return producer.addComponent(subscriptionKey, subscription);
+          return producer.addComponent(subscription);
         },
         unsubscribeComponentFromKey: function(subscriptionKey, componentId) {
           var producer;
           producer = this.producerForKey(subscriptionKey);
-          return producer.removeComponent(subscriptionKey, componentId);
+          return producer.removeComponent(componentId);
         },
         unsubscribeComponent: function(componentId) {
           return producerMapper.producers.forEach(function(producer) {

@@ -29,9 +29,9 @@ do ->
       if (producers.indexOf producerClass) is -1
         producers.push producerClass
 
-        for subscriptionKey in producerClass.prototype.SUBSCRIPTION_KEYS
-          key = subscriptionKey.key
-          producersByKey[key] = producerClass
+        subscriptionKey = producerClass::PRODUCTION_KEY
+        key = subscriptionKey.key
+        producersByKey[key] = producerClass
 
     reset: ->
       producers = []

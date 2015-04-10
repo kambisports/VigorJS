@@ -5,7 +5,7 @@ do ->
   ProducerManager =
 
     registerProducers: (producers) ->
-      producers.forEach (producer) =>
+      producers.forEach (producer) ->
         producerMapper.register producer
 
     producerForKey: (subscriptionKey) ->
@@ -13,11 +13,11 @@ do ->
 
     subscribeComponentToKey: (subscriptionKey, subscription) ->
       producer = @producerForKey subscriptionKey
-      producer.addComponent subscriptionKey, subscription
+      producer.addComponent subscription
 
     unsubscribeComponentFromKey: (subscriptionKey, componentId) ->
       producer = @producerForKey subscriptionKey
-      producer.removeComponent subscriptionKey, componentId
+      producer.removeComponent componentId
 
     unsubscribeComponent: (componentId) ->
       producerMapper.producers.forEach (producer) ->
