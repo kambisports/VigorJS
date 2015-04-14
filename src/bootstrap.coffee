@@ -46,6 +46,7 @@
 
   # DATACOMMUNICATION/PRODUCERS
   #= include ./datacommunication/producers/Producer.coffee
+  #= include ./datacommunication/producers/IdProducer.coffee
   #= include ./datacommunication/producers/ProducerMapper.coffee
   #= include ./datacommunication/producers/ProducerManager.coffee
 
