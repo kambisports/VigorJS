@@ -157,11 +157,7 @@ describe 'A Producer', ->
     dummyRepository2 = new DummyRepository()
 
     producer.repositories = [
-      dummyRepository,
-      {
-        repository: dummyRepository2,
-        callback: 'dummyRepositoryCallback'
-      }
+      dummyRepository
     ]
 
     data = {}
@@ -170,7 +166,27 @@ describe 'A Producer', ->
     producer.unsubscribeFromRepositories()
 
     dummyRepository.trigger Vigor.Repository::REPOSITORY_DIFF, data
-    dummyRepository2.trigger Vigor.Repository::REPOSITORY_DIFF, data
+
+    assert producer.onDiffInRepository.notCalled
+
+
+  it 'unsubscribes from repositories with custom callbacks', ->
+    producer = new DummyProducer()
+    producer.onDiffInRepository = sinon.spy()
+    producer.dummyRepositoryCallback = sinon.spy()
+    dummyRepository = new DummyRepository()
+    producer.repositories = [
+      {
+        repository: dummyRepository,
+        callback: 'dummyRepositoryCallback'
+      }
+    ]
+
+    data = {}
+
+    producer.subscribeToRepositories()
+    producer.unsubscribeFromRepositories()
+    dummyRepository.trigger Vigor.Repository::REPOSITORY_DIFF, data
 
     assert producer.onDiffInRepository.notCalled
     assert producer.dummyRepositoryCallback.notCalled
@@ -231,4 +247,70 @@ describe 'A Producer', ->
     assert.equal args.length, 1
     assert.equal args[0], data
 
+  it 'calls decorate when producing data', ->
+    producer = new DummyProducer()
 
+    originalData = {}
+    decoratedData = {}
+
+    sinon.stub producer, 'decorate', (data) ->
+      assert.equal data, originalData
+      decoratedData
+
+    producer.produce originalData
+    assert producer.decorate.calledOnce
+
+  it 'calls the callback with the decorated data', ->
+    producer = new DummyProducer()
+
+    decoratedData = {}
+
+    callback = sinon.spy()
+    componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, {}
+
+    sinon.stub producer, 'decorate', (data) ->
+      decoratedData
+
+    producer.addComponent componentIdentifier
+
+    assert callback.calledOnce
+    assert callback.calledWith decoratedData
+
+  it 'passes the data through the decorators in order', ->
+    originalData = {}
+
+    decorator1 = sinon.spy (data) ->
+      assert.equal data, originalData
+      data.decorator1 = true
+
+    decorator2 = sinon.spy (data) ->
+      assert.equal data.decorator1, true
+      data.decorator2 = true
+
+    producer = new DummyProducer()
+    producer.decorators = [decorator1, decorator2]
+
+    currentData = sinon.stub producer, "currentData", -> originalData
+
+    callback = sinon.spy()
+    componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, {}
+
+    producer.addComponent componentIdentifier
+
+    assert decorator1.calledOnce
+    assert decorator2.calledOnce
+    assert callback.calledOnce
+    args = callback.args[0]
+    assert.equal args.length, 1
+    data = args[0]
+    assert.equal data.decorator2, true
+
+  it 'throws an error if the subscription key does not have a contract', ->
+    producer = new DummyProducer()
+    producer.PRODUCTION_KEY =
+      key: producer.PRODUCTION_KEY.key
+
+    errorFn = ->
+      producer.produce {}
+
+    assert.throws errorFn, "The subscriptionKey #{producer.PRODUCTION_KEY.key} doesn't have a contract specified"

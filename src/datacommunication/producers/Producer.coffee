@@ -3,6 +3,7 @@ class Producer
   # the production key should be overridden in the subclass
   PRODUCTION_KEY: undefined
   repositories: []
+  decorators: []
 
   _isSubscribedToRepositories: false
 
@@ -36,7 +37,13 @@ class Producer
       @unsubscribe subscription.options
       delete @registeredComponents[subscription.id]
 
-      if @_shouldUnsubscribeFromRepositories()
+      # for..of is slightly faster than checking _.keys().length
+      shouldUnsubscribe = true
+      for component of @registeredComponents
+        shouldUnsubscribe = false
+        break
+
+      if shouldUnsubscribe
         @unsubscribeFromRepositories()
         @_isSubscribedToRepositories = false
 
@@ -57,6 +64,7 @@ class Producer
         @unsubscribeFromRepository repository
       else if repository.repository instanceof Vigor.Repository and typeof repository.callback is 'string'
         @unsubscribeFromRepository repository.repository
+    undefined
 
 
   subscribeToRepository: (repository, callback) ->
@@ -70,7 +78,7 @@ class Producer
     @stopListening repository, Vigor.Repository::REPOSITORY_DIFF
 
 
-  subscribe: (options) ->
+  subscribe: ->
     @produceDataSync()
 
 
@@ -83,36 +91,23 @@ class Producer
 
 
   produce: (data) ->
+    data = @decorate data
     @_validateContract data
-    (component.callback data) for component in @getProduceTargets()
+    (component.callback data) for componentId, component of @registeredComponents
 
-
-  getProduceTargets: ->
-    # TODO: move this logic, or something like it, to IdProducer
-    # _.filter @registeredComponents, (componentIdentifier) ->
-    #   _.isEmpty(componentIdentifier.options) or filterFn(componentIdentifier.options)
-    _.filter @registeredComponents
 
   currentData: ->
     # default implementation is a noop
+
 
   unsubscribe: (options) ->
     # default implementation is a noop
 
 
-  _shouldUnsubscribeFromRepositories: ->
-    # for..in finds out whether there are any keys
-    # faster than checking whether the length of the keys is 0
-    for component of @registeredComponents
-      return false
-
-    return true
-
-
-  decorate: (data, decoratorList) ->
-    for decorator in decoratorList
-      decorator(data)
-    return data
+  decorate: (data) ->
+    for decorator in @decorators
+      decorator data
+    data
 
 
   modelToJSON: (model) ->
