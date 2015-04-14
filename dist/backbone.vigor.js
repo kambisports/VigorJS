@@ -22,7 +22,7 @@
       root.Vigor = factory(root, root.Backbone, root._);
     }
   })(this, function(root, Backbone, _) {
-    var ComponentIdentifier, ComponentView, EventBus, EventRegistry, PackageBase, Producer, Repository, ServiceRepository, ViewModel, Vigor, previousVigor, setup, validateContract;
+    var ComponentIdentifier, ComponentView, EventBus, EventRegistry, IdProducer, PackageBase, Producer, Repository, ServiceRepository, ViewModel, Vigor, previousVigor, setup, validateContract;
     previousVigor = root.Vigor;
     Vigor = Backbone.Vigor = {};
     Vigor.helpers = {};
@@ -195,6 +195,8 @@
 
       Producer.prototype.repositories = [];
 
+      Producer.prototype.decorators = [];
+
       Producer.prototype._isSubscribedToRepositories = false;
 
       function Producer() {
@@ -224,12 +226,17 @@
       };
 
       Producer.prototype.removeComponent = function(componentId) {
-        var subscription;
+        var component, shouldUnsubscribe, subscription;
         subscription = this.registeredComponents[componentId];
         if (subscription != null) {
           this.unsubscribe(subscription.options);
           delete this.registeredComponents[subscription.id];
-          if (this._shouldUnsubscribeFromRepositories()) {
+          shouldUnsubscribe = true;
+          for (component in this.registeredComponents) {
+            shouldUnsubscribe = false;
+            break;
+          }
+          if (shouldUnsubscribe) {
             this.unsubscribeFromRepositories();
             return this._isSubscribedToRepositories = false;
           }
@@ -254,20 +261,17 @@
       };
 
       Producer.prototype.unsubscribeFromRepositories = function() {
-        var i, len, ref, repository, results;
+        var i, len, ref, repository;
         ref = this.repositories;
-        results = [];
         for (i = 0, len = ref.length; i < len; i++) {
           repository = ref[i];
           if (repository instanceof Vigor.Repository) {
-            results.push(this.unsubscribeFromRepository(repository));
+            this.unsubscribeFromRepository(repository);
           } else if (repository.repository instanceof Vigor.Repository && typeof repository.callback === 'string') {
-            results.push(this.unsubscribeFromRepository(repository.repository));
-          } else {
-            results.push(void 0);
+            this.unsubscribeFromRepository(repository.repository);
           }
         }
-        return results;
+        return void 0;
       };
 
       Producer.prototype.subscribeToRepository = function(repository, callback) {
@@ -283,7 +287,7 @@
         return this.stopListening(repository, Vigor.Repository.prototype.REPOSITORY_DIFF);
       };
 
-      Producer.prototype.subscribe = function(options) {
+      Producer.prototype.subscribe = function() {
         return this.produceDataSync();
       };
 
@@ -296,37 +300,27 @@
       };
 
       Producer.prototype.produce = function(data) {
-        var component, i, len, ref, results;
+        var component, componentId, ref, results;
+        data = this.decorate(data);
         this._validateContract(data);
-        ref = this.getProduceTargets();
+        ref = this.registeredComponents;
         results = [];
-        for (i = 0, len = ref.length; i < len; i++) {
-          component = ref[i];
+        for (componentId in ref) {
+          component = ref[componentId];
           results.push(component.callback(data));
         }
         return results;
-      };
-
-      Producer.prototype.getProduceTargets = function() {
-        return _.filter(this.registeredComponents);
       };
 
       Producer.prototype.currentData = function() {};
 
       Producer.prototype.unsubscribe = function(options) {};
 
-      Producer.prototype._shouldUnsubscribeFromRepositories = function() {
-        var component;
-        for (component in this.registeredComponents) {
-          return false;
-        }
-        return true;
-      };
-
-      Producer.prototype.decorate = function(data, decoratorList) {
-        var decorator, i, len;
-        for (i = 0, len = decoratorList.length; i < len; i++) {
-          decorator = decoratorList[i];
+      Producer.prototype.decorate = function(data) {
+        var decorator, i, len, ref;
+        ref = this.decorators;
+        for (i = 0, len = ref.length; i < len; i++) {
+          decorator = ref[i];
           decorator(data);
         }
         return data;
@@ -368,6 +362,141 @@
     _.extend(Producer.prototype, Backbone.Events);
     Producer.extend = Vigor.extend;
     Vigor.Producer = Producer;
+    IdProducer = (function(superClass) {
+      extend(IdProducer, superClass);
+
+      IdProducer.prototype.updatedIds = void 0;
+
+      IdProducer.prototype.subscriptions = void 0;
+
+      IdProducer.prototype.idType = typeof 0;
+
+      function IdProducer() {
+        IdProducer.__super__.constructor.apply(this, arguments);
+        this.updatedIds = [];
+        this.subscriptions = {};
+      }
+
+      IdProducer.prototype.subscribe = function(options) {
+        var id;
+        id = this.idForOptions(options);
+        if (typeof id !== this.idType) {
+          throw "expected the subscription key to be a " + this.idType + " but got a " + (typeof subscriptionKey);
+        }
+        if (this.subscriptions[id]) {
+          this.subscriptions[id].push(options);
+        } else {
+          this.subscriptions[id] = [options];
+        }
+        return this.produceDataSync(id);
+      };
+
+      IdProducer.prototype.onDiffInRepository = function(repository, diff) {
+        var addRemoveMap, addedModelIds, changeMap, removedModelIds, self, updatedModelIds;
+        self = this;
+        addRemoveMap = function(model) {
+          var id;
+          id = self.idForModel(model);
+          if (self.hasId(id)) {
+            return id;
+          }
+        };
+        changeMap = function(model) {
+          var id;
+          id = self.idForModel(model);
+          if ((self.hasId(id)) && (self.shouldPropagateModelChange(model, repository))) {
+            return id;
+          }
+        };
+        addedModelIds = _.map(diff.added, addRemoveMap);
+        removedModelIds = _.map(diff.removed, addRemoveMap);
+        updatedModelIds = _.map(diff.changed, changeMap);
+        return this.produceDataForIds(_.filter(_.flatten([addedModelIds, removedModelIds, updatedModelIds])));
+      };
+
+      IdProducer.prototype.produceDataForIds = function(ids) {
+        if (ids == null) {
+          ids = this.allIds();
+        }
+        this.updatedIds = _.uniq(this.updatedIds.concat(ids));
+        return this.produceData();
+      };
+
+      IdProducer.prototype.allIds = function() {
+        var ids;
+        ids = _.keys(this.subscriptions);
+        if (this.idType === (typeof 0)) {
+          ids = _.map(ids, function(id) {
+            return parseInt(id, 10);
+          });
+        }
+        return ids;
+      };
+
+      IdProducer.prototype.produceDataSync = function(id) {
+        var ids;
+        if (id != null) {
+          return this.produce([id]);
+        } else if (this.updatedIds.length > 0) {
+          ids = this.updatedIds.slice();
+          this.updatedIds.length = 0;
+          return this.produce(ids);
+        }
+      };
+
+      IdProducer.prototype.unsubscribe = function(options) {
+        var id, index, subscription;
+        id = this.idForOptions(options);
+        subscription = this.subscriptions[id];
+        if (subscription != null) {
+          index = subscription.indexOf(options);
+          if (index !== -1) {
+            subscription.splice(index, 1);
+            if (subscription.length === 0) {
+              return delete this.subscriptions[id];
+            }
+          }
+        }
+      };
+
+      IdProducer.prototype.produce = function(ids) {
+        var data, i, id, len, results;
+        results = [];
+        for (i = 0, len = ids.length; i < len; i++) {
+          id = ids[i];
+          data = this.decorate({
+            id: id
+          });
+          this._validateContract(data);
+          results.push(_.each(this.registeredComponents, function(component) {
+            if (id === this.idForOptions(component.options)) {
+              return component.callback(data);
+            }
+          }, this));
+        }
+        return results;
+      };
+
+      IdProducer.prototype.hasId = function(id) {
+        return this.subscriptions[id] != null;
+      };
+
+      IdProducer.prototype.shouldPropagateModelChange = function(model, repository) {
+        return true;
+      };
+
+      IdProducer.prototype.idForModel = function(model, repository) {
+        return model.id;
+      };
+
+      IdProducer.prototype.idForOptions = function(options) {
+        return options.id;
+      };
+
+      return IdProducer;
+
+    })(Producer);
+    Vigor.IdProducer = IdProducer;
     (function() {
       var KEY_ALREADY_REGISTERED, NO_PRODUCERS_ERROR, NO_PRODUCER_FOUND_ERROR, ProducerMapper, producers, producersByKey;
       producers = [];
