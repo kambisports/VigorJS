@@ -93,13 +93,12 @@
     };
     Vigor.helpers.validateContract = validateContract;
     EventRegistry = (function() {
-      function EventRegistry() {
-        _.extend(this, Backbone.Events);
-      }
+      function EventRegistry() {}
 
       return EventRegistry;
 
     })();
+    _.extend(EventRegistry.prototype, Backbone.Events);
     EventBus = (function() {
       function EventBus() {}
 
@@ -161,9 +160,7 @@
     })();
     Vigor.EventBus = new EventBus();
     PackageBase = (function() {
-      function PackageBase() {
-        _.extend(this, Backbone.Events);
-      }
+      function PackageBase() {}
 
       PackageBase.prototype.render = function() {
         throw 'PackageBase->render needs to be over-ridden';
@@ -176,6 +173,7 @@
       return PackageBase;
 
     })();
+    _.extend(PackageBase.prototype, Backbone.Events);
     PackageBase.extend = Vigor.extend;
     Vigor.PackageBase = PackageBase;
     Vigor.SubscriptionKeys = {
