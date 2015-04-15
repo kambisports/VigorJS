@@ -8,14 +8,13 @@ var app = app || {};
 
   app.HelloWorldsProducer = Vigor.Producer.extend({
 
-    SUBSCRIPTION_KEYS: [
-      SubscriptionKeys.HELLO_WORLDS
-    ],
+    PRODUCTION_KEY: SubscriptionKeys.HELLO_WORLDS,
+    repositories: [HelloWorldRepository],
 
     repoFetchSubscription: undefined,
 
     subscribeToRepositories: function () {
-      HelloWorldRepository.on(HelloWorldRepository.REPOSITORY_DIFF, this._onDiffInRepository, this)
+      Vigor.Producer.prototype.subscribeToRepositories.call(this);
 
       this.repoFetchSubscription = {
         pollingInterval: 3000
@@ -25,29 +24,16 @@ var app = app || {};
     },
 
     unsubscribeFromRepositories: function () {
-      HelloWorldRepository.off(HelloWorldRepository.REPOSITORY_DIFF, this._onDiffInRepository, this)
+      Vigor.Producer.prototype.unsubscribeFromRepositories.call(this);
       HelloWorldRepository.removeSubscription(HelloWorldRepository.ALL, this.repoFetchSubscription);
     },
 
-    subscribe: function (subscriptionKey, options) {
-      this._produceData();
-    },
-
-    _produceData: function () {
-      this.produce(SubscriptionKeys.HELLO_WORLDS, this._buildData());
-    },
-
-    _buildData: function () {
+    currentData: function () {
       var models = HelloWorldRepository.getHelloWorlds();
 
       models = _.without(models, undefined);
       models = this.modelsToJSON(models);
       return models;
-    },
-
-    _onDiffInRepository: function (dataDiff) {
-      if (dataDiff.added.length > 0 || dataDiff.removed.length > 0)
-        this._produceData();
     }
 
   });

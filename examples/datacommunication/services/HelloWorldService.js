@@ -28,7 +28,7 @@ var app = app || {};
             'message': 'im also added',
             'count': 3
           }
-        ]
+        ];
         this.parse(response);
       }, this), 12500);
     },
@@ -57,12 +57,12 @@ var app = app || {};
           'message': 'im going to be removed',
           'count': 0
         }
-      ]
+      ];
       return models;
     },
 
     url: function () {
-      return './datacommunication/services/helloWorld.json'
+      return './datacommunication/services/helloWorld.json';
     }
 
   });
