@@ -1,10 +1,32 @@
 {
   "name": "vigorjs",
-  "version": "1.0.0",
-  "description": "",
-  "main": "vigor.js",
+  "description": "A small framework for structuring large scale Backbone applications",
+  "version": "0.0.1",
+  "homepage": "",
+  "author": "Kambi Sports Solutions",
+  "contributors": [
+    {
+      "name": "James Ward",
+      "email": ""
+    },
+    {
+      "name": "Jon Wålstedt",
+      "email": "jon@walstedt.se"
+    },
+    {
+      "name": "Per Wiklander",
+      "email": ""
+    },
+    {
+      "name": "Stellan Garhammar",
+      "email": ""
+    }
+  ],
+  "main": "./dist/vigor.js",
   "directories": {
     "example": "examples",
+    "dist": "dist",
+    "src": "src",
     "test": "test"
   },
   "scripts": {
@@ -15,7 +37,6 @@
     "type": "git",
     "url": "https://Jonwalstedt@bitbucket.org/Jonwalstedt/backbone.vigorjs.git"
   },
-  "author": "Jon Wålstedt <jon@walstedt.se> (http://www.jonwalstedt.se/)",
   "license": "ISC",
   "dependencies": {
     "backbone": "^1.1.2",
