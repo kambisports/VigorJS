@@ -1,19 +1,22 @@
 class Repository extends Backbone.Collection
 
-  _debouncedAddedModels: undefined
-  _debouncedChangedModels: undefined
-  _debouncedRemovedModels: undefined
-  _eventTimeout: undefined
+  _throttledAddedModels: undefined
+  _throttledChangedModels: undefined
+  _throttledRemovedModels: undefined
+  _throttledTriggerUpdates: undefined
 
   initialize: ->
-    @_debouncedAddedModels = {}
-    @_debouncedChangedModels = {}
-    @_debouncedRemovedModels = {}
+    @cid = @cid or _.uniqueId 'c'
+    @_throttledAddedModels = {}
+    @_throttledChangedModels = {}
+    @_throttledRemovedModels = {}
 
-    do @addDebouncedListeners
+    @_throttledTriggerUpdates = _.throttle @_triggerUpdates, 100, leading: no
+
+    do @addThrottledListeners
     super
 
-  addDebouncedListeners: ->
+  addThrottledListeners: ->
     @on 'all', @_onAll
 
   getByIds: (ids) ->
@@ -31,43 +34,42 @@ class Repository extends Backbone.Collection
       when 'change' then @_onChange.apply(@, args)
       when 'remove' then @_onRemove.apply(@, args)
 
-    clearTimeout @_eventTimeout
-    @_eventTimeout = setTimeout @_debounced, 100
+    do @_throttledTriggerUpdates
 
   _onAdd: (model) =>
-    @_debouncedAddedModels[model.id] = model
+    @_throttledAddedModels[model.id] = model
 
   _onChange: (model) =>
-    @_debouncedChangedModels[model.id] = model
+    @_throttledChangedModels[model.id] = model
 
   _onRemove: (model) =>
-    @_debouncedRemovedModels[model.id] = model
+    @_throttledRemovedModels[model.id] = model
 
-  _debouncedAdd: ->
+  _throttledAdd: ->
     event = Repository::REPOSITORY_ADD
-    models = _.values @_debouncedAddedModels
-    @_debouncedAddedModels = {}
+    models = _.values @_throttledAddedModels
+    @_throttledAddedModels = {}
     if models.length > 0
       @trigger event, models, event
     return models
 
-  _debouncedChange: ->
+  _throttledChange: ->
     event = Repository::REPOSITORY_CHANGE
-    models = _.values @_debouncedChangedModels
-    @_debouncedChangedModels = {}
+    models = _.values @_throttledChangedModels
+    @_throttledChangedModels = {}
     if models.length > 0
       @trigger event, models, event
     return models
 
-  _debouncedRemove: ->
+  _throttledRemove: ->
     event = Repository::REPOSITORY_REMOVE
-    models = _.values @_debouncedRemovedModels
-    @_debouncedRemovedModels = {}
+    models = _.values @_throttledRemovedModels
+    @_throttledRemovedModels = {}
     if models.length > 0
       @trigger event, models, event
     return models
 
-  _debouncedDiff: (added, changed, removed) ->
+  _throttledDiff: (added, changed, removed) ->
     event = Repository::REPOSITORY_DIFF
     if  added.length or \
         changed.length or \
@@ -84,8 +86,8 @@ class Repository extends Backbone.Collection
 
       @trigger event, models, event
 
-  _debounced: =>
-    @_debouncedDiff @_debouncedAdd(), @_debouncedChange(), @_debouncedRemove()
+  _triggerUpdates: =>
+    @_throttledDiff @_throttledAdd(), @_throttledChange(), @_throttledRemove()
 
   REPOSITORY_DIFF: 'repository_diff'
   REPOSITORY_ADD: 'repository_add'

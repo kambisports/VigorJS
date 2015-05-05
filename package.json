@@ -1,8 +1,8 @@
 {
-  "name": "backbone.vigorjs",
+  "name": "vigorjs",
   "version": "1.0.0",
   "description": "",
-  "main": "backbone.vigor.js",
+  "main": "vigor.js",
   "directories": {
     "example": "examples",
     "test": "test"
@@ -35,7 +35,7 @@
     "gulp-mocha": "^2.0.0",
     "gulp-rename": "^1.2.0",
     "gulp-rimraf": "^0.1.1",
-    "gulp-uglify": "^1.1.0",
+    "gulp-uglify": "^1.2.0",
     "node-static": "^0.7.6",
     "sinon": "^1.12.2",
     "vinyl-source-stream": "^1.0.0"

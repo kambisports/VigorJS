@@ -1,4 +1,4 @@
-Vigor = require '../../../../dist/backbone.vigor'
+Vigor = require '../../../../dist/vigor'
 assert = require 'assert'
 sinon = require 'sinon'
 
@@ -77,7 +77,7 @@ describe 'An IdProducer', ->
 
     dummyProducer.subscribe subscription
     dummyProducer.unsubscribe subscription
-  
+
     assert !dummyProducer.hasId componentId2
 
 
@@ -122,7 +122,7 @@ describe 'An IdProducer', ->
       ]
       removed: []
       changed: []
-      
+
   it 'should eventually produce added items on the idForModel', (done) ->
     componentId = 1
 
@@ -422,7 +422,7 @@ describe 'An IdProducer', ->
     assert component.callback.args[0].length is 1
     assert component.callback.args[0][0] is decoratedData
 
- 
+
   it 'passes data through decorators in order before producing', ->
     componentId = 1
     decoratedData = {}
@@ -450,7 +450,7 @@ describe 'An IdProducer', ->
 
     assert decorator1.calledOnce
     assert decorator2.calledOnce
-    
+
     assert component.callback.calledOnce
     assert component.callback.args.length is 1
     assert component.callback.args[0].length is 1

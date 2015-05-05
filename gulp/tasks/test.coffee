@@ -6,7 +6,7 @@ global.extend = (obj, mixin) ->
   obj[name] = method for name, method of mixin
   obj
 
-distFile = ['dist/backbone.vigor.js']
+distFile = ['dist/vigor.js']
 # coffeeFiles = ['src/**/*.coffee']
 specFiles = ['test/spec/**/*.coffee']
 

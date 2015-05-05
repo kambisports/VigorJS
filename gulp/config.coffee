@@ -1,6 +1,7 @@
 config =
   bootstrap: './src/bootstrap.coffee'
-  outputName: 'backbone.vigor.js'
+  outputName: 'vigor.js'
+  outputMinifiedName: 'vigor.min.js'
   serverTarget: './examples'
   dest: './dist'
   src: './src/'

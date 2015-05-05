@@ -1,4 +1,4 @@
-Vigor = require '../../../../dist/backbone.vigor'
+Vigor = require '../../../../dist/vigor'
 ServiceRepository = Vigor.ServiceRepository
 assert = require 'assert'
 sinon = require 'sinon'
