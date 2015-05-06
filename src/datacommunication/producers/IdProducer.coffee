@@ -1,5 +1,5 @@
 class IdProducer extends Producer
-  
+
   updatedIds: undefined
   subscriptions: undefined
 
@@ -7,7 +7,7 @@ class IdProducer extends Producer
   # trying to add a subscription with an invalid type throws an error
   idType: typeof 0
 
-  
+
   constructor: ->
     super
     @updatedIds = []
@@ -33,12 +33,12 @@ class IdProducer extends Producer
     self = @
 
     addRemoveMap = (model) ->
-      id = self.idForModel model
+      id = self.idForModel model, repository
       if self.hasId id
         id
 
     changeMap = (model) ->
-      id = self.idForModel model
+      id = self.idForModel model, repository
       if (self.hasId id) and (self.shouldPropagateModelChange model, repository)
         id
 
@@ -60,7 +60,7 @@ class IdProducer extends Producer
     if @idType is (typeof 0)
       ids = _.map ids, (id) ->
         parseInt id, 10
-    
+
     ids
 
 
@@ -89,10 +89,10 @@ class IdProducer extends Producer
 
   produce: (ids) ->
     for id in ids
-      
+
       data = @decorate { id: id }
       @_validateContract data
-      
+
       _.each @registeredComponents, (component) ->
         if id is @idForOptions component.options
           component.callback data

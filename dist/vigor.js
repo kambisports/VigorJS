@@ -394,14 +394,14 @@
         self = this;
         addRemoveMap = function(model) {
           var id;
-          id = self.idForModel(model);
+          id = self.idForModel(model, repository);
           if (self.hasId(id)) {
             return id;
           }
         };
         changeMap = function(model) {
           var id;
-          id = self.idForModel(model);
+          id = self.idForModel(model, repository);
           if ((self.hasId(id)) && (self.shouldPropagateModelChange(model, repository))) {
             return id;
           }
