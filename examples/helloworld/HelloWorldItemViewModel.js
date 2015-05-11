@@ -2,14 +2,14 @@ var app = app || {};
 
 (function ($) {
   'use strict';
-  app.HelloWorldItemViewModel = Vigor.ViewModel.extend({
+  app.HelloWorldItemViewModel = Vigor.ComponentViewModel.extend({
 
     id: 'HelloWorldItemViewModel',
     helloWorldId: undefined,
     helloWorld: undefined,
 
     constructor: function (helloWorldId) {
-      Vigor.ViewModel.prototype.constructor.call(this, arguments);
+      Vigor.ComponentViewModel.prototype.constructor.call(this, arguments);
       this.helloWorldId = helloWorldId;
       this.helloWorld = new app.HelloWorldItemModel();
     },
@@ -23,7 +23,7 @@ var app = app || {};
     },
 
     _onChangedById: function (jsonData) {
-      Vigor.ViewModel.prototype.validateContract.apply(this, [this.helloWorld.defaults, jsonData]);
+      Vigor.ComponentViewModel.prototype.validateContract.apply(this, [this.helloWorld.defaults, jsonData]);
       this.helloWorld.set(jsonData, { add: false, remove: false, merge: true })
     }
 

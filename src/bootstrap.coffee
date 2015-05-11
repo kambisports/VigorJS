@@ -37,25 +37,26 @@
 
   # COMMON
   #= include ./common/EventBus.coffee
-  #= include ./common/PackageBase.coffee
   #= include ./common/SubscriptionKeys.coffee
   #= include ./common/EventKeys.coffee
+
+  # DATACOMMUNICATION
+  #= include ./datacommunication/ComponentIdentifier.coffee
+  #= include ./datacommunication/ProducerMapper.coffee
+  #= include ./datacommunication/ProducerManager.coffee
+  #= include ./datacommunication/DataCommunicationManager.coffee
 
   # DATACOMMUNICATION/PRODUCERS
   #= include ./datacommunication/producers/Producer.coffee
   #= include ./datacommunication/producers/IdProducer.coffee
-  #= include ./datacommunication/producers/ProducerMapper.coffee
-  #= include ./datacommunication/producers/ProducerManager.coffee
 
   # DATACOMMUNICATION/APISERVICES
   #= include ./datacommunication/apiservices/APIService.coffee
 
-  # DATACOMMUNICATION
-  #= include ./datacommunication/ComponentIdentifier.coffee
-  #= include ./datacommunication/DataCommunicationManager.coffee
-
-  #= include ./common/ComponentView.coffee
-  #= include ./common/ViewModel.coffee
+  # COMPONENTS
+  #= include ./component/ComponentBase.coffee
+  #= include ./component/ComponentView.coffee
+  #= include ./component/ComponentViewModel.coffee
 
   # REPOSITORIES
   #= include ./datacommunication/repositories/Repository.coffee

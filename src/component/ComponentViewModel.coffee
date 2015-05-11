@@ -1,9 +1,9 @@
-class ViewModel
+class ComponentViewModel
 
   dataCommunicationManager = Vigor.DataCommunicationManager
 
   constructor: ->
-    @id = "ViewModel_#{_.uniqueId()}"
+    @id = "ComponentViewModel_#{_.uniqueId()}"
 
   dispose: ->
     do @unsubscribeAll
@@ -20,5 +20,5 @@ class ViewModel
   validateContract: (contract, incommingData) ->
     return Vigor.helpers.validateContract(contract, incommingData, @id)
 
-ViewModel.extend = Vigor.extend
-Vigor.ViewModel = ViewModel
+ComponentViewModel.extend = Vigor.extend
+Vigor.ComponentViewModel = ComponentViewModel

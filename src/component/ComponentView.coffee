@@ -25,7 +25,7 @@ class ComponentView extends Backbone.View
   # @return [this]
   initialize: (options) ->
     super
-    if options.viewModel
+    if options?.viewModel
       @viewModel = options.viewModel
     return @
 
@@ -74,6 +74,5 @@ class ComponentView extends Backbone.View
     for methodName in methodNames
       unless @constructor.prototype.hasOwnProperty(methodName)
         throw new Error("#{@constructor.name} - #{methodName}() must be implemented in View.")
-        # console.log 'FIXME: ' + this.constructor.name + ' - ' + methodName + '() must be implemented in View.'
 
 Vigor.ComponentView = ComponentView

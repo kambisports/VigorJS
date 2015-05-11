@@ -3,13 +3,13 @@ var app = app || {};
 (function ($) {
   'use strict';
   var SubscriptionKeys = Vigor.SubscriptionKeys;
-  app.HelloWorldViewModel = Vigor.ViewModel.extend({
+  app.HelloWorldViewModel = Vigor.ComponentViewModel.extend({
 
     id: 'HelloWorldViewModel',
     helloWorldItems: undefined,
 
     constructor: function () {
-      Vigor.ViewModel.prototype.constructor.apply(this, arguments);
+      Vigor.ComponentViewModel.prototype.constructor.apply(this, arguments);
       this.helloWorldItems = new Backbone.Collection();
     },
 
@@ -22,7 +22,7 @@ var app = app || {};
     },
 
     _onHelloWorldItemsChanged: function (jsonArray) {
-      Vigor.ViewModel.prototype.validateContract.apply(this, [[], jsonArray]);
+      Vigor.ComponentViewModel.prototype.validateContract.apply(this, [[], jsonArray]);
       this.helloWorldItems.set(jsonArray, {add: true, remove: true, merge: false});
     }
 

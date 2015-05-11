@@ -1,9 +1,9 @@
 (function() {
-  var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
-    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    hasProp = {}.hasOwnProperty,
-    slice = [].slice;
+  var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __hasProp = {}.hasOwnProperty,
+    __slice = [].slice;
 
   (function(root, factory) {
     var Backbone, _;
@@ -11,18 +11,15 @@
       define(['backbone', 'underscore'], function(Backbone, _) {
         return factory(root, Backbone, _);
       });
-      console.log('amd');
     } else if (typeof exports === "object") {
       Backbone = require('backbone');
       _ = require('underscore');
-      console.log('commonjs');
       module.exports = factory(root, Backbone, _);
     } else {
-      console.log('global');
       root.Vigor = factory(root, root.Backbone, root._);
     }
   })(this, function(root, Backbone, _) {
-    var ComponentIdentifier, ComponentView, EventBus, EventRegistry, IdProducer, PackageBase, Producer, Repository, ServiceRepository, ViewModel, Vigor, previousVigor, setup, validateContract;
+    var ComponentBase, ComponentIdentifier, ComponentView, ComponentViewModel, EventBus, EventRegistry, IdProducer, Producer, Repository, ServiceRepository, Vigor, previousVigor, setup, validateContract;
     previousVigor = root.Vigor;
     Vigor = Backbone.Vigor = {};
     Vigor.helpers = {};
@@ -143,15 +140,15 @@
 
       EventBus.prototype._eventKeyExists = function(key) {
         var property, value;
-        return indexOf.call((function() {
-          var ref, results;
-          ref = Vigor.EventKeys;
-          results = [];
-          for (property in ref) {
-            value = ref[property];
-            results.push(value);
+        return __indexOf.call((function() {
+          var _ref, _results;
+          _ref = Vigor.EventKeys;
+          _results = [];
+          for (property in _ref) {
+            value = _ref[property];
+            _results.push(value);
           }
-          return results;
+          return _results;
         })(), key) >= 0;
       };
 
@@ -159,23 +156,6 @@
 
     })();
     Vigor.EventBus = new EventBus();
-    PackageBase = (function() {
-      function PackageBase() {}
-
-      PackageBase.prototype.render = function() {
-        throw 'PackageBase->render needs to be over-ridden';
-      };
-
-      PackageBase.prototype.dispose = function() {
-        throw 'PackageBase->dispose needs to be over-ridden';
-      };
-
-      return PackageBase;
-
-    })();
-    _.extend(PackageBase.prototype, Backbone.Events);
-    PackageBase.extend = Vigor.extend;
-    Vigor.PackageBase = PackageBase;
     Vigor.SubscriptionKeys = {
       extend: function(object) {
         return _.extend(this, object);
@@ -188,6 +168,128 @@
         return this;
       }
     };
+    ComponentIdentifier = (function() {
+      ComponentIdentifier.prototype.id = void 0;
+
+      ComponentIdentifier.prototype.callback = void 0;
+
+      ComponentIdentifier.prototype.options = void 0;
+
+      function ComponentIdentifier(_at_id, _at_callback, _at_options) {
+        this.id = _at_id;
+        this.callback = _at_callback;
+        this.options = _at_options;
+      }
+
+      return ComponentIdentifier;
+
+    })();
+    Vigor.ComponentIdentifier = ComponentIdentifier;
+    (function() {
+      var KEY_ALREADY_REGISTERED, NO_PRODUCERS_ERROR, NO_PRODUCER_FOUND_ERROR, ProducerMapper, producers, producersByKey;
+      producers = [];
+      producersByKey = {};
+      NO_PRODUCERS_ERROR = "There are no producers registered - register producers through the DataCommunicationManager";
+      NO_PRODUCER_FOUND_ERROR = function(key) {
+        return "No producer found for subscription " + key + "!";
+      };
+      KEY_ALREADY_REGISTERED = function(key) {
+        return "A producer for the key " + key + " is already registered";
+      };
+      ProducerMapper = {
+        producers: producers,
+        producerClassForKey: function(subscriptionKey) {
+          var key, producerClass;
+          key = subscriptionKey.key;
+          if (producers.length === 0) {
+            throw NO_PRODUCERS_ERROR;
+          }
+          producerClass = producersByKey[key];
+          if (!producerClass) {
+            throw NO_PRODUCER_FOUND_ERROR(key);
+          }
+          return producerClass;
+        },
+        producerForKey: function(subscriptionKey) {
+          var producerClass;
+          producerClass = this.producerClassForKey(subscriptionKey);
+          return producerClass.prototype.getInstance();
+        },
+        register: function(producerClass) {
+          var key, subscriptionKey;
+          if ((producers.indexOf(producerClass)) === -1) {
+            producers.push(producerClass);
+            subscriptionKey = producerClass.prototype.PRODUCTION_KEY;
+            key = subscriptionKey.key;
+            if (producersByKey[key] != null) {
+              throw KEY_ALREADY_REGISTERED(key);
+            }
+            return producersByKey[key] = producerClass;
+          }
+        },
+        reset: function() {
+          producers.length = 0;
+          return producersByKey = {};
+        }
+      };
+      return Vigor.ProducerMapper = ProducerMapper;
+    })();
+    (function() {
+      var ProducerManager, producerMapper;
+      producerMapper = Vigor.ProducerMapper;
+      ProducerManager = {
+        registerProducers: function(producers) {
+          return producers.forEach(function(producer) {
+            return producerMapper.register(producer);
+          });
+        },
+        producerForKey: function(subscriptionKey) {
+          var producer;
+          return producer = producerMapper.producerForKey(subscriptionKey);
+        },
+        subscribeComponentToKey: function(subscriptionKey, subscription) {
+          var producer;
+          producer = this.producerForKey(subscriptionKey);
+          return producer.addComponent(subscription);
+        },
+        unsubscribeComponentFromKey: function(subscriptionKey, componentId) {
+          var producer;
+          producer = this.producerForKey(subscriptionKey);
+          return producer.removeComponent(componentId);
+        },
+        unsubscribeComponent: function(componentId) {
+          return producerMapper.producers.forEach(function(producer) {
+            return producer.prototype.getInstance().removeComponent(componentId);
+          });
+        }
+      };
+      return Vigor.ProducerManager = ProducerManager;
+    })();
+    (function() {
+      var DataCommunicationManager, Subscription, producerManager;
+      Subscription = Vigor.ComponentIdentifier;
+      producerManager = Vigor.ProducerManager;
+      DataCommunicationManager = {
+        registerProducers: function(producers) {
+          return producerManager.registerProducers(producers);
+        },
+        subscribe: function(componentId, subscriptionKey, callback, subscriptionOptions) {
+          var subscription;
+          if (subscriptionOptions == null) {
+            subscriptionOptions = {};
+          }
+          subscription = new Subscription(componentId, callback, subscriptionOptions);
+          return producerManager.subscribeComponentToKey(subscriptionKey, subscription);
+        },
+        unsubscribe: function(componentId, subscriptionKey) {
+          return producerManager.unsubscribeComponentFromKey(subscriptionKey, componentId);
+        },
+        unsubscribeAll: function(componentId) {
+          return producerManager.unsubscribeComponent(componentId);
+        }
+      };
+      return Vigor.DataCommunicationManager = DataCommunicationManager;
+    })();
     Producer = (function() {
       Producer.prototype.PRODUCTION_KEY = void 0;
 
@@ -198,7 +300,7 @@
       Producer.prototype._isSubscribedToRepositories = false;
 
       function Producer() {
-        this.onDiffInRepository = bind(this.onDiffInRepository, this);
+        this.onDiffInRepository = __bind(this.onDiffInRepository, this);
         this.registeredComponents = {};
         this.produceData = _.throttle(this.produceDataSync, 100);
       }
@@ -242,27 +344,27 @@
       };
 
       Producer.prototype.subscribeToRepositories = function() {
-        var i, len, ref, repository, results;
-        ref = this.repositories;
-        results = [];
-        for (i = 0, len = ref.length; i < len; i++) {
-          repository = ref[i];
+        var repository, _i, _len, _ref, _results;
+        _ref = this.repositories;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          repository = _ref[_i];
           if (repository instanceof Vigor.Repository) {
-            results.push(this.subscribeToRepository(repository));
+            _results.push(this.subscribeToRepository(repository));
           } else if (repository.repository instanceof Vigor.Repository && typeof repository.callback === 'string') {
-            results.push(this.subscribeToRepository(repository.repository, this[repository.callback]));
+            _results.push(this.subscribeToRepository(repository.repository, this[repository.callback]));
           } else {
             throw 'unexpected format of producer repositories definition';
           }
         }
-        return results;
+        return _results;
       };
 
       Producer.prototype.unsubscribeFromRepositories = function() {
-        var i, len, ref, repository;
-        ref = this.repositories;
-        for (i = 0, len = ref.length; i < len; i++) {
-          repository = ref[i];
+        var repository, _i, _len, _ref;
+        _ref = this.repositories;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          repository = _ref[_i];
           if (repository instanceof Vigor.Repository) {
             this.unsubscribeFromRepository(repository);
           } else if (repository.repository instanceof Vigor.Repository && typeof repository.callback === 'string') {
@@ -298,16 +400,16 @@
       };
 
       Producer.prototype.produce = function(data) {
-        var component, componentId, ref, results;
+        var component, componentId, _ref, _results;
         data = this.decorate(data);
         this._validateContract(data);
-        ref = this.registeredComponents;
-        results = [];
-        for (componentId in ref) {
-          component = ref[componentId];
-          results.push(component.callback(data));
+        _ref = this.registeredComponents;
+        _results = [];
+        for (componentId in _ref) {
+          component = _ref[componentId];
+          _results.push(component.callback(data));
         }
-        return results;
+        return _results;
       };
 
       Producer.prototype.currentData = function() {};
@@ -315,10 +417,10 @@
       Producer.prototype.unsubscribe = function(options) {};
 
       Producer.prototype.decorate = function(data) {
-        var decorator, i, len, ref;
-        ref = this.decorators;
-        for (i = 0, len = ref.length; i < len; i++) {
-          decorator = ref[i];
+        var decorator, _i, _len, _ref;
+        _ref = this.decorators;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          decorator = _ref[_i];
           decorator(data);
         }
         return data;
@@ -360,8 +462,8 @@
     _.extend(Producer.prototype, Backbone.Events);
     Producer.extend = Vigor.extend;
     Vigor.Producer = Producer;
-    IdProducer = (function(superClass) {
-      extend(IdProducer, superClass);
+    IdProducer = (function(_super) {
+      __extends(IdProducer, _super);
 
       IdProducer.prototype.updatedIds = void 0;
 
@@ -458,21 +560,21 @@
       };
 
       IdProducer.prototype.produce = function(ids) {
-        var data, i, id, len, results;
-        results = [];
-        for (i = 0, len = ids.length; i < len; i++) {
-          id = ids[i];
+        var data, id, _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = ids.length; _i < _len; _i++) {
+          id = ids[_i];
           data = this.decorate({
             id: id
           });
           this._validateContract(data);
-          results.push(_.each(this.registeredComponents, function(component) {
+          _results.push(_.each(this.registeredComponents, function(component) {
             if (id === this.idForOptions(component.options)) {
               return component.callback(data);
             }
           }, this));
         }
-        return results;
+        return _results;
       };
 
       IdProducer.prototype.hasId = function(id) {
@@ -496,86 +598,6 @@
     })(Producer);
     Vigor.IdProducer = IdProducer;
     (function() {
-      var KEY_ALREADY_REGISTERED, NO_PRODUCERS_ERROR, NO_PRODUCER_FOUND_ERROR, ProducerMapper, producers, producersByKey;
-      producers = [];
-      producersByKey = {};
-      NO_PRODUCERS_ERROR = "There are no producers registered - register producers through the DataCommunicationManager";
-      NO_PRODUCER_FOUND_ERROR = function(key) {
-        return "No producer found for subscription " + key + "!";
-      };
-      KEY_ALREADY_REGISTERED = function(key) {
-        return "A producer for the key " + key + " is already registered";
-      };
-      ProducerMapper = {
-        producers: producers,
-        producerClassForKey: function(subscriptionKey) {
-          var key, producerClass;
-          key = subscriptionKey.key;
-          if (producers.length === 0) {
-            throw NO_PRODUCERS_ERROR;
-          }
-          producerClass = producersByKey[key];
-          if (!producerClass) {
-            throw NO_PRODUCER_FOUND_ERROR(key);
-          }
-          return producerClass;
-        },
-        producerForKey: function(subscriptionKey) {
-          var producerClass;
-          producerClass = this.producerClassForKey(subscriptionKey);
-          return producerClass.prototype.getInstance();
-        },
-        register: function(producerClass) {
-          var key, subscriptionKey;
-          if ((producers.indexOf(producerClass)) === -1) {
-            producers.push(producerClass);
-            subscriptionKey = producerClass.prototype.PRODUCTION_KEY;
-            key = subscriptionKey.key;
-            if (producersByKey[key] != null) {
-              throw KEY_ALREADY_REGISTERED(key);
-            }
-            return producersByKey[key] = producerClass;
-          }
-        },
-        reset: function() {
-          producers.length = 0;
-          return producersByKey = {};
-        }
-      };
-      return Vigor.ProducerMapper = ProducerMapper;
-    })();
-    (function() {
-      var ProducerManager, producerMapper;
-      producerMapper = Vigor.ProducerMapper;
-      ProducerManager = {
-        registerProducers: function(producers) {
-          return producers.forEach(function(producer) {
-            return producerMapper.register(producer);
-          });
-        },
-        producerForKey: function(subscriptionKey) {
-          var producer;
-          return producer = producerMapper.producerForKey(subscriptionKey);
-        },
-        subscribeComponentToKey: function(subscriptionKey, subscription) {
-          var producer;
-          producer = this.producerForKey(subscriptionKey);
-          return producer.addComponent(subscription);
-        },
-        unsubscribeComponentFromKey: function(subscriptionKey, componentId) {
-          var producer;
-          producer = this.producerForKey(subscriptionKey);
-          return producer.removeComponent(componentId);
-        },
-        unsubscribeComponent: function(componentId) {
-          return producerMapper.producers.forEach(function(producer) {
-            return producer.prototype.getInstance().removeComponent(componentId);
-          });
-        }
-      };
-      return Vigor.ProducerManager = ProducerManager;
-    })();
-    (function() {
       var APIService, ServiceChannel;
       ServiceChannel = (function() {
         ServiceChannel.prototype.subscribers = void 0;
@@ -588,11 +610,11 @@
 
         ServiceChannel.prototype.name = void 0;
 
-        function ServiceChannel(_window, name1, service1, subscribers) {
-          this._window = _window;
-          this.name = name1;
-          this.service = service1;
-          this.subscribers = subscribers;
+        function ServiceChannel(_at__window, _at_name, _at_service, _at_subscribers) {
+          this._window = _at__window;
+          this.name = _at_name;
+          this.service = _at_service;
+          this.subscribers = _at_subscribers;
           this.params = this.getParams();
           this.restart();
         }
@@ -708,9 +730,9 @@
 
       })();
       APIService = (function() {
-        function APIService(_window) {
+        function APIService(_at__window) {
           var service;
-          this._window = _window != null ? _window : window;
+          this._window = _at__window != null ? _at__window : window;
           this.channels = {};
           service = this;
           this.Model = Backbone.Model.extend({
@@ -835,50 +857,25 @@
       APIService.extend = Vigor.extend;
       return Vigor.APIService = APIService;
     })();
-    ComponentIdentifier = (function() {
-      ComponentIdentifier.prototype.id = void 0;
+    ComponentBase = (function() {
+      function ComponentBase() {}
 
-      ComponentIdentifier.prototype.callback = void 0;
-
-      ComponentIdentifier.prototype.options = void 0;
-
-      function ComponentIdentifier(id1, callback1, options1) {
-        this.id = id1;
-        this.callback = callback1;
-        this.options = options1;
-      }
-
-      return ComponentIdentifier;
-
-    })();
-    Vigor.ComponentIdentifier = ComponentIdentifier;
-    (function() {
-      var DataCommunicationManager, Subscription, producerManager;
-      Subscription = Vigor.ComponentIdentifier;
-      producerManager = Vigor.ProducerManager;
-      DataCommunicationManager = {
-        registerProducers: function(producers) {
-          return producerManager.registerProducers(producers);
-        },
-        subscribe: function(componentId, subscriptionKey, callback, subscriptionOptions) {
-          var subscription;
-          if (subscriptionOptions == null) {
-            subscriptionOptions = {};
-          }
-          subscription = new Subscription(componentId, callback, subscriptionOptions);
-          return producerManager.subscribeComponentToKey(subscriptionKey, subscription);
-        },
-        unsubscribe: function(componentId, subscriptionKey) {
-          return producerManager.unsubscribeComponentFromKey(subscriptionKey, componentId);
-        },
-        unsubscribeAll: function(componentId) {
-          return producerManager.unsubscribeComponent(componentId);
-        }
+      ComponentBase.prototype.render = function() {
+        throw 'ComponentBase->render needs to be over-ridden';
       };
-      return Vigor.DataCommunicationManager = DataCommunicationManager;
+
+      ComponentBase.prototype.dispose = function() {
+        throw 'ComponentBase->dispose needs to be over-ridden';
+      };
+
+      return ComponentBase;
+
     })();
-    ComponentView = (function(superClass) {
-      extend(ComponentView, superClass);
+    _.extend(ComponentBase.prototype, Backbone.Events);
+    ComponentBase.extend = Vigor.extend;
+    Vigor.ComponentBase = ComponentBase;
+    ComponentView = (function(_super) {
+      __extends(ComponentView, _super);
 
       ComponentView.prototype.viewModel = void 0;
 
@@ -889,7 +886,7 @@
 
       ComponentView.prototype.initialize = function(options) {
         ComponentView.__super__.initialize.apply(this, arguments);
-        if (options.viewModel) {
+        if (options != null ? options.viewModel : void 0) {
           this.viewModel = options.viewModel;
         }
         return this;
@@ -918,9 +915,9 @@
       };
 
       ComponentView.prototype.dispose = function() {
-        var ref;
-        if ((ref = this.model) != null) {
-          ref.unbind();
+        var _ref;
+        if ((_ref = this.model) != null) {
+          _ref.unbind();
         }
         this.removeSubscriptions();
         this.stopListening();
@@ -930,65 +927,65 @@
       };
 
       ComponentView.prototype._checkIfImplemented = function(methodNames) {
-        var i, len, methodName, results;
-        results = [];
-        for (i = 0, len = methodNames.length; i < len; i++) {
-          methodName = methodNames[i];
+        var methodName, _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = methodNames.length; _i < _len; _i++) {
+          methodName = methodNames[_i];
           if (!this.constructor.prototype.hasOwnProperty(methodName)) {
-            throw new Error(this.constructor.name + " - " + methodName + "() must be implemented in View.");
+            throw new Error(this.constructor.name + " - " + methodName + "() must be implemented in .");
           } else {
-            results.push(void 0);
+            _results.push(void 0);
           }
         }
-        return results;
+        return _results;
       };
 
       return ComponentView;
 
     })(Backbone.View);
     Vigor.ComponentView = ComponentView;
-    ViewModel = (function() {
+    ComponentViewModel = (function() {
       var dataCommunicationManager;
 
       dataCommunicationManager = Vigor.DataCommunicationManager;
 
-      function ViewModel() {
-        this.id = "ViewModel_" + (_.uniqueId());
+      function ComponentViewModel() {
+        this.id = "ComponentViewModel_" + (_.uniqueId());
       }
 
-      ViewModel.prototype.dispose = function() {
+      ComponentViewModel.prototype.dispose = function() {
         return this.unsubscribeAll();
       };
 
-      ViewModel.prototype.subscribe = function(key, callback, options) {
+      ComponentViewModel.prototype.subscribe = function(key, callback, options) {
         return dataCommunicationManager.subscribe(this.id, key, callback, options);
       };
 
-      ViewModel.prototype.unsubscribe = function(key) {
+      ComponentViewModel.prototype.unsubscribe = function(key) {
         return dataCommunicationManager.unsubscribe(this.id, key);
       };
 
-      ViewModel.prototype.unsubscribeAll = function() {
+      ComponentViewModel.prototype.unsubscribeAll = function() {
         return dataCommunicationManager.unsubscribeAll(this.id);
       };
 
-      ViewModel.prototype.validateContract = function(contract, incommingData) {
+      ComponentViewModel.prototype.validateContract = function(contract, incommingData) {
         return Vigor.helpers.validateContract(contract, incommingData, this.id);
       };
 
-      return ViewModel;
+      return ComponentViewModel;
 
     })();
-    ViewModel.extend = Vigor.extend;
-    Vigor.ViewModel = ViewModel;
-    Repository = (function(superClass) {
-      extend(Repository, superClass);
+    ComponentViewModel.extend = Vigor.extend;
+    Vigor.ComponentViewModel = ComponentViewModel;
+    Repository = (function(_super) {
+      __extends(Repository, _super);
 
       function Repository() {
-        this._triggerUpdates = bind(this._triggerUpdates, this);
-        this._onRemove = bind(this._onRemove, this);
-        this._onChange = bind(this._onChange, this);
-        this._onAdd = bind(this._onAdd, this);
+        this._triggerUpdates = __bind(this._triggerUpdates, this);
+        this._onRemove = __bind(this._onRemove, this);
+        this._onChange = __bind(this._onChange, this);
+        this._onAdd = __bind(this._onAdd, this);
         return Repository.__super__.constructor.apply(this, arguments);
       }
 
@@ -1017,10 +1014,10 @@
       };
 
       Repository.prototype.getByIds = function(ids) {
-        var i, id, len, models;
+        var id, models, _i, _len;
         models = [];
-        for (i = 0, len = ids.length; i < len; i++) {
-          id = ids[i];
+        for (_i = 0, _len = ids.length; _i < _len; _i++) {
+          id = ids[_i];
           models.push(this.get(id));
         }
         return models;
@@ -1032,7 +1029,7 @@
 
       Repository.prototype._onAll = function() {
         var args, event;
-        event = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
+        event = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
         switch (event) {
           case 'add':
             this._onAdd.apply(this, args);
@@ -1123,8 +1120,8 @@
 
     })(Backbone.Collection);
     Vigor.Repository = Repository;
-    ServiceRepository = (function(superClass) {
-      extend(ServiceRepository, superClass);
+    ServiceRepository = (function(_super) {
+      __extends(ServiceRepository, _super);
 
       function ServiceRepository() {
         return ServiceRepository.__super__.constructor.apply(this, arguments);
