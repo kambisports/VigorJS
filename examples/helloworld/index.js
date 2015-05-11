@@ -3,14 +3,14 @@ var app = app || {};
 (function ($) {
   'use strict';
 
-  app.HelloWorld = Vigor.PackageBase.extend({
+  app.HelloWorld = Vigor.ComponentBase.extend({
     $el: undefined,
     _helloWorldViewModel: undefined,
     _helloWorldView: undefined,
 
     constructor: function (options) {
       var viewModelId = 'dummy';
-      Vigor.PackageBase.prototype.constructor.call(this, options);
+      Vigor.ComponentBase.prototype.constructor.call(this, options);
       this._helloWorldViewModel = new app.HelloWorldViewModel(viewModelId);
       this._helloWorldView = new app.HelloWorldView({viewModel: this._helloWorldViewModel});
     },
