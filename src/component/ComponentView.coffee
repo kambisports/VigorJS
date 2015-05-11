@@ -73,6 +73,6 @@ class ComponentView extends Backbone.View
   _checkIfImplemented: (methodNames) ->
     for methodName in methodNames
       unless @constructor.prototype.hasOwnProperty(methodName)
-        throw new Error("#{@constructor.name} - #{methodName}() must be implemented in .")
+        throw new Error("#{@constructor.name} - #{methodName}() must be implemented in View.")
 
 Vigor.ComponentView = ComponentView
