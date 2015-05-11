@@ -932,7 +932,7 @@
         for (_i = 0, _len = methodNames.length; _i < _len; _i++) {
           methodName = methodNames[_i];
           if (!this.constructor.prototype.hasOwnProperty(methodName)) {
-            throw new Error(this.constructor.name + " - " + methodName + "() must be implemented in .");
+            throw new Error(this.constructor.name + " - " + methodName + "() must be implemented in View.");
           } else {
             _results.push(void 0);
           }
