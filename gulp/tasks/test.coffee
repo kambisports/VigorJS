@@ -16,7 +16,7 @@ global.extend = (obj, mixin) ->
   obj[name] = method for name, method of mixin
   obj
 
-gulp.task 'test', ['coffee'], ->
+gulp.task 'test', ['coffee-test'], ->
   gulp.src config.istanbulEntryPoint
     .pipe istanbul({includeUntested: true}) # Covering files
     .pipe istanbul.hookRequire()
@@ -24,6 +24,8 @@ gulp.task 'test', ['coffee'], ->
       gulp.src config.specFiles
         .pipe mocha reporter: 'spec'
         .pipe istanbul.writeReports() # Creating the reports after tests run
+        .on 'finish', ->
+          gulp.start 'coffee'
 
 gulp.task 'test-no-coverage', ->
   gulp.src specFiles

@@ -27,7 +27,7 @@ describe 'A Producer', ->
 
   it 'adds a component', ->
     producer = new DummyProducer()
-    componentIdentifier = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
+    componentIdentifier = new Vigor.Subscription 'foo', sinon.spy(), {}
 
     producer.addComponent componentIdentifier
 
@@ -38,7 +38,7 @@ describe 'A Producer', ->
 
   it 'ignores calls to add a component more than once', ->
     producer = new DummyProducer()
-    componentIdentifier = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
+    componentIdentifier = new Vigor.Subscription 'foo', sinon.spy(), {}
 
     producer.addComponent componentIdentifier
     producer.addComponent componentIdentifier
@@ -52,7 +52,7 @@ describe 'A Producer', ->
     producer = new DummyProducer()
 
     producer.subscribeToRepositories = sinon.spy()
-    componentIdentifier = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
+    componentIdentifier = new Vigor.Subscription 'foo', sinon.spy(), {}
 
     producer.addComponent componentIdentifier
 
@@ -109,8 +109,8 @@ describe 'A Producer', ->
   it 'does not call subscribeToRepositories when a second component is added', ->
     producer = new DummyProducer()
     producer.subscribeToRepositories = sinon.spy()
-    componentIdentifier = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
-    componentIdentifier2 = new Vigor.ComponentIdentifier 'bar', sinon.spy(), {}
+    componentIdentifier = new Vigor.Subscription 'foo', sinon.spy(), {}
+    componentIdentifier2 = new Vigor.Subscription 'bar', sinon.spy(), {}
 
     producer.addComponent componentIdentifier
     producer.addComponent componentIdentifier2
@@ -124,7 +124,7 @@ describe 'A Producer', ->
 
     componentId = 'foo'
 
-    componentIdentifier = new Vigor.ComponentIdentifier componentId, sinon.spy(), {}
+    componentIdentifier = new Vigor.Subscription componentId, sinon.spy(), {}
 
     producer.addComponent componentIdentifier
     producer.removeComponent componentId
@@ -139,8 +139,8 @@ describe 'A Producer', ->
     componentId = 'foo'
     componentId2 = 'bar'
 
-    componentIdentifier = new Vigor.ComponentIdentifier componentId, sinon.spy(), {}
-    componentIdentifier2 = new Vigor.ComponentIdentifier componentId2, sinon.spy(), {}
+    componentIdentifier = new Vigor.Subscription componentId, sinon.spy(), {}
+    componentIdentifier2 = new Vigor.Subscription componentId2, sinon.spy(), {}
 
     producer.addComponent componentIdentifier
     producer.addComponent componentIdentifier2
@@ -202,7 +202,7 @@ describe 'A Producer', ->
 
   it 'removes a component', ->
     producer = new DummyProducer()
-    componentIdentifier = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
+    componentIdentifier = new Vigor.Subscription 'foo', sinon.spy(), {}
 
     producer.addComponent componentIdentifier
     producer.removeComponent componentIdentifier.id
@@ -212,7 +212,7 @@ describe 'A Producer', ->
 
   it 'does not remove components if they are not added', ->
     producer = new DummyProducer()
-    componentIdentifier = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
+    componentIdentifier = new Vigor.Subscription 'foo', sinon.spy(), {}
 
     producer.removeComponent componentIdentifier.id
     assert.equal Object.keys(producer.registeredComponents).length, 0
@@ -220,8 +220,8 @@ describe 'A Producer', ->
 
   it 'does not remove unrelated components', ->
     producer = new DummyProducer()
-    componentIdentifier1 = new Vigor.ComponentIdentifier 'foo', sinon.spy(), {}
-    componentIdentifier2 = new Vigor.ComponentIdentifier 'bar', sinon.spy(), {}
+    componentIdentifier1 = new Vigor.Subscription 'foo', sinon.spy(), {}
+    componentIdentifier2 = new Vigor.Subscription 'bar', sinon.spy(), {}
 
     producer.addComponent componentIdentifier1
     producer.addComponent componentIdentifier2
@@ -235,7 +235,7 @@ describe 'A Producer', ->
     producer = new DummyProducer()
     callback = sinon.spy()
     producedData = {}
-    componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, {}
+    componentIdentifier = new Vigor.Subscription 'foo', callback, {}
 
     data = { key1: '' }
     currentData = sinon.stub(producer, "currentData", -> data)
@@ -266,7 +266,7 @@ describe 'A Producer', ->
     decoratedData = {}
 
     callback = sinon.spy()
-    componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, {}
+    componentIdentifier = new Vigor.Subscription 'foo', callback, {}
 
     sinon.stub producer, 'decorate', (data) ->
       decoratedData
@@ -293,7 +293,7 @@ describe 'A Producer', ->
     currentData = sinon.stub producer, "currentData", -> originalData
 
     callback = sinon.spy()
-    componentIdentifier = new Vigor.ComponentIdentifier 'foo', callback, {}
+    componentIdentifier = new Vigor.Subscription 'foo', callback, {}
 
     producer.addComponent componentIdentifier
 
