@@ -1,21 +1,16 @@
-do ->
+DataCommunicationManager =
 
-  Subscription = Vigor.ComponentIdentifier
-  producerManager = Vigor.ProducerManager
+  registerProducers: (producers) ->
+    producerManager.registerProducers producers
 
-  DataCommunicationManager =
+  subscribe: (componentId, subscriptionKey, callback, subscriptionOptions = {}) ->
+    subscription = new Subscription componentId, callback, subscriptionOptions
+    producerManager.subscribeComponentToKey subscriptionKey, subscription
 
-    registerProducers: (producers) ->
-      producerManager.registerProducers producers
+  unsubscribe: (componentId, subscriptionKey) ->
+    producerManager.unsubscribeComponentFromKey subscriptionKey, componentId
 
-    subscribe: (componentId, subscriptionKey, callback, subscriptionOptions = {}) ->
-      subscription = new Subscription componentId, callback, subscriptionOptions
-      producerManager.subscribeComponentToKey subscriptionKey, subscription
+  unsubscribeAll: (componentId) ->
+    producerManager.unsubscribeComponent componentId
 
-    unsubscribe: (componentId, subscriptionKey) ->
-      producerManager.unsubscribeComponentFromKey subscriptionKey, componentId
-
-    unsubscribeAll: (componentId) ->
-      producerManager.unsubscribeComponent componentId
-
-  Vigor.DataCommunicationManager = DataCommunicationManager
+Vigor.DataCommunicationManager = DataCommunicationManager

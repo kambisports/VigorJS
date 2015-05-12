@@ -1,5 +1,5 @@
 class Producer
-  
+
   # the production key should be overridden in the subclass
   PRODUCTION_KEY: undefined
   repositories: []
