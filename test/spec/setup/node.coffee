@@ -23,7 +23,7 @@ global.Vigor = {}
 # requireHelper 'datacommunication/apiservices/APIService'
 
 #   # DATACOMMUNICATION
-# requireHelper 'datacommunication/ComponentIdentifier'
+# requireHelper 'datacommunication/Subscription'
 # requireHelper 'datacommunication/DataCommunicationManager'
 
 #   # REPOSITORIES

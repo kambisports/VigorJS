@@ -1,3 +1,9 @@
+/**
+ * vigorjs - A small framework for structuring large scale Backbone applications
+ * @version v0.0.1
+ * @link 
+ * @license ISC
+ */
 (function() {
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -19,7 +25,7 @@
       root.Vigor = factory(root, root.Backbone, root._);
     }
   })(this, function(root, Backbone, _) {
-    var ComponentBase, ComponentIdentifier, ComponentView, ComponentViewModel, EventBus, EventRegistry, IdProducer, Producer, Repository, ServiceRepository, Vigor, previousVigor, setup, validateContract;
+    var ComponentBase, ComponentView, ComponentViewModel, DataCommunicationManager, EventBus, EventRegistry, IdProducer, KEY_ALREADY_REGISTERED, NO_PRODUCERS_ERROR, NO_PRODUCER_FOUND_ERROR, Producer, Repository, ServiceRepository, Subscription, Vigor, previousVigor, producerManager, producerMapper, producers, producersByKey, setup, validateContract;
     previousVigor = root.Vigor;
     Vigor = Backbone.Vigor = {};
     Vigor.helpers = {};
@@ -168,128 +174,116 @@
         return this;
       }
     };
-    ComponentIdentifier = (function() {
-      ComponentIdentifier.prototype.id = void 0;
+    Subscription = (function() {
+      Subscription.prototype.id = void 0;
 
-      ComponentIdentifier.prototype.callback = void 0;
+      Subscription.prototype.callback = void 0;
 
-      ComponentIdentifier.prototype.options = void 0;
+      Subscription.prototype.options = void 0;
 
-      function ComponentIdentifier(_at_id, _at_callback, _at_options) {
+      function Subscription(_at_id, _at_callback, _at_options) {
         this.id = _at_id;
         this.callback = _at_callback;
         this.options = _at_options;
       }
 
-      return ComponentIdentifier;
+      return Subscription;
 
     })();
-    Vigor.ComponentIdentifier = ComponentIdentifier;
-    (function() {
-      var KEY_ALREADY_REGISTERED, NO_PRODUCERS_ERROR, NO_PRODUCER_FOUND_ERROR, ProducerMapper, producers, producersByKey;
-      producers = [];
-      producersByKey = {};
-      NO_PRODUCERS_ERROR = "There are no producers registered - register producers through the DataCommunicationManager";
-      NO_PRODUCER_FOUND_ERROR = function(key) {
-        return "No producer found for subscription " + key + "!";
-      };
-      KEY_ALREADY_REGISTERED = function(key) {
-        return "A producer for the key " + key + " is already registered";
-      };
-      ProducerMapper = {
-        producers: producers,
-        producerClassForKey: function(subscriptionKey) {
-          var key, producerClass;
+
+    producers = [];
+    producersByKey = {};
+    NO_PRODUCERS_ERROR = "There are no producers registered - register producers through the DataCommunicationManager";
+    NO_PRODUCER_FOUND_ERROR = function(key) {
+      return "No producer found for subscription " + key + "!";
+    };
+    KEY_ALREADY_REGISTERED = function(key) {
+      return "A producer for the key " + key + " is already registered";
+    };
+    producerMapper = {
+      producers: producers,
+      producerClassForKey: function(subscriptionKey) {
+        var key, producerClass;
+        key = subscriptionKey.key;
+        if (producers.length === 0) {
+          throw NO_PRODUCERS_ERROR;
+        }
+        producerClass = producersByKey[key];
+        if (!producerClass) {
+          throw NO_PRODUCER_FOUND_ERROR(key);
+        }
+        return producerClass;
+      },
+      producerForKey: function(subscriptionKey) {
+        var producerClass;
+        producerClass = this.producerClassForKey(subscriptionKey);
+        return producerClass.prototype.getInstance();
+      },
+      register: function(producerClass) {
+        var key, subscriptionKey;
+        if ((producers.indexOf(producerClass)) === -1) {
+          producers.push(producerClass);
+          subscriptionKey = producerClass.prototype.PRODUCTION_KEY;
           key = subscriptionKey.key;
-          if (producers.length === 0) {
-            throw NO_PRODUCERS_ERROR;
+          if (producersByKey[key] != null) {
+            throw KEY_ALREADY_REGISTERED(key);
           }
-          producerClass = producersByKey[key];
-          if (!producerClass) {
-            throw NO_PRODUCER_FOUND_ERROR(key);
-          }
-          return producerClass;
-        },
-        producerForKey: function(subscriptionKey) {
-          var producerClass;
-          producerClass = this.producerClassForKey(subscriptionKey);
-          return producerClass.prototype.getInstance();
-        },
-        register: function(producerClass) {
-          var key, subscriptionKey;
-          if ((producers.indexOf(producerClass)) === -1) {
-            producers.push(producerClass);
-            subscriptionKey = producerClass.prototype.PRODUCTION_KEY;
-            key = subscriptionKey.key;
-            if (producersByKey[key] != null) {
-              throw KEY_ALREADY_REGISTERED(key);
-            }
-            return producersByKey[key] = producerClass;
-          }
-        },
-        reset: function() {
-          producers.length = 0;
-          return producersByKey = {};
+          return producersByKey[key] = producerClass;
         }
-      };
-      return Vigor.ProducerMapper = ProducerMapper;
-    })();
-    (function() {
-      var ProducerManager, producerMapper;
-      producerMapper = Vigor.ProducerMapper;
-      ProducerManager = {
-        registerProducers: function(producers) {
-          return producers.forEach(function(producer) {
-            return producerMapper.register(producer);
-          });
-        },
-        producerForKey: function(subscriptionKey) {
-          var producer;
-          return producer = producerMapper.producerForKey(subscriptionKey);
-        },
-        subscribeComponentToKey: function(subscriptionKey, subscription) {
-          var producer;
-          producer = this.producerForKey(subscriptionKey);
-          return producer.addComponent(subscription);
-        },
-        unsubscribeComponentFromKey: function(subscriptionKey, componentId) {
-          var producer;
-          producer = this.producerForKey(subscriptionKey);
-          return producer.removeComponent(componentId);
-        },
-        unsubscribeComponent: function(componentId) {
-          return producerMapper.producers.forEach(function(producer) {
-            return producer.prototype.getInstance().removeComponent(componentId);
-          });
+      },
+      reset: function() {
+        producers.length = 0;
+        return producersByKey = {};
+      }
+    };
+
+    producerManager = {
+      registerProducers: function(producers) {
+        return producers.forEach(function(producer) {
+          return producerMapper.register(producer);
+        });
+      },
+      producerForKey: function(subscriptionKey) {
+        var producer;
+        return producer = producerMapper.producerForKey(subscriptionKey);
+      },
+      subscribeComponentToKey: function(subscriptionKey, subscription) {
+        var producer;
+        producer = this.producerForKey(subscriptionKey);
+        return producer.addComponent(subscription);
+      },
+      unsubscribeComponentFromKey: function(subscriptionKey, componentId) {
+        var producer;
+        producer = this.producerForKey(subscriptionKey);
+        return producer.removeComponent(componentId);
+      },
+      unsubscribeComponent: function(componentId) {
+        return producerMapper.producers.forEach(function(producer) {
+          return producer.prototype.getInstance().removeComponent(componentId);
+        });
+      }
+    };
+
+    DataCommunicationManager = {
+      registerProducers: function(producers) {
+        return producerManager.registerProducers(producers);
+      },
+      subscribe: function(componentId, subscriptionKey, callback, subscriptionOptions) {
+        var subscription;
+        if (subscriptionOptions == null) {
+          subscriptionOptions = {};
         }
-      };
-      return Vigor.ProducerManager = ProducerManager;
-    })();
-    (function() {
-      var DataCommunicationManager, Subscription, producerManager;
-      Subscription = Vigor.ComponentIdentifier;
-      producerManager = Vigor.ProducerManager;
-      DataCommunicationManager = {
-        registerProducers: function(producers) {
-          return producerManager.registerProducers(producers);
-        },
-        subscribe: function(componentId, subscriptionKey, callback, subscriptionOptions) {
-          var subscription;
-          if (subscriptionOptions == null) {
-            subscriptionOptions = {};
-          }
-          subscription = new Subscription(componentId, callback, subscriptionOptions);
-          return producerManager.subscribeComponentToKey(subscriptionKey, subscription);
-        },
-        unsubscribe: function(componentId, subscriptionKey) {
-          return producerManager.unsubscribeComponentFromKey(subscriptionKey, componentId);
-        },
-        unsubscribeAll: function(componentId) {
-          return producerManager.unsubscribeComponent(componentId);
-        }
-      };
-      return Vigor.DataCommunicationManager = DataCommunicationManager;
-    })();
+        subscription = new Subscription(componentId, callback, subscriptionOptions);
+        return producerManager.subscribeComponentToKey(subscriptionKey, subscription);
+      },
+      unsubscribe: function(componentId, subscriptionKey) {
+        return producerManager.unsubscribeComponentFromKey(subscriptionKey, componentId);
+      },
+      unsubscribeAll: function(componentId) {
+        return producerManager.unsubscribeComponent(componentId);
+      }
+    };
+    Vigor.DataCommunicationManager = DataCommunicationManager;
     Producer = (function() {
       Producer.prototype.PRODUCTION_KEY = void 0;
 

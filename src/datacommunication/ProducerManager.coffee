@@ -1,26 +1,25 @@
-do ->
+producerManager =
 
-  producerMapper = Vigor.ProducerMapper
+  registerProducers: (producers) ->
+    producers.forEach (producer) ->
+      producerMapper.register producer
 
-  ProducerManager =
+  producerForKey: (subscriptionKey) ->
+    producer = producerMapper.producerForKey subscriptionKey
 
-    registerProducers: (producers) ->
-      producers.forEach (producer) ->
-        producerMapper.register producer
+  subscribeComponentToKey: (subscriptionKey, subscription) ->
+    producer = @producerForKey subscriptionKey
+    producer.addComponent subscription
 
-    producerForKey: (subscriptionKey) ->
-      producer = producerMapper.producerForKey subscriptionKey
+  unsubscribeComponentFromKey: (subscriptionKey, componentId) ->
+    producer = @producerForKey subscriptionKey
+    producer.removeComponent componentId
 
-    subscribeComponentToKey: (subscriptionKey, subscription) ->
-      producer = @producerForKey subscriptionKey
-      producer.addComponent subscription
+  unsubscribeComponent: (componentId) ->
+    producerMapper.producers.forEach (producer) ->
+      producer::getInstance().removeComponent componentId
 
-    unsubscribeComponentFromKey: (subscriptionKey, componentId) ->
-      producer = @producerForKey subscriptionKey
-      producer.removeComponent componentId
-
-    unsubscribeComponent: (componentId) ->
-      producerMapper.producers.forEach (producer) ->
-        producer::getInstance().removeComponent componentId
-
-  Vigor.ProducerManager = ProducerManager
+### start-test-block ###
+# this will be removed in distribution build
+Vigor.ProducerManager = producerManager
+### end-test-block ###

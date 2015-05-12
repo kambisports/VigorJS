@@ -41,7 +41,7 @@
   #= include ./common/EventKeys.coffee
 
   # DATACOMMUNICATION
-  #= include ./datacommunication/ComponentIdentifier.coffee
+  #= include ./datacommunication/Subscription.coffee
   #= include ./datacommunication/ProducerMapper.coffee
   #= include ./datacommunication/ProducerManager.coffee
   #= include ./datacommunication/DataCommunicationManager.coffee
