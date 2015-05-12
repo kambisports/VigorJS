@@ -55,11 +55,6 @@
                 </a>
               
                 
-                <a class="source" href="ComponentIdentifier.html">
-                  ComponentIdentifier.coffee
-                </a>
-              
-                
                 <a class="source" href="DataCommunicationManager.html">
                   DataCommunicationManager.coffee
                 </a>
@@ -72,6 +67,11 @@
                 
                 <a class="source" href="ProducerMapper.html">
                   ProducerMapper.coffee
+                </a>
+              
+                
+                <a class="source" href="Subscription.html">
+                  Subscription.coffee
                 </a>
               
                 
@@ -133,27 +133,22 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">do</span> -&gt;
+            <div class="content"><div class='highlight'><pre>DataCommunicationManager =
 
-  Subscription = Vigor.ComponentIdentifier
-  producerManager = Vigor.ProducerManager
+  <span class="hljs-attribute">registerProducers</span>: <span class="hljs-function"><span class="hljs-params">(producers)</span> -&gt;</span>
+    producerManager.registerProducers producers
 
-  DataCommunicationManager =
+  <span class="hljs-attribute">subscribe</span>: <span class="hljs-function"><span class="hljs-params">(componentId, subscriptionKey, callback, subscriptionOptions = {})</span> -&gt;</span>
+    subscription = <span class="hljs-keyword">new</span> Subscription componentId, callback, subscriptionOptions
+    producerManager.subscribeComponentToKey subscriptionKey, subscription
 
-    <span class="hljs-attribute">registerProducers</span>: <span class="hljs-function"><span class="hljs-params">(producers)</span> -&gt;</span>
-      producerManager.registerProducers producers
+  <span class="hljs-attribute">unsubscribe</span>: <span class="hljs-function"><span class="hljs-params">(componentId, subscriptionKey)</span> -&gt;</span>
+    producerManager.unsubscribeComponentFromKey subscriptionKey, componentId
 
-    <span class="hljs-attribute">subscribe</span>: <span class="hljs-function"><span class="hljs-params">(componentId, subscriptionKey, callback, subscriptionOptions = {})</span> -&gt;</span>
-      subscription = <span class="hljs-keyword">new</span> Subscription componentId, callback, subscriptionOptions
-      producerManager.subscribeComponentToKey subscriptionKey, subscription
+  <span class="hljs-attribute">unsubscribeAll</span>: <span class="hljs-function"><span class="hljs-params">(componentId)</span> -&gt;</span>
+    producerManager.unsubscribeComponent componentId
 
-    <span class="hljs-attribute">unsubscribe</span>: <span class="hljs-function"><span class="hljs-params">(componentId, subscriptionKey)</span> -&gt;</span>
-      producerManager.unsubscribeComponentFromKey subscriptionKey, componentId
-
-    <span class="hljs-attribute">unsubscribeAll</span>: <span class="hljs-function"><span class="hljs-params">(componentId)</span> -&gt;</span>
-      producerManager.unsubscribeComponent componentId
-
-  Vigor.DataCommunicationManager = DataCommunicationManager</pre></div></div>
+Vigor.DataCommunicationManager = DataCommunicationManager</pre></div></div>
             
         </li>
         

@@ -1,12 +1,20 @@
-# ComponentView
-# Base class for all component views
+# ##ComponentView
+# This class is intended to be used as a base class for all views within a component
+# It enforces five methods to unify the structure of ComponentViews accross a large application:
+#
+# - renderStaticContent
+# - renderDynamicContent
+# - addSubscriptions
+# - removeSubscriptions
+# - dispose
+#
+
 class ComponentView extends Backbone.View
 
-  # A view model instance is usually passed to the view upon creation
-  # @property [ViewModel<instance>]
+  # @property viewModel: ComponentViewModel
   viewModel: undefined
 
-  # Construct a new ComponentView
+  # **constructor** <br/>
   constructor: ->
     # These methods are required to make our view code
     # structure more consistent (just make them empty if
@@ -21,45 +29,54 @@ class ComponentView extends Backbone.View
 
     super
 
-  # @param [object] view options, usually containging a viewModel instance
-  # @return [this]
+  # **initialize** <br/>
+  # @param object <br/>
+  # @return this: Object <br/>
+  # view options, usually containing a viewModel instance <br/>
   initialize: (options) ->
     super
     if options?.viewModel
       @viewModel = options.viewModel
     return @
 
-  # the views render method, it will call @renderStaticContent and @addSubscriptions
-  # @return [this]
+  # **render** <br/>
+  # @return this: Object <br/>
+  # the views render method, it will call @renderStaticContent and @addSubscriptions <br/>
   render: ->
     do @renderStaticContent
     do @addSubscriptions
     return @
 
-  # Override this.
-  # Render parts of component that don't rely on model.
-  # @return [this]
+  # **renderStaticContent** <br/>
+  # @return this: Object <br/>
+  # Override this. <br/>
+  # Render parts of component that don't rely on model. <br/>
   renderStaticContent: ->
     return @
 
-  # Override this.
-  # Render parts of component that relies on model.
-  # @return [this]
+  # **renderDynamicContent** <br/>
+  # @return this: Object <br/>
+  # Override this. <br/>
+  # Render parts of component that relies on model. <br/>
   renderDynamicContent: ->
     return @
 
-  # Override this.
-  # Add view model subscriptions if needed.
-  # @return [this]
+  # **addSubscriptions** <br/>
+  # @return this: Object <br/>
+  # Override this. <br/>
+  # Add view model subscriptions if needed. <br/>
   addSubscriptions: ->
     return @
 
-  # Override this.
+  # **removeSubscriptions** <br/>
+  # @return this: Object <br/>
+  # Override this. <br/>
   # Remove view model subscriptions.
-  # @return [this]
   removeSubscriptions: ->
     return @
 
+  # **dispose** <br/>
+  # Removes events and dom elements related to the view <br/>
   # Override this, and call super.
   dispose: ->
     do @model?.unbind
@@ -69,10 +86,13 @@ class ComponentView extends Backbone.View
     do @$el.remove
     do @off
 
+  # **_checkIfImplemented** <br/>
+  # @param array: Array <br/>
   # Ensures that passed methods are implemented in the view
   _checkIfImplemented: (methodNames) ->
     for methodName in methodNames
       unless @constructor.prototype.hasOwnProperty(methodName)
         throw new Error("#{@constructor.name} - #{methodName}() must be implemented in View.")
 
+# Expose ComponentView on the Vigor object
 Vigor.ComponentView = ComponentView

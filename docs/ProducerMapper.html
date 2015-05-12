@@ -55,11 +55,6 @@
                 </a>
               
                 
-                <a class="source" href="ComponentIdentifier.html">
-                  ComponentIdentifier.coffee
-                </a>
-              
-                
                 <a class="source" href="DataCommunicationManager.html">
                   DataCommunicationManager.coffee
                 </a>
@@ -72,6 +67,11 @@
                 
                 <a class="source" href="ProducerMapper.html">
                   ProducerMapper.coffee
+                </a>
+              
+                
+                <a class="source" href="Subscription.html">
+                  Subscription.coffee
                 </a>
               
                 
@@ -133,55 +133,79 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">do</span> -&gt;
+            <div class="content"><div class='highlight'><pre>producers = []
+producersByKey = {}
 
-  producers = []
-  producersByKey = {}
+NO_PRODUCERS_ERROR = <span class="hljs-string">"There are no producers registered - register producers through the DataCommunicationManager"</span><span class="hljs-function">
+<span class="hljs-title">NO_PRODUCER_FOUND_ERROR</span> = <span class="hljs-params">(key)</span> -&gt;</span>
+  <span class="hljs-string">"No producer found for subscription <span class="hljs-subst">#{key}</span>!"</span><span class="hljs-function">
+<span class="hljs-title">KEY_ALREADY_REGISTERED</span> = <span class="hljs-params">(key)</span> -&gt;</span>
+  <span class="hljs-string">"A producer for the key <span class="hljs-subst">#{key}</span> is already registered"</span>
 
-  NO_PRODUCERS_ERROR = <span class="hljs-string">"There are no producers registered - register producers through the DataCommunicationManager"</span><span class="hljs-function">
-  <span class="hljs-title">NO_PRODUCER_FOUND_ERROR</span> = <span class="hljs-params">(key)</span> -&gt;</span>
-    <span class="hljs-string">"No producer found for subscription <span class="hljs-subst">#{key}</span>!"</span><span class="hljs-function">
-  <span class="hljs-title">KEY_ALREADY_REGISTERED</span> = <span class="hljs-params">(key)</span> -&gt;</span>
-    <span class="hljs-string">"A producer for the key <span class="hljs-subst">#{key}</span> is already registered"</span>
+producerMapper =
 
-  ProducerMapper =
+  <span class="hljs-attribute">producers</span>: producers
 
-    <span class="hljs-attribute">producers</span>: producers
+  <span class="hljs-attribute">producerClassForKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey)</span> -&gt;</span>
+    key = subscriptionKey.key
+    <span class="hljs-keyword">if</span> producers.length <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+      <span class="hljs-keyword">throw</span> NO_PRODUCERS_ERROR
 
-    <span class="hljs-attribute">producerClassForKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey)</span> -&gt;</span>
+    producerClass = producersByKey[key]
+
+    <span class="hljs-keyword">unless</span> producerClass
+      <span class="hljs-keyword">throw</span> NO_PRODUCER_FOUND_ERROR key
+
+    <span class="hljs-keyword">return</span> producerClass
+
+  <span class="hljs-attribute">producerForKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey)</span> -&gt;</span>
+    producerClass = <span class="hljs-property">@producerClassForKey</span> subscriptionKey
+    <span class="hljs-attribute">producerClass</span>::getInstance()
+
+  <span class="hljs-attribute">register</span>: <span class="hljs-function"><span class="hljs-params">(producerClass)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> (producers.indexOf producerClass) <span class="hljs-keyword">is</span> -<span class="hljs-number">1</span>
+      producers.push producerClass
+
+      subscriptionKey = <span class="hljs-attribute">producerClass</span>::PRODUCTION_KEY
       key = subscriptionKey.key
-      <span class="hljs-keyword">if</span> producers.length <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
-        <span class="hljs-keyword">throw</span> NO_PRODUCERS_ERROR
 
-      producerClass = producersByKey[key]
+      <span class="hljs-keyword">if</span> producersByKey[key]?
+        <span class="hljs-keyword">throw</span> KEY_ALREADY_REGISTERED key
 
-      <span class="hljs-keyword">unless</span> producerClass
-        <span class="hljs-keyword">throw</span> NO_PRODUCER_FOUND_ERROR key
+      producersByKey[key] = producerClass
 
-      <span class="hljs-keyword">return</span> producerClass
+  <span class="hljs-attribute">reset</span>: <span class="hljs-function">-&gt;</span>
+    producers.length = <span class="hljs-number">0</span>
+    producersByKey = {}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <h2 id="start-test-block">start-test-block</h2>
+<p>this will be removed in distribution build</p>
 
-    <span class="hljs-attribute">producerForKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey)</span> -&gt;</span>
-      producerClass = <span class="hljs-property">@producerClassForKey</span> subscriptionKey
-      <span class="hljs-attribute">producerClass</span>::getInstance()
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Vigor.ProducerMapper = producerMapper</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <h2 id="end-test-block">end-test-block</h2>
 
-    <span class="hljs-attribute">register</span>: <span class="hljs-function"><span class="hljs-params">(producerClass)</span> -&gt;</span>
-      <span class="hljs-keyword">if</span> (producers.indexOf producerClass) <span class="hljs-keyword">is</span> -<span class="hljs-number">1</span>
-        producers.push producerClass
-
-        subscriptionKey = <span class="hljs-attribute">producerClass</span>::PRODUCTION_KEY
-        key = subscriptionKey.key
-
-        <span class="hljs-keyword">if</span> producersByKey[key]?
-          <span class="hljs-keyword">throw</span> KEY_ALREADY_REGISTERED key
-
-        producersByKey[key] = producerClass
-
-
-    <span class="hljs-attribute">reset</span>: <span class="hljs-function">-&gt;</span>
-      producers.length = <span class="hljs-number">0</span>
-      producersByKey = {}
-
-  Vigor.ProducerMapper = ProducerMapper</pre></div></div>
+            </div>
             
         </li>
         
