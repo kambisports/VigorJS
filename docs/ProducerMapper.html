@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>ProducerMapper.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="bootstrap.html">
+                  bootstrap.coffee
+                </a>
+              
+                
+                <a class="source" href="EventBus.html">
+                  EventBus.coffee
+                </a>
+              
+                
+                <a class="source" href="EventKeys.html">
+                  EventKeys.coffee
+                </a>
+              
+                
+                <a class="source" href="SubscriptionKeys.html">
+                  SubscriptionKeys.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentBase.html">
+                  ComponentBase.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentView.html">
+                  ComponentView.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentViewModel.html">
+                  ComponentViewModel.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentIdentifier.html">
+                  ComponentIdentifier.coffee
+                </a>
+              
+                
+                <a class="source" href="DataCommunicationManager.html">
+                  DataCommunicationManager.coffee
+                </a>
+              
+                
+                <a class="source" href="ProducerManager.html">
+                  ProducerManager.coffee
+                </a>
+              
+                
+                <a class="source" href="ProducerMapper.html">
+                  ProducerMapper.coffee
+                </a>
+              
+                
+                <a class="source" href="APIService.html">
+                  APIService.coffee
+                </a>
+              
+                
+                <a class="source" href="IdProducer.html">
+                  IdProducer.coffee
+                </a>
+              
+                
+                <a class="source" href="Producer.html">
+                  Producer.coffee
+                </a>
+              
+                
+                <a class="source" href="Repository.html">
+                  Repository.coffee
+                </a>
+              
+                
+                <a class="source" href="ServiceRepository.html">
+                  ServiceRepository.coffee
+                </a>
+              
+                
+                <a class="source" href="validateContract.html">
+                  validateContract.coffee
+                </a>
+              
+                
+                <a class="source" href="setup.html">
+                  setup.coffee
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>ProducerMapper.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">do</span> -&gt;
+
+  producers = []
+  producersByKey = {}
+
+  NO_PRODUCERS_ERROR = <span class="hljs-string">"There are no producers registered - register producers through the DataCommunicationManager"</span><span class="hljs-function">
+  <span class="hljs-title">NO_PRODUCER_FOUND_ERROR</span> = <span class="hljs-params">(key)</span> -&gt;</span>
+    <span class="hljs-string">"No producer found for subscription <span class="hljs-subst">#{key}</span>!"</span><span class="hljs-function">
+  <span class="hljs-title">KEY_ALREADY_REGISTERED</span> = <span class="hljs-params">(key)</span> -&gt;</span>
+    <span class="hljs-string">"A producer for the key <span class="hljs-subst">#{key}</span> is already registered"</span>
+
+  ProducerMapper =
+
+    <span class="hljs-attribute">producers</span>: producers
+
+    <span class="hljs-attribute">producerClassForKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey)</span> -&gt;</span>
+      key = subscriptionKey.key
+      <span class="hljs-keyword">if</span> producers.length <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+        <span class="hljs-keyword">throw</span> NO_PRODUCERS_ERROR
+
+      producerClass = producersByKey[key]
+
+      <span class="hljs-keyword">unless</span> producerClass
+        <span class="hljs-keyword">throw</span> NO_PRODUCER_FOUND_ERROR key
+
+      <span class="hljs-keyword">return</span> producerClass
+
+    <span class="hljs-attribute">producerForKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey)</span> -&gt;</span>
+      producerClass = <span class="hljs-property">@producerClassForKey</span> subscriptionKey
+      <span class="hljs-attribute">producerClass</span>::getInstance()
+
+    <span class="hljs-attribute">register</span>: <span class="hljs-function"><span class="hljs-params">(producerClass)</span> -&gt;</span>
+      <span class="hljs-keyword">if</span> (producers.indexOf producerClass) <span class="hljs-keyword">is</span> -<span class="hljs-number">1</span>
+        producers.push producerClass
+
+        subscriptionKey = <span class="hljs-attribute">producerClass</span>::PRODUCTION_KEY
+        key = subscriptionKey.key
+
+        <span class="hljs-keyword">if</span> producersByKey[key]?
+          <span class="hljs-keyword">throw</span> KEY_ALREADY_REGISTERED key
+
+        producersByKey[key] = producerClass
+
+
+    <span class="hljs-attribute">reset</span>: <span class="hljs-function">-&gt;</span>
+      producers.length = <span class="hljs-number">0</span>
+      producersByKey = {}
+
+  Vigor.ProducerMapper = ProducerMapper</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

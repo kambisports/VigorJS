@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Producer.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="bootstrap.html">
+                  bootstrap.coffee
+                </a>
+              
+                
+                <a class="source" href="EventBus.html">
+                  EventBus.coffee
+                </a>
+              
+                
+                <a class="source" href="EventKeys.html">
+                  EventKeys.coffee
+                </a>
+              
+                
+                <a class="source" href="SubscriptionKeys.html">
+                  SubscriptionKeys.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentBase.html">
+                  ComponentBase.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentView.html">
+                  ComponentView.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentViewModel.html">
+                  ComponentViewModel.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentIdentifier.html">
+                  ComponentIdentifier.coffee
+                </a>
+              
+                
+                <a class="source" href="DataCommunicationManager.html">
+                  DataCommunicationManager.coffee
+                </a>
+              
+                
+                <a class="source" href="ProducerManager.html">
+                  ProducerManager.coffee
+                </a>
+              
+                
+                <a class="source" href="ProducerMapper.html">
+                  ProducerMapper.coffee
+                </a>
+              
+                
+                <a class="source" href="APIService.html">
+                  APIService.coffee
+                </a>
+              
+                
+                <a class="source" href="IdProducer.html">
+                  IdProducer.coffee
+                </a>
+              
+                
+                <a class="source" href="Producer.html">
+                  Producer.coffee
+                </a>
+              
+                
+                <a class="source" href="Repository.html">
+                  Repository.coffee
+                </a>
+              
+                
+                <a class="source" href="ServiceRepository.html">
+                  ServiceRepository.coffee
+                </a>
+              
+                
+                <a class="source" href="validateContract.html">
+                  validateContract.coffee
+                </a>
+              
+                
+                <a class="source" href="setup.html">
+                  setup.coffee
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>Producer.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Producer</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>the production key should be overridden in the subclass</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">PRODUCTION_KEY</span>: <span class="hljs-literal">undefined</span>
+  <span class="hljs-attribute">repositories</span>: []
+  <span class="hljs-attribute">decorators</span>: []
+
+  <span class="hljs-attribute">_isSubscribedToRepositories</span>: <span class="hljs-literal">false</span>
+
+
+  <span class="hljs-attribute">constructor</span>: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-property">@registeredComponents</span> = {}
+    <span class="hljs-property">@produceData</span> = _.throttle <span class="hljs-property">@produceDataSync</span>, <span class="hljs-number">100</span>
+
+
+  <span class="hljs-attribute">getInstance</span>: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-keyword">unless</span> <span class="hljs-property">@instance</span>?
+      <span class="hljs-property">@instance</span> = <span class="hljs-keyword">new</span> <span class="hljs-property">@constructor</span>()
+    <span class="hljs-property">@instance</span>
+
+
+  <span class="hljs-attribute">addComponent</span>: <span class="hljs-function"><span class="hljs-params">(subscription)</span> -&gt;</span>
+    existingSubscription = <span class="hljs-property">@registeredComponents</span>[subscription.id]
+    <span class="hljs-keyword">unless</span> existingSubscription?
+      <span class="hljs-property">@registeredComponents</span>[subscription.id] = subscription
+      <span class="hljs-property">@subscribe</span> subscription.options
+
+      <span class="hljs-keyword">unless</span> <span class="hljs-property">@_isSubscribedToRepositories</span>
+        <span class="hljs-property">@subscribeToRepositories</span>()
+        <span class="hljs-property">@_isSubscribedToRepositories</span> = <span class="hljs-literal">true</span>
+
+
+  <span class="hljs-attribute">removeComponent</span>: <span class="hljs-function"><span class="hljs-params">(componentId)</span> -&gt;</span>
+    subscription = <span class="hljs-property">@registeredComponents</span>[componentId]
+
+    <span class="hljs-keyword">if</span> subscription?
+      <span class="hljs-property">@unsubscribe</span> subscription.options
+      <span class="hljs-keyword">delete</span> <span class="hljs-property">@registeredComponents</span>[subscription.id]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>for..of is slightly faster than checking _.keys().length</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      shouldUnsubscribe = <span class="hljs-literal">true</span>
+      <span class="hljs-keyword">for</span> component <span class="hljs-keyword">of</span> <span class="hljs-property">@registeredComponents</span>
+        shouldUnsubscribe = <span class="hljs-literal">false</span>
+        <span class="hljs-keyword">break</span>
+
+      <span class="hljs-keyword">if</span> shouldUnsubscribe
+        <span class="hljs-property">@unsubscribeFromRepositories</span>()
+        <span class="hljs-property">@_isSubscribedToRepositories</span> = <span class="hljs-literal">false</span>
+
+
+  <span class="hljs-attribute">subscribeToRepositories</span>: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-keyword">for</span> repository <span class="hljs-keyword">in</span> <span class="hljs-property">@repositories</span>
+      <span class="hljs-keyword">if</span> repository <span class="hljs-keyword">instanceof</span> Vigor.Repository
+        <span class="hljs-property">@subscribeToRepository</span> repository
+      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> repository.repository <span class="hljs-keyword">instanceof</span> Vigor.Repository <span class="hljs-keyword">and</span> <span class="hljs-keyword">typeof</span> repository.callback <span class="hljs-keyword">is</span> <span class="hljs-string">'string'</span>
+        <span class="hljs-property">@subscribeToRepository</span> repository.repository, @[repository.callback]
+      <span class="hljs-keyword">else</span>
+        <span class="hljs-keyword">throw</span> <span class="hljs-string">'unexpected format of producer repositories definition'</span>
+
+
+  <span class="hljs-attribute">unsubscribeFromRepositories</span>: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-keyword">for</span> repository <span class="hljs-keyword">in</span> <span class="hljs-property">@repositories</span>
+      <span class="hljs-keyword">if</span> repository <span class="hljs-keyword">instanceof</span> Vigor.Repository
+        <span class="hljs-property">@unsubscribeFromRepository</span> repository
+      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> repository.repository <span class="hljs-keyword">instanceof</span> Vigor.Repository <span class="hljs-keyword">and</span> <span class="hljs-keyword">typeof</span> repository.callback <span class="hljs-keyword">is</span> <span class="hljs-string">'string'</span>
+        <span class="hljs-property">@unsubscribeFromRepository</span> repository.repository
+    <span class="hljs-literal">undefined</span>
+
+
+  <span class="hljs-attribute">subscribeToRepository</span>: <span class="hljs-function"><span class="hljs-params">(repository, callback)</span> -&gt;</span>
+    callback = callback <span class="hljs-keyword">or</span> (diff) =&gt;
+      <span class="hljs-property">@onDiffInRepository</span> repository, diff
+
+    <span class="hljs-property">@listenTo</span> repository, Vigor.<span class="hljs-attribute">Repository</span>::REPOSITORY_DIFF, callback
+
+
+  <span class="hljs-attribute">unsubscribeFromRepository</span>: <span class="hljs-function"><span class="hljs-params">(repository)</span> -&gt;</span>
+    <span class="hljs-property">@stopListening</span> repository, Vigor.<span class="hljs-attribute">Repository</span>::REPOSITORY_DIFF
+
+
+  <span class="hljs-attribute">subscribe</span>: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-property">@produceDataSync</span>()
+
+
+  <span class="hljs-attribute">onDiffInRepository</span>: <span class="hljs-function">=&gt;</span>
+    <span class="hljs-property">@produceData</span>()
+
+
+  <span class="hljs-attribute">produceDataSync</span>: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-property">@produce</span> <span class="hljs-property">@currentData</span>()
+
+
+  <span class="hljs-attribute">produce</span>: <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span>
+    data = <span class="hljs-property">@decorate</span> data
+    <span class="hljs-property">@_validateContract</span> data
+    (component.callback data) <span class="hljs-keyword">for</span> componentId, component <span class="hljs-keyword">of</span> <span class="hljs-property">@registeredComponents</span>
+
+
+  <span class="hljs-attribute">currentData</span>: <span class="hljs-function">-&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>default implementation is a noop</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+
+  <span class="hljs-attribute">unsubscribe</span>: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>default implementation is a noop</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+
+  <span class="hljs-attribute">decorate</span>: <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span>
+    <span class="hljs-keyword">for</span> decorator <span class="hljs-keyword">in</span> <span class="hljs-property">@decorators</span>
+      decorator data
+    data
+
+
+  <span class="hljs-attribute">modelToJSON</span>: <span class="hljs-function"><span class="hljs-params">(model)</span> -&gt;</span>
+    <span class="hljs-keyword">return</span> model.toJSON()
+
+
+  <span class="hljs-attribute">modelsToJSON</span>: <span class="hljs-function"><span class="hljs-params">(models)</span> -&gt;</span>
+    _.map models, <span class="hljs-property">@modelToJSON</span>
+
+
+  <span class="hljs-attribute">_validateContract</span>: <span class="hljs-function"><span class="hljs-params">(dataToProduce)</span> -&gt;</span>
+    contract = <span class="hljs-property">@PRODUCTION_KEY</span>.contract
+    <span class="hljs-keyword">unless</span> contract
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error <span class="hljs-string">"The subscriptionKey <span class="hljs-subst">#{subscriptionKey.key}</span> doesn't have a contract specified"</span>
+
+    <span class="hljs-keyword">return</span> Vigor.helpers.validateContract(contract, dataToProduce, @, <span class="hljs-string">'producing'</span>)
+
+
+  <span class="hljs-attribute">extend</span>: <span class="hljs-function"><span class="hljs-params">(obj, mixin)</span> -&gt;</span>
+    obj[name] = method <span class="hljs-keyword">for</span> name, method <span class="hljs-keyword">of</span> mixin
+    <span class="hljs-keyword">return</span> obj
+
+
+  <span class="hljs-attribute">mixin</span>: <span class="hljs-function"><span class="hljs-params">(instance, mixin)</span> -&gt;</span>
+    <span class="hljs-property">@extend</span> instance, mixin
+
+
+_.extend Producer.prototype, Backbone.Events
+Producer.extend = Vigor.extend
+Vigor.Producer = Producer</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
