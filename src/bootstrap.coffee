@@ -2,23 +2,25 @@
   if typeof define is "function" and define.amd
 
     # AMD. Register as an anonymous module.
-    define ['backbone', 'underscore'], (Backbone, _) ->
-        return factory(root, Backbone, _)
+    define ['backbone', 'underscore', 'jquery'], (Backbone, _, $) ->
+        return factory(root, Backbone, _, $)
 
   else if typeof exports is "object"
     Backbone = require 'backbone'
     _ = require 'underscore'
+    $ = require 'jquery'
+
     # Node. Does not work with strict CommonJS, but
     # only CommonJS-like environments that support module.exports,
     # like Node.
-    module.exports = factory(root, Backbone, _)
+    module.exports = factory(root, Backbone, _, $)
   else
 
     # Browser globals (root is window)
-    root.Vigor = factory(root, root.Backbone, root._)
+    root.Vigor = factory(root, root.Backbone, root._, root.$)
   return
 
-) @, (root, Backbone, _) ->
+) @, (root, Backbone, _, $) ->
 
   previousVigor = root.Vigor
   Vigor = Backbone.Vigor = {}
