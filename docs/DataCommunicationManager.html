@@ -130,25 +130,106 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              
+              <p>The DataCommuncationManager is the entry point to communication between view layer and
+data layer. The <a href="ComponentViewModel.html">ComponentViewModel</a> has a reference to the DataCommunicationManager.
+The DataCommuncationManager can be viewed as the public API betweem the two layers.</p>
+<p>The DataCommuncationManager uses the <a href="ProducerManager.html">ProducerManager</a> to interact with producers</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre>DataCommunicationManager =
+            <div class="content"><div class='highlight'><pre>DataCommunicationManager =</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p><strong>registerProducers:</strong> </br>
+@param [producers]: Array <br/></p>
+<p>Registers a one or more [producers] in the data layer</p>
 
-  <span class="hljs-attribute">registerProducers</span>: <span class="hljs-function"><span class="hljs-params">(producers)</span> -&gt;</span>
-    producerManager.registerProducers producers
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">registerProducers</span>: <span class="hljs-function"><span class="hljs-params">(producers)</span> -&gt;</span>
+    producerManager.registerProducers producers</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p><strong>subscribe:</strong> </br>
+@param [componentId]: String <br/>
+@param [subscriptionKey]: Object <br/>
+@param [callback]: Function <br/>
+@param [subscriptionOptions]: Object (default empty object) <br/></p>
+<p>Registers a component with [componentId] to recieve data changes on given [subscriptionKey] through the component [callback]</p>
 
-  <span class="hljs-attribute">subscribe</span>: <span class="hljs-function"><span class="hljs-params">(componentId, subscriptionKey, callback, subscriptionOptions = {})</span> -&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">subscribe</span>: <span class="hljs-function"><span class="hljs-params">(componentId, subscriptionKey, callback, subscriptionOptions = {})</span> -&gt;</span>
     subscription = <span class="hljs-keyword">new</span> Subscription componentId, callback, subscriptionOptions
-    producerManager.subscribeComponentToKey subscriptionKey, subscription
+    producerManager.subscribeComponentToKey subscriptionKey, subscription</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p><strong>unsubscribe:</strong> </br>
+@param [componentId]: String <br/>
+@param [subscriptionKey]: Object <br/></p>
+<p>Unsubscribes a component from recieving data</p>
 
-  <span class="hljs-attribute">unsubscribe</span>: <span class="hljs-function"><span class="hljs-params">(componentId, subscriptionKey)</span> -&gt;</span>
-    producerManager.unsubscribeComponentFromKey subscriptionKey, componentId
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribe</span>: <span class="hljs-function"><span class="hljs-params">(componentId, subscriptionKey)</span> -&gt;</span>
+    producerManager.unsubscribeComponentFromKey subscriptionKey, componentId</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p><strong>unsubscribeAll:</strong> </br>
+@param [componentId]: String <br/></p>
+<p>Removes all subscriptions for the given component id</p>
 
-  <span class="hljs-attribute">unsubscribeAll</span>: <span class="hljs-function"><span class="hljs-params">(componentId)</span> -&gt;</span>
-    producerManager.unsubscribeComponent componentId
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribeAll</span>: <span class="hljs-function"><span class="hljs-params">(componentId)</span> -&gt;</span>
+    producerManager.unsubscribeComponent componentId</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Expose the DataCommuncationManager on Vigor</p>
 
-Vigor.DataCommunicationManager = DataCommunicationManager</pre></div></div>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Vigor.DataCommunicationManager = DataCommunicationManager</pre></div></div>
             
         </li>
         

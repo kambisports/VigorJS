@@ -5,11 +5,11 @@
  * @license ISC
  */
 (function() {
-  var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    __hasProp = {}.hasOwnProperty,
-    __slice = [].slice;
+  var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    hasProp = {}.hasOwnProperty,
+    slice = [].slice;
 
   (function(root, factory) {
     var Backbone, _;
@@ -146,15 +146,15 @@
 
       EventBus.prototype._eventKeyExists = function(key) {
         var property, value;
-        return __indexOf.call((function() {
-          var _ref, _results;
-          _ref = Vigor.EventKeys;
-          _results = [];
-          for (property in _ref) {
-            value = _ref[property];
-            _results.push(value);
+        return indexOf.call((function() {
+          var ref, results;
+          ref = Vigor.EventKeys;
+          results = [];
+          for (property in ref) {
+            value = ref[property];
+            results.push(value);
           }
-          return _results;
+          return results;
         })(), key) >= 0;
       };
 
@@ -181,10 +181,10 @@
 
       Subscription.prototype.options = void 0;
 
-      function Subscription(_at_id, _at_callback, _at_options) {
-        this.id = _at_id;
-        this.callback = _at_callback;
-        this.options = _at_options;
+      function Subscription(id1, callback1, options1) {
+        this.id = id1;
+        this.callback = callback1;
+        this.options = options1;
       }
 
       return Subscription;
@@ -294,7 +294,7 @@
       Producer.prototype._isSubscribedToRepositories = false;
 
       function Producer() {
-        this.onDiffInRepository = __bind(this.onDiffInRepository, this);
+        this.onDiffInRepository = bind(this.onDiffInRepository, this);
         this.registeredComponents = {};
         this.produceData = _.throttle(this.produceDataSync, 100);
       }
@@ -338,27 +338,27 @@
       };
 
       Producer.prototype.subscribeToRepositories = function() {
-        var repository, _i, _len, _ref, _results;
-        _ref = this.repositories;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          repository = _ref[_i];
+        var i, len, ref, repository, results;
+        ref = this.repositories;
+        results = [];
+        for (i = 0, len = ref.length; i < len; i++) {
+          repository = ref[i];
           if (repository instanceof Vigor.Repository) {
-            _results.push(this.subscribeToRepository(repository));
+            results.push(this.subscribeToRepository(repository));
           } else if (repository.repository instanceof Vigor.Repository && typeof repository.callback === 'string') {
-            _results.push(this.subscribeToRepository(repository.repository, this[repository.callback]));
+            results.push(this.subscribeToRepository(repository.repository, this[repository.callback]));
           } else {
             throw 'unexpected format of producer repositories definition';
           }
         }
-        return _results;
+        return results;
       };
 
       Producer.prototype.unsubscribeFromRepositories = function() {
-        var repository, _i, _len, _ref;
-        _ref = this.repositories;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          repository = _ref[_i];
+        var i, len, ref, repository;
+        ref = this.repositories;
+        for (i = 0, len = ref.length; i < len; i++) {
+          repository = ref[i];
           if (repository instanceof Vigor.Repository) {
             this.unsubscribeFromRepository(repository);
           } else if (repository.repository instanceof Vigor.Repository && typeof repository.callback === 'string') {
@@ -394,16 +394,16 @@
       };
 
       Producer.prototype.produce = function(data) {
-        var component, componentId, _ref, _results;
+        var component, componentId, ref, results;
         data = this.decorate(data);
         this._validateContract(data);
-        _ref = this.registeredComponents;
-        _results = [];
-        for (componentId in _ref) {
-          component = _ref[componentId];
-          _results.push(component.callback(data));
+        ref = this.registeredComponents;
+        results = [];
+        for (componentId in ref) {
+          component = ref[componentId];
+          results.push(component.callback(data));
         }
-        return _results;
+        return results;
       };
 
       Producer.prototype.currentData = function() {};
@@ -411,10 +411,10 @@
       Producer.prototype.unsubscribe = function(options) {};
 
       Producer.prototype.decorate = function(data) {
-        var decorator, _i, _len, _ref;
-        _ref = this.decorators;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          decorator = _ref[_i];
+        var decorator, i, len, ref;
+        ref = this.decorators;
+        for (i = 0, len = ref.length; i < len; i++) {
+          decorator = ref[i];
           decorator(data);
         }
         return data;
@@ -456,8 +456,8 @@
     _.extend(Producer.prototype, Backbone.Events);
     Producer.extend = Vigor.extend;
     Vigor.Producer = Producer;
-    IdProducer = (function(_super) {
-      __extends(IdProducer, _super);
+    IdProducer = (function(superClass) {
+      extend(IdProducer, superClass);
 
       IdProducer.prototype.updatedIds = void 0;
 
@@ -554,21 +554,21 @@
       };
 
       IdProducer.prototype.produce = function(ids) {
-        var data, id, _i, _len, _results;
-        _results = [];
-        for (_i = 0, _len = ids.length; _i < _len; _i++) {
-          id = ids[_i];
+        var data, i, id, len, results;
+        results = [];
+        for (i = 0, len = ids.length; i < len; i++) {
+          id = ids[i];
           data = this.decorate({
             id: id
           });
           this._validateContract(data);
-          _results.push(_.each(this.registeredComponents, function(component) {
+          results.push(_.each(this.registeredComponents, function(component) {
             if (id === this.idForOptions(component.options)) {
               return component.callback(data);
             }
           }, this));
         }
-        return _results;
+        return results;
       };
 
       IdProducer.prototype.hasId = function(id) {
@@ -604,11 +604,11 @@
 
         ServiceChannel.prototype.name = void 0;
 
-        function ServiceChannel(_at__window, _at_name, _at_service, _at_subscribers) {
-          this._window = _at__window;
-          this.name = _at_name;
-          this.service = _at_service;
-          this.subscribers = _at_subscribers;
+        function ServiceChannel(_window, name1, service1, subscribers) {
+          this._window = _window;
+          this.name = name1;
+          this.service = service1;
+          this.subscribers = subscribers;
           this.params = this.getParams();
           this.restart();
         }
@@ -724,9 +724,9 @@
 
       })();
       APIService = (function() {
-        function APIService(_at__window) {
+        function APIService(_window) {
           var service;
-          this._window = _at__window != null ? _at__window : window;
+          this._window = _window != null ? _window : window;
           this.channels = {};
           service = this;
           this.Model = Backbone.Model.extend({
@@ -868,8 +868,8 @@
     _.extend(ComponentBase.prototype, Backbone.Events);
     ComponentBase.extend = Vigor.extend;
     Vigor.ComponentBase = ComponentBase;
-    ComponentView = (function(_super) {
-      __extends(ComponentView, _super);
+    ComponentView = (function(superClass) {
+      extend(ComponentView, superClass);
 
       ComponentView.prototype.viewModel = void 0;
 
@@ -909,9 +909,9 @@
       };
 
       ComponentView.prototype.dispose = function() {
-        var _ref;
-        if ((_ref = this.model) != null) {
-          _ref.unbind();
+        var ref;
+        if ((ref = this.model) != null) {
+          ref.unbind();
         }
         this.removeSubscriptions();
         this.stopListening();
@@ -921,17 +921,17 @@
       };
 
       ComponentView.prototype._checkIfImplemented = function(methodNames) {
-        var methodName, _i, _len, _results;
-        _results = [];
-        for (_i = 0, _len = methodNames.length; _i < _len; _i++) {
-          methodName = methodNames[_i];
+        var i, len, methodName, results;
+        results = [];
+        for (i = 0, len = methodNames.length; i < len; i++) {
+          methodName = methodNames[i];
           if (!this.constructor.prototype.hasOwnProperty(methodName)) {
             throw new Error(this.constructor.name + " - " + methodName + "() must be implemented in View.");
           } else {
-            _results.push(void 0);
+            results.push(void 0);
           }
         }
-        return _results;
+        return results;
       };
 
       return ComponentView;
@@ -972,14 +972,14 @@
     })();
     ComponentViewModel.extend = Vigor.extend;
     Vigor.ComponentViewModel = ComponentViewModel;
-    Repository = (function(_super) {
-      __extends(Repository, _super);
+    Repository = (function(superClass) {
+      extend(Repository, superClass);
 
       function Repository() {
-        this._triggerUpdates = __bind(this._triggerUpdates, this);
-        this._onRemove = __bind(this._onRemove, this);
-        this._onChange = __bind(this._onChange, this);
-        this._onAdd = __bind(this._onAdd, this);
+        this._triggerUpdates = bind(this._triggerUpdates, this);
+        this._onRemove = bind(this._onRemove, this);
+        this._onChange = bind(this._onChange, this);
+        this._onAdd = bind(this._onAdd, this);
         return Repository.__super__.constructor.apply(this, arguments);
       }
 
@@ -1008,10 +1008,10 @@
       };
 
       Repository.prototype.getByIds = function(ids) {
-        var id, models, _i, _len;
+        var i, id, len, models;
         models = [];
-        for (_i = 0, _len = ids.length; _i < _len; _i++) {
-          id = ids[_i];
+        for (i = 0, len = ids.length; i < len; i++) {
+          id = ids[i];
           models.push(this.get(id));
         }
         return models;
@@ -1023,7 +1023,7 @@
 
       Repository.prototype._onAll = function() {
         var args, event;
-        event = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+        event = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
         switch (event) {
           case 'add':
             this._onAdd.apply(this, args);
@@ -1114,8 +1114,8 @@
 
     })(Backbone.Collection);
     Vigor.Repository = Repository;
-    ServiceRepository = (function(_super) {
-      __extends(ServiceRepository, _super);
+    ServiceRepository = (function(superClass) {
+      extend(ServiceRepository, superClass);
 
       function ServiceRepository() {
         return ServiceRepository.__super__.constructor.apply(this, arguments);

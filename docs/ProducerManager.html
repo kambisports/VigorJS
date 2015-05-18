@@ -130,29 +130,12 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              
+              <h2 id="producermanager">ProducerManager</h2>
+<p>The ProducerManager utilizies the <a href="ProducerMapper.html">ProducerMapper</a> to (un)register components on subscriptions.</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre>producerManager =
-
-  <span class="hljs-attribute">registerProducers</span>: <span class="hljs-function"><span class="hljs-params">(producers)</span> -&gt;</span>
-    producers.forEach (producer) -&gt;
-      producerMapper.register producer
-
-  <span class="hljs-attribute">producerForKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey)</span> -&gt;</span>
-    producer = producerMapper.producerForKey subscriptionKey
-
-  <span class="hljs-attribute">subscribeComponentToKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey, subscription)</span> -&gt;</span>
-    producer = <span class="hljs-property">@producerForKey</span> subscriptionKey
-    producer.addComponent subscription
-
-  <span class="hljs-attribute">unsubscribeComponentFromKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey, componentId)</span> -&gt;</span>
-    producer = <span class="hljs-property">@producerForKey</span> subscriptionKey
-    producer.removeComponent componentId
-
-  <span class="hljs-attribute">unsubscribeComponent</span>: <span class="hljs-function"><span class="hljs-params">(componentId)</span> -&gt;</span>
-    producerMapper.producers.forEach (producer) -&gt;
-      <span class="hljs-attribute">producer</span>::getInstance().removeComponent componentId</pre></div></div>
+            <div class="content"><div class='highlight'><pre>producerManager =</pre></div></div>
             
         </li>
         
@@ -163,12 +146,15 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <h2 id="start-test-block">start-test-block</h2>
-<p>this will be removed in distribution build</p>
+              <p><strong>registerProducers:</strong> </br>
+@param [producers]: Array <br/></p>
+<p>Registers a one or more producers in mapper</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>Vigor.ProducerManager = producerManager</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">registerProducers</span>: <span class="hljs-function"><span class="hljs-params">(producers)</span> -&gt;</span>
+    producers.forEach (producer) -&gt;
+      producerMapper.register producer</pre></div></div>
             
         </li>
         
@@ -178,6 +164,100 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p><strong>producerForKey:</strong> </br>
+@param [subscriptionKey]: String <br/>
+@returns [producer]: Producer </br></p>
+<p>Retrieves a registered producer for the given subscription</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">producerForKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey)</span> -&gt;</span>
+    producer = producerMapper.producerForKey subscriptionKey</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p><strong>subscribeComponentToKey:</strong> </br>
+@param [subscriptionKey]: String <br/>
+@param [subscription]: Object <br/></p>
+<p>Adds a component to the producer for the given [subscriptionKey]</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">subscribeComponentToKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey, subscription)</span> -&gt;</span>
+    producer = <span class="hljs-property">@producerForKey</span> subscriptionKey
+    producer.addComponent subscription</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p><strong>unsubscribeComponentFromKey:</strong> </br>
+@param [subscriptionKey]: String <br/>
+@param [componentId]: String <br/></p>
+<p>Unsubscribes a component with [componentId] from the producer for the given [subscriptionKey]</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribeComponentFromKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey, componentId)</span> -&gt;</span>
+    producer = <span class="hljs-property">@producerForKey</span> subscriptionKey
+    producer.removeComponent componentId</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p><strong>unsubscribeComponent:</strong> </br>
+@param [componentId]: String <br/></p>
+<p>Unsubscribes a component with [componentId] from any producer that might have it in its subscription</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribeComponent</span>: <span class="hljs-function"><span class="hljs-params">(componentId)</span> -&gt;</span>
+    producerMapper.producers.forEach (producer) -&gt;
+      <span class="hljs-attribute">producer</span>::getInstance().removeComponent componentId</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <h2 id="start-test-block">start-test-block</h2>
+<p>this will be removed in distribution build since the manager should be private</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Vigor.ProducerManager = producerManager</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <h2 id="end-test-block">end-test-block</h2>
 
