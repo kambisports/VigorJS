@@ -1054,10 +1054,7 @@
         event = Repository.prototype.REPOSITORY_ADD;
         models = _.values(this._throttledAddedModels);
         this._throttledAddedModels = {};
-        if (models.length > 0) {
-          this.trigger(event, models, event);
-        }
-        return models;
+        return this._throttledEvent(event, models, event);
       };
 
       Repository.prototype._throttledChange = function() {
@@ -1065,10 +1062,7 @@
         event = Repository.prototype.REPOSITORY_CHANGE;
         models = _.values(this._throttledChangedModels);
         this._throttledChangedModels = {};
-        if (models.length > 0) {
-          this.trigger(event, models, event);
-        }
-        return models;
+        return this._throttledEvent(event, models, event);
       };
 
       Repository.prototype._throttledRemove = function() {
@@ -1076,8 +1070,12 @@
         event = Repository.prototype.REPOSITORY_REMOVE;
         models = _.values(this._throttledRemovedModels);
         this._throttledRemovedModels = {};
+        return this._throttledEvent(event, models, event);
+      };
+
+      Repository.prototype._throttledEvent = function(event, models, eventRef) {
         if (models.length > 0) {
-          this.trigger(event, models, event);
+          this.trigger(event, models, eventRef);
         }
         return models;
       };

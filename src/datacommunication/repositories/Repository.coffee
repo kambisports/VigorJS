@@ -1,8 +1,18 @@
+#  ## Repository
+#
+# The Repository extends a [Backbone Collection](http://backbonejs.org/#Collection)
+# and adds functionality for diffing and throttling data
+#
+#
+
 class Repository extends Backbone.Collection
 
   _throttledAddedModels: undefined
   _throttledChangedModels: undefined
   _throttledRemovedModels: undefined
+
+  # Reference to a [throttled](http://underscorejs.org/#throttle) version of the _triggerUpdates
+  # function in order to avoid flooding the listeners
   _throttledTriggerUpdates: undefined
 
   initialize: ->
@@ -16,9 +26,14 @@ class Repository extends Backbone.Collection
     do @addThrottledListeners
     super
 
+  # **addThrottledListeners** <br/>
+  # Catch all events triggered from Backbone Collection in order make throttling possible
   addThrottledListeners: ->
     @on 'all', @_onAll
 
+  # **getByIds** <br/>
+  # @param [ids]: Array <br/>
+  # @return models: Array
   getByIds: (ids) ->
     models = []
     for id in ids
@@ -49,26 +64,33 @@ class Repository extends Backbone.Collection
     event = Repository::REPOSITORY_ADD
     models = _.values @_throttledAddedModels
     @_throttledAddedModels = {}
-    if models.length > 0
-      @trigger event, models, event
-    return models
+    @_throttledEvent event, models, event
 
   _throttledChange: ->
     event = Repository::REPOSITORY_CHANGE
     models = _.values @_throttledChangedModels
     @_throttledChangedModels = {}
-    if models.length > 0
-      @trigger event, models, event
-    return models
+    @_throttledEvent event, models, event
 
   _throttledRemove: ->
     event = Repository::REPOSITORY_REMOVE
     models = _.values @_throttledRemovedModels
     @_throttledRemovedModels = {}
+    @_throttledEvent event, models, event
+
+  _throttledEvent: (event, models, eventRef) ->
     if models.length > 0
-      @trigger event, models, event
+      @trigger event, models, eventRef
     return models
 
+
+  # **_throttledDiff** <br/>
+  # @param [added]: Array <br/>
+  # @param [changed]: Array <br/>
+  # @param [removed]: Array <br/>
+  #
+  # An event type called REPOSITORY_DIFF is added to the repository which supplies a consolidated
+  # response with all the added, removed and updated models since last throttled batch
   _throttledDiff: (added, changed, removed) ->
     event = Repository::REPOSITORY_DIFF
     if  added.length or \

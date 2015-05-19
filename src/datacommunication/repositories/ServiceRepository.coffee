@@ -1,5 +1,5 @@
 #  ## ServiceRepository
-# 
+#
 # A ServiceRepository extends the Repository class and enables
 # subscriptions for services
 #
@@ -31,20 +31,22 @@ class ServiceRepository extends Vigor.Repository
 
   # **addSubscription** <br/>
   # @param [type]: String <br/>
-  # The type of service(s) to add the subscription for </br>
+  # Used to identify the service for this subscription.
   # @param [subscription]: Object <br/>
+  # Used to configure the service request
   #
-  # Adds a subscription to service(s) of a certain type
+  # Maps the service through type before subscribing
   addSubscription: (type, subscription) ->
     if @services[type]
       @addSubscriptionToService @services[type], subscription
 
   # **removeSubscription** <br/>
   # @param [type]: String <br/>
-  # The type of service(s) to remove the subscription for </br>
+  # Used to identify the service for this subscription.
   # @param [subscription]: Object <br/>
+  # Used to configure the service request
   #
-  # Removes a subscription from service(s) of a certain type
+  # Maps the service through type before unsubscribing
   removeSubscription: (type, subscription) ->
     if @services[type]
       @removeSubscriptionFromService @services[type], subscription

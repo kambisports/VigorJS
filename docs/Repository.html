@@ -130,15 +130,34 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              
+              <h2 id="repository">Repository</h2>
+<p>The Repository extends a <a href="http://backbonejs.org/#Collection">Backbone Collection</a>
+and adds functionality for diffing and throttling data</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Repository</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Backbone</span>.<span class="hljs-title">Collection</span></span>
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Repository</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Backbone</span>.<span class="hljs-title">Collection</span></span>
 
   <span class="hljs-attribute">_throttledAddedModels</span>: <span class="hljs-literal">undefined</span>
   <span class="hljs-attribute">_throttledChangedModels</span>: <span class="hljs-literal">undefined</span>
-  <span class="hljs-attribute">_throttledRemovedModels</span>: <span class="hljs-literal">undefined</span>
-  <span class="hljs-attribute">_throttledTriggerUpdates</span>: <span class="hljs-literal">undefined</span>
+  <span class="hljs-attribute">_throttledRemovedModels</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Reference to a <a href="http://underscorejs.org/#throttle">throttled</a> version of the _triggerUpdates
+function in order to avoid flooding the listeners</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_throttledTriggerUpdates</span>: <span class="hljs-literal">undefined</span>
 
   <span class="hljs-attribute">initialize</span>: <span class="hljs-function">-&gt;</span>
     <span class="hljs-property">@cid</span> = <span class="hljs-property">@cid</span> <span class="hljs-keyword">or</span> _.uniqueId <span class="hljs-string">'c'</span>
@@ -149,12 +168,41 @@
     <span class="hljs-property">@_throttledTriggerUpdates</span> = _.throttle <span class="hljs-property">@_triggerUpdates</span>, <span class="hljs-number">100</span>, <span class="hljs-attribute">leading</span>: <span class="hljs-literal">no</span>
 
     <span class="hljs-keyword">do</span> <span class="hljs-property">@addThrottledListeners</span>
-    <span class="hljs-keyword">super</span>
+    <span class="hljs-keyword">super</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p><strong>addThrottledListeners</strong> <br/>
+Catch all events triggered from Backbone Collection in order make throttling possible</p>
 
-  <span class="hljs-attribute">addThrottledListeners</span>: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-property">@on</span> <span class="hljs-string">'all'</span>, <span class="hljs-property">@_onAll</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">addThrottledListeners</span>: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-property">@on</span> <span class="hljs-string">'all'</span>, <span class="hljs-property">@_onAll</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p><strong>getByIds</strong> <br/>
+@param [ids]: Array <br/>
+@return models: Array</p>
 
-  <span class="hljs-attribute">getByIds</span>: <span class="hljs-function"><span class="hljs-params">(ids)</span> -&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">getByIds</span>: <span class="hljs-function"><span class="hljs-params">(ids)</span> -&gt;</span>
     models = []
     <span class="hljs-keyword">for</span> id <span class="hljs-keyword">in</span> ids
       models.push <span class="hljs-property">@get</span> id
@@ -184,27 +232,44 @@
     event = <span class="hljs-attribute">Repository</span>::REPOSITORY_ADD
     models = _.values <span class="hljs-property">@_throttledAddedModels</span>
     <span class="hljs-property">@_throttledAddedModels</span> = {}
-    <span class="hljs-keyword">if</span> models.length &gt; <span class="hljs-number">0</span>
-      <span class="hljs-property">@trigger</span> event, models, event
-    <span class="hljs-keyword">return</span> models
+    <span class="hljs-property">@_throttledEvent</span> event, models, event
 
   <span class="hljs-attribute">_throttledChange</span>: <span class="hljs-function">-&gt;</span>
     event = <span class="hljs-attribute">Repository</span>::REPOSITORY_CHANGE
     models = _.values <span class="hljs-property">@_throttledChangedModels</span>
     <span class="hljs-property">@_throttledChangedModels</span> = {}
-    <span class="hljs-keyword">if</span> models.length &gt; <span class="hljs-number">0</span>
-      <span class="hljs-property">@trigger</span> event, models, event
-    <span class="hljs-keyword">return</span> models
+    <span class="hljs-property">@_throttledEvent</span> event, models, event
 
   <span class="hljs-attribute">_throttledRemove</span>: <span class="hljs-function">-&gt;</span>
     event = <span class="hljs-attribute">Repository</span>::REPOSITORY_REMOVE
     models = _.values <span class="hljs-property">@_throttledRemovedModels</span>
     <span class="hljs-property">@_throttledRemovedModels</span> = {}
-    <span class="hljs-keyword">if</span> models.length &gt; <span class="hljs-number">0</span>
-      <span class="hljs-property">@trigger</span> event, models, event
-    <span class="hljs-keyword">return</span> models
+    <span class="hljs-property">@_throttledEvent</span> event, models, event
 
-  <span class="hljs-attribute">_throttledDiff</span>: <span class="hljs-function"><span class="hljs-params">(added, changed, removed)</span> -&gt;</span>
+  <span class="hljs-attribute">_throttledEvent</span>: <span class="hljs-function"><span class="hljs-params">(event, models, eventRef)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> models.length &gt; <span class="hljs-number">0</span>
+      <span class="hljs-property">@trigger</span> event, models, eventRef
+    <span class="hljs-keyword">return</span> models</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p><strong>_throttledDiff</strong> <br/>
+@param [added]: Array <br/>
+@param [changed]: Array <br/>
+@param [removed]: Array <br/></p>
+<p>An event type called REPOSITORY_DIFF is added to the repository which supplies a consolidated
+response with all the added, removed and updated models since last throttled batch</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_throttledDiff</span>: <span class="hljs-function"><span class="hljs-params">(added, changed, removed)</span> -&gt;</span>
     event = <span class="hljs-attribute">Repository</span>::REPOSITORY_DIFF
     <span class="hljs-keyword">if</span>  added.length <span class="hljs-keyword">or</span> \
         changed.length <span class="hljs-keyword">or</span> \
