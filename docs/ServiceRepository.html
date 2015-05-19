@@ -130,28 +130,128 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              
+              <h2 id="servicerepository">ServiceRepository</h2>
+<p>A ServiceRepository extends the Repository class and enables
+subscriptions for services</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ServiceRepository</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Vigor</span>.<span class="hljs-title">Repository</span></span>
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ServiceRepository</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Vigor</span>.<span class="hljs-title">Repository</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Holds the services</p>
 
-  <span class="hljs-attribute">services</span>: {}
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">services</span>: {}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p><strong>addSubscriptionToService</strong> <br/>
+@param [service]: Object <br/>
+The service to add the subscription to </br>
+@param [subscription]: Object <br/>
+The subscription to add to the service</p>
+<p>Adds a subscription to a service</p>
 
-  <span class="hljs-attribute">addSubscriptionToService</span>: <span class="hljs-function"><span class="hljs-params">(service, subscription)</span> -&gt;</span>
-    service.addSubscription subscription
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">addSubscriptionToService</span>: <span class="hljs-function"><span class="hljs-params">(service, subscription)</span> -&gt;</span>
+    service.addSubscription subscription</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p><strong>removeSubscriptionFromService</strong> <br/>
+@param [service]: Object <br/>
+The service to remove the subscription from </br>
+@param [subscription]: Object <br/>
+The subscription to remove from the service</p>
+<p>Removes a subscription from a service</p>
 
-  <span class="hljs-attribute">removeSubscriptionFromService</span>: <span class="hljs-function"><span class="hljs-params">(service, subscription)</span> -&gt;</span>
-    service.removeSubscription subscription
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">removeSubscriptionFromService</span>: <span class="hljs-function"><span class="hljs-params">(service, subscription)</span> -&gt;</span>
+    service.removeSubscription subscription</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p><strong>addSubscription</strong> <br/>
+@param [type]: String <br/>
+The type of service(s) to add the subscription for </br>
+@param [subscription]: Object <br/></p>
+<p>Adds a subscription to service(s) of a certain type</p>
 
-  <span class="hljs-attribute">addSubscription</span>: <span class="hljs-function"><span class="hljs-params">(type, subscription)</span> -&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">addSubscription</span>: <span class="hljs-function"><span class="hljs-params">(type, subscription)</span> -&gt;</span>
     <span class="hljs-keyword">if</span> <span class="hljs-property">@services</span>[type]
-      <span class="hljs-property">@addSubscriptionToService</span> <span class="hljs-property">@services</span>[type], subscription
+      <span class="hljs-property">@addSubscriptionToService</span> <span class="hljs-property">@services</span>[type], subscription</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p><strong>removeSubscription</strong> <br/>
+@param [type]: String <br/>
+The type of service(s) to remove the subscription for </br>
+@param [subscription]: Object <br/></p>
+<p>Removes a subscription from service(s) of a certain type</p>
 
-  <span class="hljs-attribute">removeSubscription</span>: <span class="hljs-function"><span class="hljs-params">(type, subscription)</span> -&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">removeSubscription</span>: <span class="hljs-function"><span class="hljs-params">(type, subscription)</span> -&gt;</span>
     <span class="hljs-keyword">if</span> <span class="hljs-property">@services</span>[type]
-      <span class="hljs-property">@removeSubscriptionFromService</span> <span class="hljs-property">@services</span>[type], subscription
+      <span class="hljs-property">@removeSubscriptionFromService</span> <span class="hljs-property">@services</span>[type], subscription</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Expose ServiceRepository on the Vigor object</p>
 
-Vigor.ServiceRepository = ServiceRepository</pre></div></div>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Vigor.ServiceRepository = ServiceRepository</pre></div></div>
             
         </li>
         
