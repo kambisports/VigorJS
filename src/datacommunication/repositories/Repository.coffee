@@ -7,8 +7,11 @@
 
 class Repository extends Backbone.Collection
 
+  # Plain object holding reference to all the Backbone Collection models **added** since last throttled batch
   _throttledAddedModels: undefined
+  # Plain object holding reference to all the Backbone Collection models **updated** since last throttled batch
   _throttledChangedModels: undefined
+  # Plain object holding reference to all the Backbone Collection models **removed** since last throttled batch
   _throttledRemovedModels: undefined
 
   # Reference to a [throttled](http://underscorejs.org/#throttle) version of the _triggerUpdates
@@ -27,7 +30,8 @@ class Repository extends Backbone.Collection
     super
 
   # **addThrottledListeners** <br/>
-  # Catch all events triggered from Backbone Collection in order make throttling possible
+  # Catch all events triggered from Backbone Collection in order to make throttling possible.
+  # It still bubbles the event for outside subscribers.
   addThrottledListeners: ->
     @on 'all', @_onAll
 
@@ -43,6 +47,8 @@ class Repository extends Backbone.Collection
   isEmpty: ->
     return @models.length <= 0
 
+  # **_onAll** <br/>
+  # see *addThrottledListeners*
   _onAll: (event, args...) ->
     switch event
       when 'add' then @_onAdd.apply(@, args)

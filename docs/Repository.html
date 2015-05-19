@@ -137,11 +137,7 @@ and adds functionality for diffing and throttling data</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Repository</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Backbone</span>.<span class="hljs-title">Collection</span></span>
-
-  <span class="hljs-attribute">_throttledAddedModels</span>: <span class="hljs-literal">undefined</span>
-  <span class="hljs-attribute">_throttledChangedModels</span>: <span class="hljs-literal">undefined</span>
-  <span class="hljs-attribute">_throttledRemovedModels</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Repository</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Backbone</span>.<span class="hljs-title">Collection</span></span></pre></div></div>
             
         </li>
         
@@ -151,6 +147,51 @@ and adds functionality for diffing and throttling data</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Plain object holding reference to all the Backbone Collection models <strong>added</strong> since last throttled batch</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_throttledAddedModels</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Plain object holding reference to all the Backbone Collection models <strong>updated</strong> since last throttled batch</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_throttledChangedModels</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Plain object holding reference to all the Backbone Collection models <strong>removed</strong> since last throttled batch</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_throttledRemovedModels</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p>Reference to a <a href="http://underscorejs.org/#throttle">throttled</a> version of the _triggerUpdates
 function in order to avoid flooding the listeners</p>
@@ -173,14 +214,15 @@ function in order to avoid flooding the listeners</p>
         </li>
         
         
-        <li id="section-3">
+        <li id="section-6">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p><strong>addThrottledListeners</strong> <br/>
-Catch all events triggered from Backbone Collection in order make throttling possible</p>
+Catch all events triggered from Backbone Collection in order to make throttling possible.
+It still bubbles the event for outside subscribers.</p>
 
             </div>
             
@@ -190,11 +232,11 @@ Catch all events triggered from Backbone Collection in order make throttling pos
         </li>
         
         
-        <li id="section-4">
+        <li id="section-7">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-4">&#182;</a>
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p><strong>getByIds</strong> <br/>
 @param [ids]: Array <br/>
@@ -209,9 +251,23 @@ Catch all events triggered from Backbone Collection in order make throttling pos
     <span class="hljs-keyword">return</span> models
 
   <span class="hljs-attribute">isEmpty</span>: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">return</span> <span class="hljs-property">@models</span>.length &lt;= <span class="hljs-number">0</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-property">@models</span>.length &lt;= <span class="hljs-number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p><strong>_onAll</strong> <br/>
+see <em>addThrottledListeners</em></p>
 
-  <span class="hljs-attribute">_onAll</span>: <span class="hljs-function"><span class="hljs-params">(event, args...)</span> -&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_onAll</span>: <span class="hljs-function"><span class="hljs-params">(event, args...)</span> -&gt;</span>
     <span class="hljs-keyword">switch</span> event
       <span class="hljs-keyword">when</span> <span class="hljs-string">'add'</span> <span class="hljs-keyword">then</span> <span class="hljs-property">@_onAdd</span>.apply(@, args)
       <span class="hljs-keyword">when</span> <span class="hljs-string">'change'</span> <span class="hljs-keyword">then</span> <span class="hljs-property">@_onChange</span>.apply(@, args)
@@ -254,11 +310,11 @@ Catch all events triggered from Backbone Collection in order make throttling pos
         </li>
         
         
-        <li id="section-5">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p><strong>_throttledDiff</strong> <br/>
 @param [added]: Array <br/>
