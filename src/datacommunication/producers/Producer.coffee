@@ -1,10 +1,23 @@
+# ## Producer
+#
+# A Producer listens to data changes in one or several repositories
+# and produces data on a certain Production Key.
+#
+#
+
 class Producer
 
-  # the production key should be overridden in the subclass
+  # The production key that is used for subscribing to the producer. <br/>
+  # This key should be overridden in the subclass.
   PRODUCTION_KEY: undefined
+
+  # The repository (or repositories) that the producer listens to.
   repositories: []
+
+  # The decorator(s) that is used for formatting the produced data.
   decorators: []
 
+  # Keeps track of if the producer has subscribed to its repositories or not.
   _isSubscribedToRepositories: false
 
 
@@ -19,6 +32,11 @@ class Producer
     @instance
 
 
+  # **addComponent** <br/>
+  # @param [subscription]: Object <br/>
+  # The subscription, which contains an id, a callback and options. <br/>
+  #
+  # Adds (subscribes) a component to the producer.
   addComponent: (subscription) ->
     existingSubscription = @registeredComponents[subscription.id]
     unless existingSubscription?
@@ -30,6 +48,11 @@ class Producer
         @_isSubscribedToRepositories = true
 
 
+  # **removeComponent** <br/>
+  # @param [componentId]: String <br/>
+  # The id of the component that should be removed. <br/>
+  #
+  # Removes a component (its subscription) from the producer.
   removeComponent: (componentId) ->
     subscription = @registeredComponents[componentId]
 
@@ -37,7 +60,6 @@ class Producer
       @unsubscribe subscription.options
       delete @registeredComponents[subscription.id]
 
-      # for..of is slightly faster than checking _.keys().length
       shouldUnsubscribe = true
       for component of @registeredComponents
         shouldUnsubscribe = false
@@ -48,6 +70,9 @@ class Producer
         @_isSubscribedToRepositories = false
 
 
+  # **subscribeToRepositories** <br/>
+  # Subscribes to all the repositories. <br/>
+  # Also registers the callback function if the repository has one.
   subscribeToRepositories: ->
     for repository in @repositories
       if repository instanceof Vigor.Repository
@@ -58,6 +83,8 @@ class Producer
         throw 'unexpected format of producer repositories definition'
 
 
+  # **unsubscribeFromRepositories** <br/>
+  # Unsubscribes from all the repositories.
   unsubscribeFromRepositories: ->
     for repository in @repositories
       if repository instanceof Vigor.Repository
@@ -67,6 +94,13 @@ class Producer
     undefined
 
 
+  # **subscribeToRepository** <br/>
+  # @param [repository]: Object <br/>
+  # The repository to subscribe to. <br/>
+  # @param [callback]: String <br/>
+  # The method that should be executed on repository diff.
+  #
+  # Sets up a subscription to a repository with a custom or predefined callback.
   subscribeToRepository: (repository, callback) ->
     callback = callback or (diff) =>
       @onDiffInRepository repository, diff
@@ -74,14 +108,23 @@ class Producer
     @listenTo repository, Vigor.Repository::REPOSITORY_DIFF, callback
 
 
+  # **unsubscribeFromRepository** <br/>
+  # @param [repository]: Object <br/>
+  # The repository to unsubscribe from.
+  #
+  # Unsubscribes from a repository.
   unsubscribeFromRepository: (repository) ->
     @stopListening repository, Vigor.Repository::REPOSITORY_DIFF
 
 
+  # **subscribe** <br/>
+  # Called when a component is added.
   subscribe: ->
     @produceDataSync()
 
 
+  # **onDiffInRepository** <br/>
+  # Used as default callback when subscribing to a repository.
   onDiffInRepository: =>
     @produceData()
 
@@ -90,20 +133,36 @@ class Producer
     @produce @currentData()
 
 
+  # ***produce*** <br/>
+  # @param [data]: Object <br/>
+  # The current data.
+  #
+  # This method is called by the produceDataSync method <br/>
+  # and in turn calls methods for decoration of the current data <br/>
+  # and validation of its contract.
   produce: (data) ->
     data = @decorate data
     @_validateContract data
     (component.callback data) for componentId, component of @registeredComponents
 
 
+  # **currentData** <br/>
+  # This is where the actual collection of the data is done. <br/>
+  # Default implementation is a noop.
   currentData: ->
-    # default implementation is a noop
 
-
+  # **unsubscribe** <br/>
+  # Default implementation is a noop.
   unsubscribe: (options) ->
-    # default implementation is a noop
 
 
+  # **decorate** <br/>
+  # @param [data]: Object <br/>
+  # The data to decorate .<br/>
+  # @return data: Object <br/>
+  # The decorated data.
+  #
+  # Runs the assigned decorator(s) on the data.
   decorate: (data) ->
     for decorator in @decorators
       decorator data
@@ -118,6 +177,12 @@ class Producer
     _.map models, @modelToJSON
 
 
+  # **_validateContract** <br/>
+  # @param [dataToProduce]: Object <br/>
+  # The data to validate. <br/>
+  # @return : Boolean
+  #
+  # Used to validate data against a predefined contract, if there is one.
   _validateContract: (dataToProduce) ->
     contract = @PRODUCTION_KEY.contract
     unless contract
