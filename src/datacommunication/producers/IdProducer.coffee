@@ -1,22 +1,32 @@
+# ## IdProducer
+#
+# An IdProducer is like a Producer, with the difference that it
+# listens to data changes for specific ids.
+#
+#
+
 class IdProducer extends Producer
 
   updatedIds: undefined
   subscriptions: undefined
 
-  # the type of the internal ids should be value types, and are numbers by default
-  # trying to add a subscription with an invalid type throws an error
+  # This is the type of the internal ids. <br/>
+  # This should be value types, and are numbers by default.<br/>
+  # Trying to add a subscription with an invalid type throws an error.
   idType: typeof 0
 
 
   constructor: ->
     super
     @updatedIds = []
-
-    # TODO: make this an ES6 Map so we can have keys of arbitrary types,
-    # and then remove idType
     @subscriptions = {}
 
 
+  # **subscribe** <br/>
+  # @params [options]: Object <br/>
+  # Subsciption options.
+  #
+  # Subscribe to the producer, if the id is of valid type.
   subscribe: (options) ->
     id = @idForOptions options
     if typeof id isnt @idType
@@ -49,6 +59,7 @@ class IdProducer extends Producer
     @produceDataForIds _.filter _.flatten [addedModelIds, removedModelIds, updatedModelIds]
 
 
+
   produceDataForIds: (ids = @allIds()) ->
     @updatedIds = _.uniq @updatedIds.concat ids
     @produceData()
@@ -75,6 +86,11 @@ class IdProducer extends Producer
       @produce ids
 
 
+  # **unsubscribe** <br/>
+  # @params [options]: Object <br/>
+  # Contains the id to unsubscribe from.
+  #
+  # Unsubscribe from the producer.
   unsubscribe: (options) ->
     id = @idForOptions options
     subscription = @subscriptions[id]
@@ -86,7 +102,11 @@ class IdProducer extends Producer
         if subscription.length is 0
           delete @subscriptions[id]
 
-
+  # **produce** <br/>
+  # @params [ids]: Array <br/>
+  # List of ids to produce data for. <br/>
+  #
+  # Produce (decorated and validated) data for the ids.
   produce: (ids) ->
     for id in ids
 

@@ -130,10 +130,14 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              
+              <h2 id="idproducer">IdProducer</h2>
+<p>An IdProducer is like a Producer, with the difference that it
+listens to data changes for specific ids.</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">IdProducer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Producer</span></span>
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">IdProducer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Producer</span></span>
 
   <span class="hljs-attribute">updatedIds</span>: <span class="hljs-literal">undefined</span>
   <span class="hljs-attribute">subscriptions</span>: <span class="hljs-literal">undefined</span></pre></div></div>
@@ -147,8 +151,9 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>the type of the internal ids should be value types, and are numbers by default
-trying to add a subscription with an invalid type throws an error</p>
+              <p>This is the type of the internal ids. <br/>
+This should be value types, and are numbers by default.<br/>
+Trying to add a subscription with an invalid type throws an error.</p>
 
             </div>
             
@@ -157,7 +162,8 @@ trying to add a subscription with an invalid type throws an error</p>
 
   <span class="hljs-attribute">constructor</span>: <span class="hljs-function">-&gt;</span>
     <span class="hljs-keyword">super</span>
-    <span class="hljs-property">@updatedIds</span> = []</pre></div></div>
+    <span class="hljs-property">@updatedIds</span> = []
+    <span class="hljs-property">@subscriptions</span> = {}</pre></div></div>
             
         </li>
         
@@ -168,15 +174,14 @@ trying to add a subscription with an invalid type throws an error</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>TODO: make this an ES6 Map so we can have keys of arbitrary types,
-and then remove idType</p>
+              <p><strong>subscribe</strong> <br/>
+@params [options]: Object <br/>
+Subsciption options.</p>
+<p>Subscribe to the producer, if the id is of valid type.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@subscriptions</span> = {}
-
-
-  <span class="hljs-attribute">subscribe</span>: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">subscribe</span>: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
     id = <span class="hljs-property">@idForOptions</span> options
     <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> id <span class="hljs-keyword">isnt</span> <span class="hljs-property">@idType</span>
       <span class="hljs-keyword">throw</span> <span class="hljs-string">"expected the subscription key to be a <span class="hljs-subst">#{<span class="hljs-property">@idType</span>}</span> but got a <span class="hljs-subst">#{<span class="hljs-keyword">typeof</span> subscriptionKey}</span>"</span>
@@ -208,6 +213,7 @@ and then remove idType</p>
     <span class="hljs-property">@produceDataForIds</span> _.filter _.flatten [addedModelIds, removedModelIds, updatedModelIds]
 
 
+
   <span class="hljs-attribute">produceDataForIds</span>: <span class="hljs-function"><span class="hljs-params">(ids = <span class="hljs-property">@allIds</span>())</span> -&gt;</span>
     <span class="hljs-property">@updatedIds</span> = _.uniq <span class="hljs-property">@updatedIds</span>.concat ids
     <span class="hljs-property">@produceData</span>()
@@ -231,10 +237,25 @@ and then remove idType</p>
       ids = <span class="hljs-property">@updatedIds</span>.slice()
       <span class="hljs-property">@updatedIds</span>.length = <span class="hljs-number">0</span>
 
-      <span class="hljs-property">@produce</span> ids
+      <span class="hljs-property">@produce</span> ids</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p><strong>unsubscribe</strong> <br/>
+@params [options]: Object <br/>
+Contains the id to unsubscribe from.</p>
+<p>Unsubscribe from the producer.</p>
 
-
-  <span class="hljs-attribute">unsubscribe</span>: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribe</span>: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
     id = <span class="hljs-property">@idForOptions</span> options
     subscription = <span class="hljs-property">@subscriptions</span>[id]
     <span class="hljs-keyword">if</span> subscription?
@@ -243,10 +264,25 @@ and then remove idType</p>
         subscription.splice index, <span class="hljs-number">1</span>
 
         <span class="hljs-keyword">if</span> subscription.length <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
-          <span class="hljs-keyword">delete</span> <span class="hljs-property">@subscriptions</span>[id]
+          <span class="hljs-keyword">delete</span> <span class="hljs-property">@subscriptions</span>[id]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p><strong>produce</strong> <br/>
+@params [ids]: Array <br/>
+List of ids to produce data for. <br/></p>
+<p>Produce (decorated and validated) data for the ids.</p>
 
-
-  <span class="hljs-attribute">produce</span>: <span class="hljs-function"><span class="hljs-params">(ids)</span> -&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">produce</span>: <span class="hljs-function"><span class="hljs-params">(ids)</span> -&gt;</span>
     <span class="hljs-keyword">for</span> id <span class="hljs-keyword">in</span> ids
 
       data = <span class="hljs-property">@decorate</span> { <span class="hljs-attribute">id</span>: id }
