@@ -1,16 +1,25 @@
 # ## IdProducer
 #
-# An IdProducer is like a Producer, with the difference that it
-# listens to data changes for specific ids.
+# An IdProducer produces data for multiple models.
 #
-#
+# When an ordinary producer produces data, it produces all of its data to all of its subscribers.<br/>
+# An IdProducer produces data for multiple data models, each of which has its own id.
+# A subscription to an IdProducer specifies an id which corresponds to the model it is interested in.
+# When a model's data changes, the IdProducer produces the data for that model to the subscribers that
+# are subscribed to that model's id.
+
 
 class IdProducer extends Producer
 
+  # An array containing the ids of the models that have been added, removed
+  # or updated since the last time data was produced
   updatedIds: undefined
+
+  # A map of the subscriptions to this producer. The keys of this map are model ids
+  # and the values are arrays of subscription options objects.
   subscriptions: undefined
 
-  # This is the type of the internal ids. <br/>
+  # This is the type of the model ids.<br/>
   # This should be value types, and are numbers by default.<br/>
   # Trying to add a subscription with an invalid type throws an error.
   idType: typeof 0
@@ -22,9 +31,9 @@ class IdProducer extends Producer
     @subscriptions = {}
 
 
-  # **subscribe** <br/>
-  # @params [options]: Object <br/>
-  # Subsciption options.
+  # **subscribe**<br/>
+  # @param [options]: Object<br/>
+  # Subsciption options. Can be used to get the id to unsubscribe from.
   #
   # Subscribe to the producer, if the id is of valid type.
   subscribe: (options) ->
@@ -38,7 +47,15 @@ class IdProducer extends Producer
 
     @produceDataSync id
 
-
+  # **onDiffInRepository**<br/>
+  # @param [repository]: [Repository](Repository.html)<br/>
+  # The repository whose data changed.
+  #
+  # @param [diff]: Object<br/>
+  # An object containing arrays of data items that were added, removed and changed
+  #
+  # Handles updates from repositories. Filters the given models to only those that have subscriptions
+  # and produces data for them.
   onDiffInRepository: (repository, diff) ->
     self = @
 
@@ -59,12 +76,20 @@ class IdProducer extends Producer
     @produceDataForIds _.filter _.flatten [addedModelIds, removedModelIds, updatedModelIds]
 
 
-
+  # **produceDataForIds**<br/>
+  # @param [ids]: Array of idTypes<br/>
+  # An array of model ids to produce data for. Defaults to all subscribed models.<br/>
+  #
+  # Produces data for all given model ids.
   produceDataForIds: (ids = @allIds()) ->
     @updatedIds = _.uniq @updatedIds.concat ids
     @produceData()
 
-
+  # **allIds**<br/>
+  # @returns [ids]: Array of idTypes<br/>
+  # All subscribed ids.
+  #
+  # Returns an array of all subscribed ids.
   allIds: ->
     ids = _.keys @subscriptions
 
@@ -74,7 +99,14 @@ class IdProducer extends Producer
 
     ids
 
+  # **produceData**<br/>
+  # Aynchronously produces data for all models whose data has changed since the last time data was produced.
 
+  # **produceDataSync**<br/>
+  # @param [id]: idType<br/>
+  # The id to produce data for. Defaults to all ids whose data has changed since the last time data was produced.
+  #
+  # Synchronously produces data for all models whose data has changed since the last time data was produced. If an id is supplied, only data for the model with that id is produced.
   produceDataSync: (id) ->
     if id?
       @produce [id]
@@ -87,8 +119,8 @@ class IdProducer extends Producer
 
 
   # **unsubscribe** <br/>
-  # @params [options]: Object <br/>
-  # Contains the id to unsubscribe from.
+  # @param [options]: Object <br/>
+  # Subsciption options. Can be used to get the id to unsubscribe from. This must be the same reference as the options used when subscribing (i.e. ===).
   #
   # Unsubscribe from the producer.
   unsubscribe: (options) ->
@@ -102,9 +134,9 @@ class IdProducer extends Producer
         if subscription.length is 0
           delete @subscriptions[id]
 
-  # **produce** <br/>
-  # @params [ids]: Array <br/>
-  # List of ids to produce data for. <br/>
+  # **produce**<br/>
+  # @param [ids]: Array of idTypes<br/>
+  # List of ids to produce data for.
   #
   # Produce (decorated and validated) data for the ids.
   produce: (ids) ->
@@ -119,18 +151,51 @@ class IdProducer extends Producer
       , @
 
 
+  # **hasId**<br/>
+  # @param [id]: idType<br/>
+  # The id to check for.
+  #
+  # @returns [hasId]: boolean<br/>
+  # True if there is a subscription for the given id, false otherwise.
+  #
+  # Returns true if there is a subscription for the given id, otherwise returns false.
   hasId: (id) ->
     @subscriptions[id]?
 
 
+  # **shouldPropagateModelChange**<br/>
+  # @param [model]: Object<br/>
+  # A model
+  #
+  # @param [repository]: [Repository](Repository.html)<br/>
+  # The repository which contains the model.<br/>
+  #
+  # Called when a model changes to determine whether to produce data for the model. If true, then data for the model will be produced for this change.
   shouldPropagateModelChange: (model, repository) ->
     true
 
-
+  # **idForModel**<br/>
+  # @param [model]: Object<br/>
+  # A model
+  #
+  # @param [repository]: [Repository](Repository.html)<br/>
+  # The repository which contains the model.
+  #
+  # @returns [id]: idType<br/>
+  # The internal id of the given model.
+  #
+  # Translates a model to an id of type idType which uniquely identifies the model internally to this producer.
   idForModel: (model, repository) ->
     model.id
 
-
+  # **idForOptions**<br/>
+  # @param [options]: Object<br/>
+  # A subscription options object.
+  #
+  # @returns [id]: idType<br/>
+  # The internal id of the model that the subscription options refer to.
+  #
+  # Translates subscription options to an id of type idType which uniquely identifies the model internally to this producer.
   idForOptions: (options) ->
     options.id
 

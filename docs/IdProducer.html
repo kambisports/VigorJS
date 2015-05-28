@@ -131,16 +131,18 @@
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
               <h2 id="idproducer">IdProducer</h2>
-<p>An IdProducer is like a Producer, with the difference that it
-listens to data changes for specific ids.</p>
+<p>An IdProducer produces data for multiple models.</p>
+<p>When an ordinary producer produces data, it produces all of its data to all of its subscribers.<br/>
+An IdProducer produces data for multiple data models, each of which has its own id.
+A subscription to an IdProducer specifies an id which corresponds to the model it is interested in.
+When a model’s data changes, the IdProducer produces the data for that model to the subscribers that
+are subscribed to that model’s id.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">IdProducer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Producer</span></span>
 
-  <span class="hljs-attribute">updatedIds</span>: <span class="hljs-literal">undefined</span>
-  <span class="hljs-attribute">subscriptions</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">IdProducer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Producer</span></span></pre></div></div>
             
         </li>
         
@@ -151,7 +153,39 @@ listens to data changes for specific ids.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>This is the type of the internal ids. <br/>
+              <p>An array containing the ids of the models that have been added, removed
+or updated since the last time data was produced</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">updatedIds</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>A map of the subscriptions to this producer. The keys of this map are model ids
+and the values are arrays of subscription options objects.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">subscriptions</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>This is the type of the model ids.<br/>
 This should be value types, and are numbers by default.<br/>
 Trying to add a subscription with an invalid type throws an error.</p>
 
@@ -168,15 +202,15 @@ Trying to add a subscription with an invalid type throws an error.</p>
         </li>
         
         
-        <li id="section-3">
+        <li id="section-5">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
+                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p><strong>subscribe</strong> <br/>
-@params [options]: Object <br/>
-Subsciption options.</p>
+              <p><strong>subscribe</strong><br/>
+@param [options]: Object<br/>
+Subsciption options. Can be used to get the id to unsubscribe from.</p>
 <p>Subscribe to the producer, if the id is of valid type.</p>
 
             </div>
@@ -190,10 +224,28 @@ Subsciption options.</p>
     <span class="hljs-keyword">else</span>
       <span class="hljs-property">@subscriptions</span>[id] = [options]
 
-    <span class="hljs-property">@produceDataSync</span> id
+    <span class="hljs-property">@produceDataSync</span> id</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p><strong>onDiffInRepository</strong><br/>
+@param [repository]: <a href="Repository.html">Repository</a><br/>
+The repository whose data changed.</p>
+<p>@param [diff]: Object<br/>
+An object containing arrays of data items that were added, removed and changed</p>
+<p>Handles updates from repositories. Filters the given models to only those that have subscriptions
+and produces data for them.</p>
 
-
-  <span class="hljs-attribute">onDiffInRepository</span>: <span class="hljs-function"><span class="hljs-params">(repository, diff)</span> -&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">onDiffInRepository</span>: <span class="hljs-function"><span class="hljs-params">(repository, diff)</span> -&gt;</span>
     self = @
 <span class="hljs-function">
     <span class="hljs-title">addRemoveMap</span> = <span class="hljs-params">(model)</span> -&gt;</span>
@@ -210,26 +262,84 @@ Subsciption options.</p>
     removedModelIds = _.map diff.removed, addRemoveMap
     updatedModelIds = _.map diff.changed, changeMap
 
-    <span class="hljs-property">@produceDataForIds</span> _.filter _.flatten [addedModelIds, removedModelIds, updatedModelIds]
+    <span class="hljs-property">@produceDataForIds</span> _.filter _.flatten [addedModelIds, removedModelIds, updatedModelIds]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p><strong>produceDataForIds</strong><br/>
+@param [ids]: Array of idTypes<br/>
+An array of model ids to produce data for. Defaults to all subscribed models.<br/></p>
+<p>Produces data for all given model ids.</p>
 
-
-
-  <span class="hljs-attribute">produceDataForIds</span>: <span class="hljs-function"><span class="hljs-params">(ids = <span class="hljs-property">@allIds</span>())</span> -&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">produceDataForIds</span>: <span class="hljs-function"><span class="hljs-params">(ids = <span class="hljs-property">@allIds</span>())</span> -&gt;</span>
     <span class="hljs-property">@updatedIds</span> = _.uniq <span class="hljs-property">@updatedIds</span>.concat ids
-    <span class="hljs-property">@produceData</span>()
+    <span class="hljs-property">@produceData</span>()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p><strong>allIds</strong><br/>
+@returns [ids]: Array of idTypes<br/>
+All subscribed ids.</p>
+<p>Returns an array of all subscribed ids.</p>
 
-
-  <span class="hljs-attribute">allIds</span>: <span class="hljs-function">-&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">allIds</span>: <span class="hljs-function">-&gt;</span>
     ids = _.keys <span class="hljs-property">@subscriptions</span>
 
     <span class="hljs-keyword">if</span> <span class="hljs-property">@idType</span> <span class="hljs-keyword">is</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-number">0</span>)
       ids = _.map ids, <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span>
         parseInt id, <span class="hljs-number">10</span>
 
-    ids
+    ids</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p><strong>produceData</strong><br/>
+Aynchronously produces data for all models whose data has changed since the last time data was produced.</p>
 
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p><strong>produceDataSync</strong><br/>
+@param [id]: idType<br/>
+The id to produce data for. Defaults to all ids whose data has changed since the last time data was produced.</p>
+<p>Synchronously produces data for all models whose data has changed since the last time data was produced. If an id is supplied, only data for the model with that id is produced.</p>
 
-  <span class="hljs-attribute">produceDataSync</span>: <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">produceDataSync</span>: <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span>
     <span class="hljs-keyword">if</span> id?
       <span class="hljs-property">@produce</span> [id]
 
@@ -242,15 +352,15 @@ Subsciption options.</p>
         </li>
         
         
-        <li id="section-4">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-4">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p><strong>unsubscribe</strong> <br/>
-@params [options]: Object <br/>
-Contains the id to unsubscribe from.</p>
+@param [options]: Object <br/>
+Subsciption options. Can be used to get the id to unsubscribe from. This must be the same reference as the options used when subscribing (i.e. ===).</p>
 <p>Unsubscribe from the producer.</p>
 
             </div>
@@ -269,15 +379,15 @@ Contains the id to unsubscribe from.</p>
         </li>
         
         
-        <li id="section-5">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p><strong>produce</strong> <br/>
-@params [ids]: Array <br/>
-List of ids to produce data for. <br/></p>
+              <p><strong>produce</strong><br/>
+@param [ids]: Array of idTypes<br/>
+List of ids to produce data for.</p>
 <p>Produce (decorated and validated) data for the ids.</p>
 
             </div>
@@ -291,22 +401,92 @@ List of ids to produce data for. <br/></p>
       _.each <span class="hljs-property">@registeredComponents</span>, <span class="hljs-function"><span class="hljs-params">(component)</span> -&gt;</span>
         <span class="hljs-keyword">if</span> id <span class="hljs-keyword">is</span> <span class="hljs-property">@idForOptions</span> component.options
           component.callback data
-      , @
+      , @</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p><strong>hasId</strong><br/>
+@param [id]: idType<br/>
+The id to check for.</p>
+<p>@returns [hasId]: boolean<br/>
+True if there is a subscription for the given id, false otherwise.</p>
+<p>Returns true if there is a subscription for the given id, otherwise returns false.</p>
 
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">hasId</span>: <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span>
+    <span class="hljs-property">@subscriptions</span>[id]?</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p><strong>shouldPropagateModelChange</strong><br/>
+@param [model]: Object<br/>
+A model</p>
+<p>@param [repository]: <a href="Repository.html">Repository</a><br/>
+The repository which contains the model.<br/></p>
+<p>Called when a model changes to determine whether to produce data for the model. If true, then data for the model will be produced for this change.</p>
 
-  <span class="hljs-attribute">hasId</span>: <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span>
-    <span class="hljs-property">@subscriptions</span>[id]?
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">shouldPropagateModelChange</span>: <span class="hljs-function"><span class="hljs-params">(model, repository)</span> -&gt;</span>
+    <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p><strong>idForModel</strong><br/>
+@param [model]: Object<br/>
+A model</p>
+<p>@param [repository]: <a href="Repository.html">Repository</a><br/>
+The repository which contains the model.</p>
+<p>@returns [id]: idType<br/>
+The internal id of the given model.</p>
+<p>Translates a model to an id of type idType which uniquely identifies the model internally to this producer.</p>
 
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">idForModel</span>: <span class="hljs-function"><span class="hljs-params">(model, repository)</span> -&gt;</span>
+    model.id</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p><strong>idForOptions</strong><br/>
+@param [options]: Object<br/>
+A subscription options object.</p>
+<p>@returns [id]: idType<br/>
+The internal id of the model that the subscription options refer to.</p>
+<p>Translates subscription options to an id of type idType which uniquely identifies the model internally to this producer.</p>
 
-  <span class="hljs-attribute">shouldPropagateModelChange</span>: <span class="hljs-function"><span class="hljs-params">(model, repository)</span> -&gt;</span>
-    <span class="hljs-literal">true</span>
-
-
-  <span class="hljs-attribute">idForModel</span>: <span class="hljs-function"><span class="hljs-params">(model, repository)</span> -&gt;</span>
-    model.id
-
-
-  <span class="hljs-attribute">idForOptions</span>: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">idForOptions</span>: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
     options.id
 
 
