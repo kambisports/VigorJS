@@ -1,37 +1,51 @@
 do ->
-  # the ServiceChannel class is private to Service
-  # A service channel does not perform fetches itself, but asks the service to fetch with the
-  # consolidated params
+  # ## ServiceChannel
+  # The ServiceChannel class is private to the APIService class. Service channels are used to group subscriptions to an
+  # API service into sets of subscriptions whose requirements can be fulfilled with a single request, thus reducing
+  # network usage.<br/>
+  # Each subscription to the channel may have a polling interval, and the channel will ask the service that created
+  # it to perform a fetch when the polling intervals elapse.<br/>
+  # Service channels are not used for post requests, which cannot be consolidated.
   class ServiceChannel
 
+    # An array of subscription objects, each of which may contain a pollingInterval in ms, and a params object
     subscribers: undefined
+
+    # The minimum polling interval of the subscribers, or 0
     pollingInterval: undefined
+
+    # The unix timestamp of the last poll
     lastPollTime: undefined
+
+    # A timeout id, as returned by window.setTimeout, for the next poll.
     timeout: undefined
+
+    # The name of this channel; used by the API service to uniquely identify it.
     name: undefined
 
-
+    # **constructor**<br/>
+    # If subscribers are provided, the requests will start immediately.
     constructor: (@_window, @name, @service, @subscribers) ->
       @params = @getParams()
       @restart()
 
 
-    # restart the channel. This takes into account the time elapsed
-    # since the last poll as well as the poll interval
+    # **restart**<br/>
+    # Restarts the channel, causing it to schedule the next request.<br/>
+    # This method can be called at any time, since it takes into account the time since the last request.
     restart: ->
       @pollingInterval = @getPollingInterval()
 
       if @lastPollTime?
         elapsedWait = @_window.Date.now() - @lastPollTime
-        wait = @pollingInterval - elapsedWait
-
-        if wait < 0
-          wait = 0
-      else wait = 0
+        wait = Math.max @pollingInterval - elapsedWait, 0
+      else
+        wait = 0
 
       @setupNextFetch wait
 
-    # stopping the channel cleans up and asks the service to remove it
+    # **stop**<br/>
+    # Stops the channel and asks the service to remove it.
     stop: ->
       @_window.clearTimeout @timeout
       @timeout = undefined
@@ -39,24 +53,26 @@ do ->
       @params = undefined
       @service.removeChannel @
 
-    # sets up a timeout to execute the next fetch
-    # optionally given a wait value to override the polling interval, for example
-    # when restarting after changing the polling interval
+    # **setupNextFetch**<br/>
+    # @param [wait]: number<br/>
+    # The amount of time to wait until the fetch. Defaults to the current polling interval.
+    #
+    # Schedules the next fetch to start the given number of ms in the future.
     setupNextFetch: (wait = @pollingInterval) ->
 
       @_window.clearTimeout @timeout
+
       @timeout = @_window.setTimeout (_.bind ->
         @lastPollTime = @_window.Date.now()
         @service.fetch @params
 
-        # if there are any requests with a zero polling interval, we can
-        # and should remove them
+        # remove requests with a zero polling interval since the request has now been made
         @cullImmediateRequests()
 
         # check to make sure we still have subscribers after culling
         # immediate requests
         if @subscribers?
-
+          # if we still have subscribers, set up the next fetch
           if @pollingInterval > 0
             @setupNextFetch()
           else
@@ -64,6 +80,11 @@ do ->
       , @), wait
 
 
+    # **addSubscription**<br/>
+    # @param [subscriber]: Object<br/>
+    # The subscription to add. May contain a pollingInterval in ms, and a params object.
+    #
+    # Add a subscription to the channel, causing the params to update. A fetch may be scheduled or rescheduled.
     addSubscription: (subscriber) ->
       unless _.contains @subscribers, subscriber
         @subscribers.push subscriber
@@ -71,6 +92,12 @@ do ->
         @onSubscriptionsChanged()
 
 
+    # **removeSubscription**<br/>
+    # @param [subscriber]: Object<br/>
+    # The subscription to remove. This must be the same reference as the object used when subscribing (i.e. ===).
+    #
+    # Remove a subscription to the channel, causing the params to update. The next fetch may be rescheduled or the
+    # channel may be stopped if this is the last subscriber.
     removeSubscription: (subscriber) ->
       if _.contains @subscribers, subscriber
         @subscribers = _.without @subscribers, subscriber
@@ -80,7 +107,8 @@ do ->
         else
           @onSubscriptionsChanged()
 
-
+    # **onSubscriptionsChanged**<br/>
+    # Updates the params and reschedules the next fetch if necessary.
     onSubscriptionsChanged: ->
       params = @getParams()
       didParamsChange = not _.isEqual params, @params
@@ -101,9 +129,12 @@ do ->
         @restart()
 
 
-    # returns the lowest polling interval of subscribers
-    # if no subscriber has a polling interval, we return 0 which represents
-    # an immediate request on add
+    # **getPollingInterval**<br/>
+    # @returns [pollingInterval]: number<br/>
+    # The current polling interval in ms.
+    #
+    # Returns the lowest polling interval of subscribers. If no subscriber has a polling interval,
+    # returns 0 which represents an immediate request.
     getPollingInterval: ->
 
       pollingInterval = _.min _.map @subscribers, (subscriber) ->
@@ -111,16 +142,22 @@ do ->
 
       if pollingInterval is Infinity then 0 else pollingInterval
 
-    # a channel always holds an up-to-date copy of the consilidated params
-    # this method updates those params, and is called whenever a subscriber is
-    # added or removed
+
+    # **getParams**<br/>
+    # @returns [params]: Object<br/>
+    # The current consolidated params for this channel.
+    #
+    # A channel always holds an up-to-date copy of the consilidated params.
+    # This method updates those params, and is called whenever a subscriber is
+    # added or removed.
     getParams: ->
       @service.consolidateParams (_.filter _.map @subscribers, (subscriber) ->
         subscriber.params
       ), @name
 
 
-    # remove all subscribers with no polling interval
+    # **cullImmediateRequests**<br/>
+    # Removes all subscribers without a polling interval.
     cullImmediateRequests: ->
       immediateRequests = _.filter @subscribers, (subscriber) ->
         (subscriber.pollingInterval is undefined) or (subscriber.pollingInterval is 0)

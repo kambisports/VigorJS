@@ -144,24 +144,17 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>the ServiceChannel class is private to Service
-A service channel does not perform fetches itself, but asks the service to fetch with the
-consolidated params</p>
+              <h2 id="servicechannel">ServiceChannel</h2>
+<p>The ServiceChannel class is private to the APIService class. Service channels are used to group subscriptions to an
+API service into sets of subscriptions whose requirements can be fulfilled with a single request, thus reducing
+network usage.<br/>
+Each subscription to the channel may have a polling interval, and the channel will ask the service that created
+it to perform a fetch when the polling intervals elapse.<br/>
+Service channels are not used for post requests, which cannot be consolidated.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ServiceChannel</span></span>
-
-    <span class="hljs-attribute">subscribers</span>: <span class="hljs-literal">undefined</span>
-    <span class="hljs-attribute">pollingInterval</span>: <span class="hljs-literal">undefined</span>
-    <span class="hljs-attribute">lastPollTime</span>: <span class="hljs-literal">undefined</span>
-    <span class="hljs-attribute">timeout</span>: <span class="hljs-literal">undefined</span>
-    <span class="hljs-attribute">name</span>: <span class="hljs-literal">undefined</span>
-
-
-    <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@_window</span>, <span class="hljs-property">@name</span>, <span class="hljs-property">@service</span>, <span class="hljs-property">@subscribers</span>)</span> -&gt;</span>
-      <span class="hljs-property">@params</span> = <span class="hljs-property">@getParams</span>()
-      <span class="hljs-property">@restart</span>()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ServiceChannel</span></span></pre></div></div>
             
         </li>
         
@@ -172,23 +165,11 @@ consolidated params</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>restart the channel. This takes into account the time elapsed
-since the last poll as well as the poll interval</p>
+              <p>An array of subscription objects, each of which may contain a pollingInterval in ms, and a params object</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">restart</span>: <span class="hljs-function">-&gt;</span>
-      <span class="hljs-property">@pollingInterval</span> = <span class="hljs-property">@getPollingInterval</span>()
-
-      <span class="hljs-keyword">if</span> <span class="hljs-property">@lastPollTime</span>?
-        elapsedWait = <span class="hljs-property">@_window</span>.Date.now() - <span class="hljs-property">@lastPollTime</span>
-        wait = <span class="hljs-property">@pollingInterval</span> - elapsedWait
-
-        <span class="hljs-keyword">if</span> wait &lt; <span class="hljs-number">0</span>
-          wait = <span class="hljs-number">0</span>
-      <span class="hljs-keyword">else</span> wait = <span class="hljs-number">0</span>
-
-      <span class="hljs-property">@setupNextFetch</span> wait</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">subscribers</span>: <span class="hljs-literal">undefined</span></pre></div></div>
             
         </li>
         
@@ -199,7 +180,112 @@ since the last poll as well as the poll interval</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>stopping the channel cleans up and asks the service to remove it</p>
+              <p>The minimum polling interval of the subscribers, or 0</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">pollingInterval</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>The unix timestamp of the last poll</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">lastPollTime</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>A timeout id, as returned by window.setTimeout, for the next poll.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">timeout</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>The name of this channel; used by the API service to uniquely identify it.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">name</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p><strong>constructor</strong><br/>
+If subscribers are provided, the requests will start immediately.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@_window</span>, <span class="hljs-property">@name</span>, <span class="hljs-property">@service</span>, <span class="hljs-property">@subscribers</span>)</span> -&gt;</span>
+      <span class="hljs-property">@params</span> = <span class="hljs-property">@getParams</span>()
+      <span class="hljs-property">@restart</span>()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p><strong>restart</strong><br/>
+Restarts the channel, causing it to schedule the next request.<br/>
+This method can be called at any time, since it takes into account the time since the last request.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">restart</span>: <span class="hljs-function">-&gt;</span>
+      <span class="hljs-property">@pollingInterval</span> = <span class="hljs-property">@getPollingInterval</span>()
+
+      <span class="hljs-keyword">if</span> <span class="hljs-property">@lastPollTime</span>?
+        elapsedWait = <span class="hljs-property">@_window</span>.Date.now() - <span class="hljs-property">@lastPollTime</span>
+        wait = Math.max <span class="hljs-property">@pollingInterval</span> - elapsedWait, <span class="hljs-number">0</span>
+      <span class="hljs-keyword">else</span>
+        wait = <span class="hljs-number">0</span>
+
+      <span class="hljs-property">@setupNextFetch</span> wait</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p><strong>stop</strong><br/>
+Stops the channel and asks the service to remove it.</p>
 
             </div>
             
@@ -213,21 +299,23 @@ since the last poll as well as the poll interval</p>
         </li>
         
         
-        <li id="section-5">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p>sets up a timeout to execute the next fetch
-optionally given a wait value to override the polling interval, for example
-when restarting after changing the polling interval</p>
+              <p><strong>setupNextFetch</strong><br/>
+@param [wait]: number<br/>
+The amount of time to wait until the fetch. Defaults to the current polling interval.</p>
+<p>Schedules the next fetch to start the given number of ms in the future.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">setupNextFetch</span>: <span class="hljs-function"><span class="hljs-params">(wait = <span class="hljs-property">@pollingInterval</span>)</span> -&gt;</span>
 
       <span class="hljs-property">@_window</span>.clearTimeout <span class="hljs-property">@timeout</span>
+
       <span class="hljs-property">@timeout</span> = <span class="hljs-property">@_window</span>.setTimeout (_.bind -&gt;
         <span class="hljs-property">@lastPollTime</span> = <span class="hljs-property">@_window</span>.Date.now()
         <span class="hljs-property">@service</span>.fetch <span class="hljs-property">@params</span></pre></div></div>
@@ -235,14 +323,13 @@ when restarting after changing the polling interval</p>
         </li>
         
         
-        <li id="section-6">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p>if there are any requests with a zero polling interval, we can
-and should remove them</p>
+              <p>remove requests with a zero polling interval since the request has now been made</p>
 
             </div>
             
@@ -251,44 +338,101 @@ and should remove them</p>
         </li>
         
         
-        <li id="section-7">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>check to make sure we still have subscribers after culling
 immediate requests</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> <span class="hljs-property">@subscribers</span>?
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> <span class="hljs-property">@subscribers</span>?</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>if we still have subscribers, set up the next fetch</p>
 
-          <span class="hljs-keyword">if</span> <span class="hljs-property">@pollingInterval</span> &gt; <span class="hljs-number">0</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> <span class="hljs-property">@pollingInterval</span> &gt; <span class="hljs-number">0</span>
             <span class="hljs-property">@setupNextFetch</span>()
           <span class="hljs-keyword">else</span>
             <span class="hljs-property">@timeout</span> = <span class="hljs-literal">undefined</span>
-      , @), wait
+      , @), wait</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p><strong>addSubscription</strong><br/>
+@param [subscriber]: Object<br/>
+The subscription to add. May contain a pollingInterval in ms, and a params object.</p>
+<p>Add a subscription to the channel, causing the params to update. A fetch may be scheduled or rescheduled.</p>
 
-
-    <span class="hljs-attribute">addSubscription</span>: <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">addSubscription</span>: <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
       <span class="hljs-keyword">unless</span> _.contains <span class="hljs-property">@subscribers</span>, subscriber
         <span class="hljs-property">@subscribers</span>.push subscriber
 
-        <span class="hljs-property">@onSubscriptionsChanged</span>()
+        <span class="hljs-property">@onSubscriptionsChanged</span>()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p><strong>removeSubscription</strong><br/>
+@param [subscriber]: Object<br/>
+The subscription to remove. This must be the same reference as the object used when subscribing (i.e. ===).</p>
+<p>Remove a subscription to the channel, causing the params to update. The next fetch may be rescheduled or the
+channel may be stopped if this is the last subscriber.</p>
 
-
-    <span class="hljs-attribute">removeSubscription</span>: <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">removeSubscription</span>: <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
       <span class="hljs-keyword">if</span> _.contains <span class="hljs-property">@subscribers</span>, subscriber
         <span class="hljs-property">@subscribers</span> = _.without <span class="hljs-property">@subscribers</span>, subscriber
 
         <span class="hljs-keyword">if</span> <span class="hljs-property">@subscribers</span>.length <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
           <span class="hljs-property">@stop</span>()
         <span class="hljs-keyword">else</span>
-          <span class="hljs-property">@onSubscriptionsChanged</span>()
+          <span class="hljs-property">@onSubscriptionsChanged</span>()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p><strong>onSubscriptionsChanged</strong><br/>
+Updates the params and reschedules the next fetch if necessary.</p>
 
-
-    <span class="hljs-attribute">onSubscriptionsChanged</span>: <span class="hljs-function">-&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">onSubscriptionsChanged</span>: <span class="hljs-function">-&gt;</span>
       params = <span class="hljs-property">@getParams</span>()
       didParamsChange = <span class="hljs-keyword">not</span> _.isEqual params, <span class="hljs-property">@params</span>
 
@@ -310,15 +454,17 @@ immediate requests</p>
         </li>
         
         
-        <li id="section-8">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>returns the lowest polling interval of subscribers
-if no subscriber has a polling interval, we return 0 which represents
-an immediate request on add</p>
+              <p><strong>getPollingInterval</strong><br/>
+@returns [pollingInterval]: number<br/>
+The current polling interval in ms.</p>
+<p>Returns the lowest polling interval of subscribers. If no subscriber has a polling interval,
+returns 0 which represents an immediate request.</p>
 
             </div>
             
@@ -332,15 +478,18 @@ an immediate request on add</p>
         </li>
         
         
-        <li id="section-9">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p>a channel always holds an up-to-date copy of the consilidated params
-this method updates those params, and is called whenever a subscriber is
-added or removed</p>
+              <p><strong>getParams</strong><br/>
+@returns [params]: Object<br/>
+The current consolidated params for this channel.</p>
+<p>A channel always holds an up-to-date copy of the consilidated params.
+This method updates those params, and is called whenever a subscriber is
+added or removed.</p>
 
             </div>
             
@@ -352,13 +501,14 @@ added or removed</p>
         </li>
         
         
-        <li id="section-10">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
-              <p>remove all subscribers with no polling interval</p>
+              <p><strong>cullImmediateRequests</strong><br/>
+Removes all subscribers without a polling interval.</p>
 
             </div>
             
@@ -369,11 +519,11 @@ added or removed</p>
         </li>
         
         
-        <li id="section-11">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>remove the immediate requests. this will never trigger a
 restart because the polling interval is zero and cannot be lowered</p>
@@ -392,11 +542,11 @@ restart because the polling interval is zero and cannot be lowered</p>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>optionally pass in a window object to stub Date, set/clearTimeout for testing</p>
 
@@ -410,11 +560,11 @@ restart because the polling interval is zero and cannot be lowered</p>
         </li>
         
         
-        <li id="section-13">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>sync is called with the model as context
 url and parse are called with the service as the context
@@ -436,11 +586,11 @@ parse is passed the sync response and options but not the model</p>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>overridable
 convert an array of params for the subscribers on this channel into
@@ -457,11 +607,11 @@ because all the params are identical anyway</p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>overridable
 return the name of the channel that should request data for the given params
@@ -474,11 +624,11 @@ by default, subscribers with identical params are put on the same channel</p>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>null/undefined should be equivalent to an empty params object</p>
 
@@ -489,11 +639,11 @@ by default, subscribers with identical params are put on the same channel</p>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p>overridable
 return true if the service should fetch immediately after the given params update</p>
@@ -506,11 +656,11 @@ return true if the service should fetch immediately after the given params updat
         </li>
         
         
-        <li id="section-18">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>overridable fetch/post success/error callbacks</p>
 
@@ -524,11 +674,11 @@ return true if the service should fetch immediately after the given params updat
         </li>
         
         
-        <li id="section-19">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>overridable model sync method</p>
 
@@ -540,11 +690,11 @@ return true if the service should fetch immediately after the given params updat
         </li>
         
         
-        <li id="section-20">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>overridable model url method</p>
 
@@ -556,11 +706,11 @@ return true if the service should fetch immediately after the given params updat
         </li>
         
         
-        <li id="section-21">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>overridable model parse method</p>
 
@@ -572,11 +722,11 @@ return true if the service should fetch immediately after the given params updat
         </li>
         
         
-        <li id="section-22">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>an object referencing the channels owned by this service</p>
 

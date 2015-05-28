@@ -618,10 +618,7 @@
           this.pollingInterval = this.getPollingInterval();
           if (this.lastPollTime != null) {
             elapsedWait = this._window.Date.now() - this.lastPollTime;
-            wait = this.pollingInterval - elapsedWait;
-            if (wait < 0) {
-              wait = 0;
-            }
+            wait = Math.max(this.pollingInterval - elapsedWait, 0);
           } else {
             wait = 0;
           }
