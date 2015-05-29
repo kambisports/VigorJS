@@ -721,6 +721,8 @@
 
       })();
       APIService = (function() {
+        APIService.prototype.channels = void 0;
+
         function APIService(_window) {
           var service;
           this._window = _window != null ? _window : window;
@@ -770,8 +772,6 @@
         APIService.prototype.parse = function(resp, options, model) {
           return Backbone.Model.prototype.parse.call(model);
         };
-
-        APIService.prototype.channels = void 0;
 
         APIService.prototype.removeChannel = function(channel) {
           return this.channels = _.without(this.channels, channel);
