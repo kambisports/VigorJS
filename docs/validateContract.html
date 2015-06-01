@@ -130,7 +130,22 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              
+              <p><strong>ValidateContract</strong><br/>
+@param [contract]: Object<br/>
+The contract to validate the data against. The contract should match the shape of the expected data object and
+contain primitive values of the same type as the expected values.</p>
+<p>@param [dataToCompare]: Object<br/>
+The data to validate.</p>
+<p>@param [comparatorId]: String<br/>
+A human-readable name for the comparator, to be used to make nice error messages when things go wrong.</p>
+<p>@param [verb]: String<br/>
+A human-readable name for the action that the comparator is trying to achieve, to be used to make nice error
+messages when things go wrong. The default value is <code>receiving</code>.</p>
+<p>@returns <code>true</code> if the data is valid according to the given contract, <code>false</code> otherwise.</p>
+<p>Validates the given data according to the given contract. If the shape or any of the primitive types of the data
+object differ from the contract object, the contract is violated and this function returns <code>false</code>. Otherwise, it
+returns <code>true</code>.</p>
+
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">validateContract</span> = <span class="hljs-params">(contract, dataToCompare, comparatorId, verb = <span class="hljs-string">'recieving'</span>)</span> -&gt;</span>

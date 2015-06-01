@@ -1,3 +1,23 @@
+# **ValidateContract**<br/>
+# @param [contract]: Object<br/>
+# The contract to validate the data against. The contract should match the shape of the expected data object and
+# contain primitive values of the same type as the expected values.
+#
+# @param [dataToCompare]: Object<br/>
+# The data to validate.
+#
+# @param [comparatorId]: String<br/>
+# A human-readable name for the comparator, to be used to make nice error messages when things go wrong.
+#
+# @param [verb]: String<br/>
+# A human-readable name for the action that the comparator is trying to achieve, to be used to make nice error
+# messages when things go wrong. The default value is `receiving`.
+#
+# @returns `true` if the data is valid according to the given contract, `false` otherwise.
+#
+# Validates the given data according to the given contract. If the shape or any of the primitive types of the data
+# object differ from the contract object, the contract is violated and this function returns `false`. Otherwise, it
+# returns `true`.
 validateContract = (contract, dataToCompare, comparatorId, verb = 'recieving') ->
   unless Vigor.settings.validateContract then return
   unless contract
