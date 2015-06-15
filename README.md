@@ -1,7 +1,7 @@
 # Vigorjs
 
 ## Introduction
-As applications grows they become harder and harder to maintain, Vigorjs is a small library built ontop of Backbone to address this issue. 
+As applications grows they become harder and harder to maintain, Vigorjs is a small library built ontop of Backbone to address this issue.
 
 The main goal of Vigorjs is to keep the application modular and separate gui components, data handling, and api communication.
 
@@ -23,7 +23,7 @@ The main goal of Vigorjs is to keep the application modular and separate gui com
 	- Repository
 		- [Repository.coffee](./docs/Repository.html)
 		- [ServiceRepository.coffee](./docs/ServiceRepository.html)
-	
+
 	- Services
 		- [APIService.coffee](./docs/APIService.html)
 
@@ -34,19 +34,19 @@ The main goal of Vigorjs is to keep the application modular and separate gui com
 ## Concept
 By introducing the concepts of ***Components***, ***Producers***, ***Repositories***, ***Services*** and an ***EventBus*** we want to clarify and simplify the responsibilities and actions of each layer within a large scale Backbone application.
 
-![](./docs/vigorjs.png) 
+![](./docs/vigorjs.png)
 
-A simplified description of the responsibilities fore each concept is as follows: 
+A simplified description of the responsibilities fore each concept is as follows:
 
 
 ### Components
-[ComponentBase.coffee](./docs/ComponentBase.html), 
-[ComponentView.coffee](./docs/ComponentView.html), 
+[ComponentBase.coffee](./docs/ComponentBase.html),
+[ComponentView.coffee](./docs/ComponentView.html),
 [ComponentViewModel.coffee](./docs/ComponentViewModel.html)
 
-- A ***Component*** is the gui component presented to the end user in the form of a package containing one or multiple views, view-models, collections etc. 
+- A ***Component*** is the gui component presented to the end user in the form of a package containing one or multiple views, view-models, collections etc.
 
-- A ***Component***  should be as simple, and easy to reuse. Main focus should be on rendering, handle user interaction etc. 
+- A ***Component***  should be as simple, and easy to reuse. Main focus should be on rendering, handle user interaction etc.
 
 - A ***Component*** should be served with data tailored for its needs.
 
@@ -57,8 +57,8 @@ A simplified description of the responsibilities fore each concept is as follows
 
 
 ###Producers
-[Producer.coffee](./docs/Producer.html), 
-[IdProducer.coffee](./docs/IdProducer.html), 
+[Producer.coffee](./docs/Producer.html),
+[IdProducer.coffee](./docs/IdProducer.html),
 [SubscriptionKeys.coffee](./docs/SubscriptionKeys.html)
 
 - A ***Producer*** is the link between a ***Component*** and a ***Repository***
@@ -67,7 +67,7 @@ A simplified description of the responsibilities fore each concept is as follows
 
 - A ***Producer*** produces data on only one ***SubscriptionKey*** (each producer only does one thing)
 
-- A ***Producer*** produce new data on its ***SubscriptionKey*** everytime any relevant data changes. 
+- A ***Producer*** produce new data on its ***SubscriptionKey*** everytime any relevant data changes.
 
 - A ***Producer***  subscribes to one or more ***Repositories*** to be notified when data changes and then produces new data.
 
@@ -80,7 +80,7 @@ A simplified description of the responsibilities fore each concept is as follows
 
 
 ###Repositories
-[Repository.coffee](./docs/Repository.html), 
+[Repository.coffee](./docs/Repository.html),
 [ServiceRepository.coffee](./docs/ServiceRepository.html)
 
 - A ***Repository*** is the link between a ***Producer*** and a ***Service***
@@ -107,7 +107,7 @@ A simplified description of the responsibilities fore each concept is as follows
 
 
 ###EventBus
-[EventBus.coffee](./docs/EventBus.html), 
+[EventBus.coffee](./docs/EventBus.html),
 [EventKeys.coffee](./docs/EventKeys.html)
 
 - The ***EventBus*** is the communication link between components and other parts of a application
@@ -118,8 +118,8 @@ A simplified description of the responsibilities fore each concept is as follows
 
 
 ## Dependencies
-[jQuery](http://jquery.com/), 
-[Backbone](http://backbonejs.org/), 
+[jQuery](http://jquery.com/),
+[Backbone](http://backbonejs.org/),
 [Underscore](http://underscorejs.org/)
 
 - ***Vigorjs*** is dependent on ***jQuery***, ***Backbone*** and ***Underscore***
@@ -134,5 +134,5 @@ A simplified description of the responsibilities fore each concept is as follows
 
 ## Hello World
 
-## Best practises 
+## Best practises
 (TODO: Create better examples showing how to use the library)

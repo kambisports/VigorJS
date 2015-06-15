@@ -138,7 +138,7 @@ class IdProducer extends Producer
   # @param [ids]: Array of idTypes<br/>
   # List of ids to produce data for.
   #
-  # Produce (decorated and validated) data for the ids.
+  # Produce (gathered, decorated and validated) data for the ids.
   produce: (ids) ->
     for id in ids
 
@@ -153,6 +153,10 @@ class IdProducer extends Producer
           component.callback data
       , @
 
+  # **currentData**<br/>
+  # @param [id]: The id to produce data for
+  #
+  # This is where the actual collection of the data is done. <br/>
   currentData: (id) ->
     # default implementation is a noop
 
