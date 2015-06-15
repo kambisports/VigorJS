@@ -2,7 +2,7 @@ gulp = require 'gulp'
 
 gulp.task 'default', ['clean'], ->
   # Run build tasks
-  gulp.start 'coffee',
+  gulp.start 'build-coffee',
              'server',
              'watch'
 

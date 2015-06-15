@@ -16,6 +16,8 @@ banner = ['/**',
   ' */',
   ''].join('\n');
 
+gulp.task 'build-coffee', ['coffee', 'docco'], ->
+
 gulp.task 'coffee', ->
   gulp.src(config.bootstrap)
     .pipe include()

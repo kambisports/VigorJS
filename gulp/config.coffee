@@ -5,6 +5,7 @@ config =
   serverTarget: './examples'
   dest: './dist'
   src: './src/'
+  docs: './docs'
   istanbulEntryPoint: ['./dist/vigor.js']
   specFiles: ['./test/spec/**/*.coffee']
   fileTypes: ['.js', '.css', '.txt', '.ico', '.html', '.png']
