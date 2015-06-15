@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>APIService.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="bootstrap.html">
+                  bootstrap.coffee
+                </a>
+              
+                
+                <a class="source" href="EventBus.html">
+                  EventBus.coffee
+                </a>
+              
+                
+                <a class="source" href="EventKeys.html">
+                  EventKeys.coffee
+                </a>
+              
+                
+                <a class="source" href="SubscriptionKeys.html">
+                  SubscriptionKeys.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentBase.html">
+                  ComponentBase.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentView.html">
+                  ComponentView.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentViewModel.html">
+                  ComponentViewModel.coffee
+                </a>
+              
+                
+                <a class="source" href="DataCommunicationManager.html">
+                  DataCommunicationManager.coffee
+                </a>
+              
+                
+                <a class="source" href="ProducerManager.html">
+                  ProducerManager.coffee
+                </a>
+              
+                
+                <a class="source" href="ProducerMapper.html">
+                  ProducerMapper.coffee
+                </a>
+              
+                
+                <a class="source" href="Subscription.html">
+                  Subscription.coffee
+                </a>
+              
+                
+                <a class="source" href="APIService.html">
+                  APIService.coffee
+                </a>
+              
+                
+                <a class="source" href="IdProducer.html">
+                  IdProducer.coffee
+                </a>
+              
+                
+                <a class="source" href="Producer.html">
+                  Producer.coffee
+                </a>
+              
+                
+                <a class="source" href="Repository.html">
+                  Repository.coffee
+                </a>
+              
+                
+                <a class="source" href="ServiceRepository.html">
+                  ServiceRepository.coffee
+                </a>
+              
+                
+                <a class="source" href="validateContract.html">
+                  validateContract.coffee
+                </a>
+              
+                
+                <a class="source" href="setup.html">
+                  setup.coffee
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>APIService.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">do</span> -&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <h2 id="servicechannel">ServiceChannel</h2>
+<p>The ServiceChannel class is private to the APIService class. Service channels are used to group subscriptions to an
+API service into sets of subscriptions whose requirements can be fulfilled with a single request, thus reducing
+network usage.<br/>
+Each subscription to the channel may have a polling interval, and the channel will ask the service that created
+it to perform a fetch when the polling intervals elapse.<br/>
+Service channels are not used for post requests, which are always started immediately, idependent of other requests,
+and cannot be polled.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ServiceChannel</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>An array of subscription objects, each of which may contain a pollingInterval in ms, and a params object</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">subscribers</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>The minimum polling interval of the subscribers, or 0</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">pollingInterval</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>The unix timestamp of the last poll</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">lastPollTime</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>A timeout id, as returned by window.setTimeout, for the next poll.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">timeout</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>The name of this channel; used by the API service to uniquely identify it.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">name</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p><strong>constructor</strong><br/>
+If subscribers are provided, the requests will start immediately.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@_window</span>, <span class="hljs-property">@name</span>, <span class="hljs-property">@service</span>, <span class="hljs-property">@subscribers</span>)</span> -&gt;</span>
+      <span class="hljs-property">@params</span> = <span class="hljs-property">@getParams</span>()
+      <span class="hljs-property">@restart</span>()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p><strong>restart</strong><br/>
+Restarts the channel, causing it to schedule the next request.<br/>
+This method can be called at any time, since it takes into account the time since the last request.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">restart</span>: <span class="hljs-function">-&gt;</span>
+      <span class="hljs-property">@pollingInterval</span> = <span class="hljs-property">@getPollingInterval</span>()
+
+      <span class="hljs-keyword">if</span> <span class="hljs-property">@lastPollTime</span>?
+        elapsedWait = <span class="hljs-property">@_window</span>.Date.now() - <span class="hljs-property">@lastPollTime</span>
+        wait = Math.max <span class="hljs-property">@pollingInterval</span> - elapsedWait, <span class="hljs-number">0</span>
+      <span class="hljs-keyword">else</span>
+        wait = <span class="hljs-number">0</span>
+
+      <span class="hljs-property">@setupNextFetch</span> wait</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p><strong>stop</strong><br/>
+Stops the channel and asks the service to remove it.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">stop</span>: <span class="hljs-function">-&gt;</span>
+      <span class="hljs-property">@_window</span>.clearTimeout <span class="hljs-property">@timeout</span>
+      <span class="hljs-property">@timeout</span> = <span class="hljs-literal">undefined</span>
+      <span class="hljs-property">@subscribers</span> = <span class="hljs-literal">undefined</span>
+      <span class="hljs-property">@params</span> = <span class="hljs-literal">undefined</span>
+      <span class="hljs-property">@service</span>.removeChannel @</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p><strong>setupNextFetch</strong><br/>
+@param [wait]: Number<br/>
+The amount of time to wait until the fetch. Defaults to the current polling interval.</p>
+<p>Schedules the next fetch to start the given number of ms in the future.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">setupNextFetch</span>: <span class="hljs-function"><span class="hljs-params">(wait = <span class="hljs-property">@pollingInterval</span>)</span> -&gt;</span>
+
+      <span class="hljs-property">@_window</span>.clearTimeout <span class="hljs-property">@timeout</span>
+
+      <span class="hljs-property">@timeout</span> = <span class="hljs-property">@_window</span>.setTimeout (_.bind -&gt;
+        <span class="hljs-property">@lastPollTime</span> = <span class="hljs-property">@_window</span>.Date.now()
+        <span class="hljs-property">@service</span>.fetch <span class="hljs-property">@params</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Remove requests with a zero polling interval since the request has now been made</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-property">@cullImmediateRequests</span>()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Check to make sure we still have subscribers after culling
+immediate requests</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> <span class="hljs-property">@subscribers</span>?</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>if we still have subscribers, set up the next fetch</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> <span class="hljs-property">@pollingInterval</span> &gt; <span class="hljs-number">0</span>
+            <span class="hljs-property">@setupNextFetch</span>()
+          <span class="hljs-keyword">else</span>
+            <span class="hljs-property">@timeout</span> = <span class="hljs-literal">undefined</span>
+      , @), wait</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p><strong>addSubscription</strong><br/>
+@param [subscriber]: Object<br/>
+The subscription to add. May contain a pollingInterval in ms, and a params object.</p>
+<p>Add a subscription to the channel, causing the params to update. A fetch may be scheduled or rescheduled.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">addSubscription</span>: <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
+      <span class="hljs-keyword">unless</span> _.contains <span class="hljs-property">@subscribers</span>, subscriber
+        <span class="hljs-property">@subscribers</span>.push subscriber
+
+        <span class="hljs-property">@onSubscriptionsChanged</span>()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p><strong>removeSubscription</strong><br/>
+@param [subscriber]: Object<br/>
+The subscription to remove. This must be the same reference as the object used when subscribing (i.e. ===).</p>
+<p>Remove a subscription to the channel, causing the params to update. The next fetch may be rescheduled or the
+channel may be stopped if this is the last subscriber.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">removeSubscription</span>: <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
+      <span class="hljs-keyword">if</span> _.contains <span class="hljs-property">@subscribers</span>, subscriber
+        <span class="hljs-property">@subscribers</span> = _.without <span class="hljs-property">@subscribers</span>, subscriber
+
+        <span class="hljs-keyword">if</span> <span class="hljs-property">@subscribers</span>.length <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+          <span class="hljs-property">@stop</span>()
+        <span class="hljs-keyword">else</span>
+          <span class="hljs-property">@onSubscriptionsChanged</span>()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p><strong>onSubscriptionsChanged</strong><br/>
+Updates the params and reschedules the next fetch if necessary.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">onSubscriptionsChanged</span>: <span class="hljs-function">-&gt;</span>
+      params = <span class="hljs-property">@getParams</span>()
+      didParamsChange = <span class="hljs-keyword">not</span> _.isEqual params, <span class="hljs-property">@params</span>
+
+      oldParams = <span class="hljs-property">@params</span>
+      <span class="hljs-property">@params</span> = params
+
+      shouldFetchImmediately = <span class="hljs-literal">false</span>
+
+      <span class="hljs-keyword">if</span> didParamsChange
+        shouldFetchImmediately = <span class="hljs-property">@service</span>.shouldFetchOnParamsUpdate <span class="hljs-property">@params</span>, oldParams, <span class="hljs-property">@name</span>
+
+      <span class="hljs-keyword">if</span> shouldFetchImmediately
+        <span class="hljs-property">@lastPollTime</span> = <span class="hljs-literal">undefined</span>
+        <span class="hljs-property">@restart</span>()
+
+      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@getPollingInterval</span>() <span class="hljs-keyword">isnt</span> <span class="hljs-property">@pollingInterval</span>
+        <span class="hljs-property">@restart</span>()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p><strong>getPollingInterval</strong><br/>
+@returns [pollingInterval]: Number<br/>
+The current polling interval in ms.</p>
+<p>Returns the lowest polling interval of subscribers. If no subscriber has a polling interval,
+returns 0 which represents an immediate request.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">getPollingInterval</span>: <span class="hljs-function">-&gt;</span>
+
+      pollingInterval = _.min _.map <span class="hljs-property">@subscribers</span>, <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
+        subscriber.pollingInterval
+
+      <span class="hljs-keyword">if</span> pollingInterval <span class="hljs-keyword">is</span> Infinity <span class="hljs-keyword">then</span> <span class="hljs-number">0</span> <span class="hljs-keyword">else</span> pollingInterval</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p><strong>getParams</strong><br/>
+@returns [params]: Object<br/>
+The current consolidated params for this channel.</p>
+<p>A channel always holds an up-to-date copy of the consilidated params.
+This method updates those params, and is called whenever a subscriber is
+added or removed.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">getParams</span>: <span class="hljs-function">-&gt;</span>
+      <span class="hljs-property">@service</span>.consolidateParams (_.filter _.map <span class="hljs-property">@subscribers</span>, <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
+        subscriber.params
+      ), <span class="hljs-property">@name</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p><strong>cullImmediateRequests</strong><br/>
+Removes all subscribers that do not have a polling interval.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">cullImmediateRequests</span>: <span class="hljs-function">-&gt;</span>
+      immediateRequests = _.filter <span class="hljs-property">@subscribers</span>, <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
+        (subscriber.pollingInterval <span class="hljs-keyword">is</span> <span class="hljs-literal">undefined</span>) <span class="hljs-keyword">or</span> (subscriber.pollingInterval <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Remove the immediate requests. This will never trigger a
+restart because the polling interval is zero and cannot be lowered</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      _.each immediateRequests, <span class="hljs-function"><span class="hljs-params">(immediateRequest)</span> -&gt;</span>
+        <span class="hljs-property">@removeSubscription</span> immediateRequest
+      , @
+
+      <span class="hljs-property">@pollingInterval</span> = <span class="hljs-property">@getPollingInterval</span>()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <h2 id="apiservice">APIService</h2>
+<p>An API service makes XHRs when it is subscribed to.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">APIService</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>An object referencing the channels owned by this service by name</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">channels</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>Optionally pass in a window object to stub Date, set/clearTimeout for testing</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@_window</span> = <span class="hljs-built_in">window</span>)</span> -&gt;</span>
+      <span class="hljs-property">@channels</span> = {}
+
+      service = @
+
+      <span class="hljs-property">@Model</span> = Backbone.Model.extend
+        <span class="hljs-attribute">sync</span>: <span class="hljs-function"><span class="hljs-params">(method, model, options)</span> -&gt;</span>
+          service.sync method, model, options
+
+        <span class="hljs-attribute">url</span>: <span class="hljs-function">-&gt;</span>
+          service.url @
+
+        <span class="hljs-attribute">parse</span>: <span class="hljs-function"><span class="hljs-params">(resp, options)</span> -&gt;</span>
+          service.parse resp, options, @</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p><strong>consolidateParams</strong><br/>
+@param [paramsArray]: Array&lt;Object&gt;<br/>
+An array of all of the params of all of the subscribers on a channel</p>
+<p>@param [channelName]: String<br/>
+The name of the channel</p>
+<p>@returns [params]: Object
+The consolidated params that should be used for the request</p>
+<p>Converts an array of params for the subscribers on this channel into
+a single params object. The default implementation just returns the first
+params object in the array. This is fine when using the default implementation of
+channelForParams because all the params are identical anyway.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">consolidateParams</span>: <span class="hljs-function"><span class="hljs-params">(paramsArray, channelName)</span> -&gt;</span>
+      paramsArray[<span class="hljs-number">0</span>]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p><strong>channelForParams</strong><br/>
+@param [params]: Object<br/>
+The params to be added to a channel</p>
+<p>@returns [channelName]: String<br/>
+The name of the channel to add the params to</p>
+<p>Returns the name of the channel that should request data for the given params.
+By default, only subscribers with identical params are put on the same channel</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">channelForParams</span>: <span class="hljs-function"><span class="hljs-params">(params)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p><code>null</code>/<code>undefined</code> should be equivalent to an empty params object</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      (JSON.stringify params) <span class="hljs-keyword">or</span> <span class="hljs-string">"{}"</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p><strong>shouldFetchOnParamsUpdate</strong><br/>
+@param [newParams]: Object<br/>
+The new consolidated params object</p>
+<p>@param [oldParams]: Object<br/>
+The old consolidated params object</p>
+<p>@param [channelName]: String<br/>
+The name of the channel that the params are for.</p>
+<p>This method is called by the service channel when its consolidated params change.
+Return true if the service should fetch immediately after the given params update, or
+false if the service should wait until the next scheduled poll time.<br/>
+The default implementation always returns true, forcing an immediate fetch.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">shouldFetchOnParamsUpdate</span>: <span class="hljs-function"><span class="hljs-params">(newParams, oldParams, channelName)</span> -&gt;</span>
+      <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p><strong>onFetchSuccess</strong><br/>
+Called when a fetch is successful.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">onFetchSuccess</span>: <span class="hljs-function">-&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p><strong>onFetchError</strong><br/>
+Called when a fetch is unsuccessful.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">onFetchError</span>: <span class="hljs-function">-&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p><strong>onPostSuccess</strong><br/>
+Called when a post request is successful.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">onPostSuccess</span>: <span class="hljs-function">-&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <p><strong>onPostError</strong><br/>
+Called when a post request is unsuccessful.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">onPostError</span>: <span class="hljs-function">-&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p><strong>sync</strong><br/>
+See <a href="http://backbonejs.org/#Model-sync">Backbone.Model.sync</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">sync</span>: <span class="hljs-function"><span class="hljs-params">(method, model, options)</span> -&gt;</span>
+      Backbone.Model.prototype.sync.call model, method, model, options</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <p><strong>url</strong><br/>
+See <a href="http://backbonejs.org/#Model-url">Backbone.Model.url</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">url</span>: <span class="hljs-function"><span class="hljs-params">(model)</span> -&gt;</span>
+      Backbone.Model.prototype.url.call model</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <p><strong>parse</strong><br/>
+See <a href="http://backbonejs.org/#Model-parse">Backbone.model.parse</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">parse</span>: <span class="hljs-function"><span class="hljs-params">(resp, options, model)</span> -&gt;</span>
+      Backbone.Model.prototype.parse.call model</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <p><strong>removeChannel</strong><br/>
+@param [channel]: String<br/>
+The name of the channel to remove</p>
+<p>Removes the given channel. Called by channels when they are no longer required.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">removeChannel</span>: <span class="hljs-function"><span class="hljs-params">(channel)</span> -&gt;</span>
+      <span class="hljs-property">@channels</span> = _.without <span class="hljs-property">@channels</span>, channel</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <p><strong>addSubscription</strong><br/>
+@param [subscriber]: Object
+A subscription to the service. This must contain an HTTP method: <code>GET</code> and <code>POST</code> are currently supported.<br/>
+For fetches, this should also contain a <code>params</code> object and optionally a <code>pollingInterval</code> in ms.<br/>
+For posts, this should contain a <code>postParams</code> object.</p>
+<p>Adds a subscription to the service, triggering a request.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">addSubscription</span>: <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
+      method = subscriber.method <span class="hljs-keyword">or</span> <span class="hljs-string">'GET'</span>
+      <span class="hljs-keyword">switch</span> method
+        <span class="hljs-keyword">when</span> <span class="hljs-string">'GET'</span>
+          <span class="hljs-property">@addGetSubscription</span> subscriber
+        <span class="hljs-keyword">when</span> <span class="hljs-string">'POST'</span>
+          <span class="hljs-property">@post</span> subscriber.postParams
+        <span class="hljs-keyword">when</span> <span class="hljs-string">'PUT'</span>
+          <span class="hljs-keyword">throw</span> <span class="hljs-string">'PUT not yet implemented'</span>
+        <span class="hljs-keyword">when</span> <span class="hljs-string">'DELETE'</span>
+          <span class="hljs-keyword">throw</span> <span class="hljs-string">'DELETE not yet implemented'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-38">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-38">&#182;</a>
+              </div>
+              <p><strong>addGetSubscription</strong><br/>
+@param @param [subscriber]: Object<br/>
+A subscription to the service. This should contain a params object and optionally a pollingInterval in ms.</p>
+<p>Adds a subscription to the service, triggering a fetch request.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">addGetSubscription</span>: <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
+      channelName = <span class="hljs-property">@channelForParams</span> subscriber.params
+      channel = <span class="hljs-property">@channels</span>[channelName]
+
+      <span class="hljs-keyword">if</span> channel?
+        channel.addSubscription subscriber
+
+      <span class="hljs-keyword">else</span>
+        <span class="hljs-property">@channels</span>[channelName] = <span class="hljs-keyword">new</span> ServiceChannel <span class="hljs-property">@_window</span>, channelName, @, [subscriber]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-39">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-39">&#182;</a>
+              </div>
+              <p><strong>removeSubscription</strong><br/>
+@param [subscriber]: Object<br/>
+A subscription to the service. This must be the same reference as the object used when subscribing (i.e. ===)</p>
+<p>Removes a subscription to the service.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">removeSubscription</span>: <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
+      <span class="hljs-keyword">if</span> subscriber?
+        channelId = <span class="hljs-property">@channelForParams</span> subscriber.params
+        channel = <span class="hljs-property">@channels</span>[channelId]
+
+        <span class="hljs-keyword">if</span> channel?
+          channel.removeSubscription subscriber</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-40">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-40">&#182;</a>
+              </div>
+              <p><strong>getModelInstance</strong><br/>
+@param [params]: Object<br/>
+The params for the request.</p>
+<p>@returns [modelInstance]: <a href="http://backbonejs.org/#Model">Backbone.Model</a>
+The Backbone model on which XHR requests are performed.</p>
+<p>Returns a Backbone model on which XHR requests are performed.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">getModelInstance</span>: <span class="hljs-function"><span class="hljs-params">(params)</span> -&gt;</span>
+      <span class="hljs-keyword">new</span> <span class="hljs-property">@Model</span> params</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-41">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-41">&#182;</a>
+              </div>
+              <p><strong>propagateResponse</strong><br/>
+See <a href="http://backbonejs.org/#Events-trigger">Backbone.Events.trigger</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">propagateResponse</span>: <span class="hljs-function"><span class="hljs-params">(key, responseData)</span> -&gt;</span>
+      <span class="hljs-property">@trigger</span> key, responseData</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-42">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-42">&#182;</a>
+              </div>
+              <p><strong>fetch</strong><br/>
+@param [params]: Object<br/>
+The consolidated params for a request</p>
+<p>Makes a fetch request with the given params. Either onFetchSuccess or onFetchError
+will be called when the request is resolved.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">fetch</span>: <span class="hljs-function"><span class="hljs-params">(params)</span> -&gt;</span>
+      model = <span class="hljs-property">@getModelInstance</span> params
+      model.fetch
+        <span class="hljs-attribute">success</span>: <span class="hljs-property">@onFetchSuccess</span>
+        <span class="hljs-attribute">error</span>: <span class="hljs-property">@onFetchError</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-43">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-43">&#182;</a>
+              </div>
+              <p><strong>post</strong><br/>
+@param [params]: Object<br/>
+The consolidated params for a request</p>
+<p>Makes a post request with the given params. Either onPostSuccess or onPostError
+will be called when the request is resolved.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">post</span>: <span class="hljs-function"><span class="hljs-params">(params)</span> -&gt;</span>
+      model = <span class="hljs-property">@getModelInstance</span> params
+      model.save <span class="hljs-literal">undefined</span>,
+        <span class="hljs-attribute">success</span>: <span class="hljs-property">@onPostSuccess</span>
+        <span class="hljs-attribute">error</span>: <span class="hljs-property">@onPostError</span>
+
+  _.extend APIService.prototype, Backbone.Events
+  APIService.extend = Vigor.extend
+  Vigor.APIService = APIService</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

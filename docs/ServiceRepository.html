@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>ServiceRepository.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="bootstrap.html">
+                  bootstrap.coffee
+                </a>
+              
+                
+                <a class="source" href="EventBus.html">
+                  EventBus.coffee
+                </a>
+              
+                
+                <a class="source" href="EventKeys.html">
+                  EventKeys.coffee
+                </a>
+              
+                
+                <a class="source" href="SubscriptionKeys.html">
+                  SubscriptionKeys.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentBase.html">
+                  ComponentBase.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentView.html">
+                  ComponentView.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentViewModel.html">
+                  ComponentViewModel.coffee
+                </a>
+              
+                
+                <a class="source" href="DataCommunicationManager.html">
+                  DataCommunicationManager.coffee
+                </a>
+              
+                
+                <a class="source" href="ProducerManager.html">
+                  ProducerManager.coffee
+                </a>
+              
+                
+                <a class="source" href="ProducerMapper.html">
+                  ProducerMapper.coffee
+                </a>
+              
+                
+                <a class="source" href="Subscription.html">
+                  Subscription.coffee
+                </a>
+              
+                
+                <a class="source" href="APIService.html">
+                  APIService.coffee
+                </a>
+              
+                
+                <a class="source" href="IdProducer.html">
+                  IdProducer.coffee
+                </a>
+              
+                
+                <a class="source" href="Producer.html">
+                  Producer.coffee
+                </a>
+              
+                
+                <a class="source" href="Repository.html">
+                  Repository.coffee
+                </a>
+              
+                
+                <a class="source" href="ServiceRepository.html">
+                  ServiceRepository.coffee
+                </a>
+              
+                
+                <a class="source" href="validateContract.html">
+                  validateContract.coffee
+                </a>
+              
+                
+                <a class="source" href="setup.html">
+                  setup.coffee
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>ServiceRepository.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h2 id="servicerepository">ServiceRepository</h2>
+<p>A ServiceRepository extends the Repository class and enables
+subscriptions for services</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ServiceRepository</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Vigor</span>.<span class="hljs-title">Repository</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Holds the services</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">services</span>: {}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p><strong>addSubscriptionToService</strong> <br/>
+@param [service]: Object <br/>
+The service to add the subscription to </br>
+@param [subscription]: Object <br/>
+The subscription to add to the service</p>
+<p>Adds a subscription to a service</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">addSubscriptionToService</span>: <span class="hljs-function"><span class="hljs-params">(service, subscription)</span> -&gt;</span>
+    service.addSubscription subscription</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p><strong>removeSubscriptionFromService</strong> <br/>
+@param [service]: Object <br/>
+The service to remove the subscription from </br>
+@param [subscription]: Object <br/>
+The subscription to remove from the service</p>
+<p>Removes a subscription from a service</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">removeSubscriptionFromService</span>: <span class="hljs-function"><span class="hljs-params">(service, subscription)</span> -&gt;</span>
+    service.removeSubscription subscription</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p><strong>addSubscription</strong> <br/>
+@param [type]: String <br/>
+Used to identify the service for this subscription.
+@param [subscription]: Object <br/>
+Used to configure the service request</p>
+<p>Maps the service through type before subscribing</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">addSubscription</span>: <span class="hljs-function"><span class="hljs-params">(type, subscription)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@services</span>[type]
+      <span class="hljs-property">@addSubscriptionToService</span> <span class="hljs-property">@services</span>[type], subscription</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p><strong>removeSubscription</strong> <br/>
+@param [type]: String <br/>
+Used to identify the service for this subscription.
+@param [subscription]: Object <br/>
+Used to configure the service request</p>
+<p>Maps the service through type before unsubscribing</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">removeSubscription</span>: <span class="hljs-function"><span class="hljs-params">(type, subscription)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@services</span>[type]
+      <span class="hljs-property">@removeSubscriptionFromService</span> <span class="hljs-property">@services</span>[type], subscription</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Expose ServiceRepository on the Vigor object</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Vigor.ServiceRepository = ServiceRepository</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

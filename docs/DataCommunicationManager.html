@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>DataCommunicationManager.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="bootstrap.html">
+                  bootstrap.coffee
+                </a>
+              
+                
+                <a class="source" href="EventBus.html">
+                  EventBus.coffee
+                </a>
+              
+                
+                <a class="source" href="EventKeys.html">
+                  EventKeys.coffee
+                </a>
+              
+                
+                <a class="source" href="SubscriptionKeys.html">
+                  SubscriptionKeys.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentBase.html">
+                  ComponentBase.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentView.html">
+                  ComponentView.coffee
+                </a>
+              
+                
+                <a class="source" href="ComponentViewModel.html">
+                  ComponentViewModel.coffee
+                </a>
+              
+                
+                <a class="source" href="DataCommunicationManager.html">
+                  DataCommunicationManager.coffee
+                </a>
+              
+                
+                <a class="source" href="ProducerManager.html">
+                  ProducerManager.coffee
+                </a>
+              
+                
+                <a class="source" href="ProducerMapper.html">
+                  ProducerMapper.coffee
+                </a>
+              
+                
+                <a class="source" href="Subscription.html">
+                  Subscription.coffee
+                </a>
+              
+                
+                <a class="source" href="APIService.html">
+                  APIService.coffee
+                </a>
+              
+                
+                <a class="source" href="IdProducer.html">
+                  IdProducer.coffee
+                </a>
+              
+                
+                <a class="source" href="Producer.html">
+                  Producer.coffee
+                </a>
+              
+                
+                <a class="source" href="Repository.html">
+                  Repository.coffee
+                </a>
+              
+                
+                <a class="source" href="ServiceRepository.html">
+                  ServiceRepository.coffee
+                </a>
+              
+                
+                <a class="source" href="validateContract.html">
+                  validateContract.coffee
+                </a>
+              
+                
+                <a class="source" href="setup.html">
+                  setup.coffee
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>DataCommunicationManager.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <p>The DataCommuncationManager is the entry point to communication between view layer and
+data layer. The <a href="ComponentViewModel.html">ComponentViewModel</a> has a reference to the DataCommunicationManager.
+The DataCommuncationManager can be viewed as the public API betweem the two layers.</p>
+<p>The DataCommuncationManager uses the <a href="ProducerManager.html">ProducerManager</a> to interact with producers</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>DataCommunicationManager =</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p><strong>registerProducers:</strong> </br>
+@param [producers]: Array <br/></p>
+<p>Registers a one or more [producers] in the data layer</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">registerProducers</span>: <span class="hljs-function"><span class="hljs-params">(producers)</span> -&gt;</span>
+    producerManager.registerProducers producers</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p><strong>subscribe:</strong> </br>
+@param [componentId]: String <br/>
+@param [subscriptionKey]: Object <br/>
+@param [callback]: Function <br/>
+@param [subscriptionOptions]: Object (default empty object) <br/></p>
+<p>Registers a component with [componentId] to recieve data changes on given [subscriptionKey] through the component [callback]</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">subscribe</span>: <span class="hljs-function"><span class="hljs-params">(componentId, subscriptionKey, callback, subscriptionOptions = {})</span> -&gt;</span>
+    subscription = <span class="hljs-keyword">new</span> Subscription componentId, callback, subscriptionOptions
+    producerManager.subscribeComponentToKey subscriptionKey, subscription</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p><strong>unsubscribe:</strong> </br>
+@param [componentId]: String <br/>
+@param [subscriptionKey]: Object <br/></p>
+<p>Unsubscribes a component from recieving data</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribe</span>: <span class="hljs-function"><span class="hljs-params">(componentId, subscriptionKey)</span> -&gt;</span>
+    producerManager.unsubscribeComponentFromKey subscriptionKey, componentId</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p><strong>unsubscribeAll:</strong> </br>
+@param [componentId]: String <br/></p>
+<p>Removes all subscriptions for the given component id</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribeAll</span>: <span class="hljs-function"><span class="hljs-params">(componentId)</span> -&gt;</span>
+    producerManager.unsubscribeComponent componentId</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Expose the DataCommuncationManager on Vigor</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Vigor.DataCommunicationManager = DataCommunicationManager</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

@@ -621,10 +621,7 @@
           this.pollingInterval = this.getPollingInterval();
           if (this.lastPollTime != null) {
             elapsedWait = this._window.Date.now() - this.lastPollTime;
-            wait = this.pollingInterval - elapsedWait;
-            if (wait < 0) {
-              wait = 0;
-            }
+            wait = Math.max(this.pollingInterval - elapsedWait, 0);
           } else {
             wait = 0;
           }
@@ -727,6 +724,8 @@
 
       })();
       APIService = (function() {
+        APIService.prototype.channels = void 0;
+
         function APIService(_window) {
           var service;
           this._window = _window != null ? _window : window;
@@ -776,8 +775,6 @@
         APIService.prototype.parse = function(resp, options, model) {
           return Backbone.Model.prototype.parse.call(model);
         };
-
-        APIService.prototype.channels = void 0;
 
         APIService.prototype.removeChannel = function(channel) {
           return this.channels = _.without(this.channels, channel);
@@ -1057,10 +1054,7 @@
         event = Repository.prototype.REPOSITORY_ADD;
         models = _.values(this._throttledAddedModels);
         this._throttledAddedModels = {};
-        if (models.length > 0) {
-          this.trigger(event, models, event);
-        }
-        return models;
+        return this._throttledEvent(event, models, event);
       };
 
       Repository.prototype._throttledChange = function() {
@@ -1068,10 +1062,7 @@
         event = Repository.prototype.REPOSITORY_CHANGE;
         models = _.values(this._throttledChangedModels);
         this._throttledChangedModels = {};
-        if (models.length > 0) {
-          this.trigger(event, models, event);
-        }
-        return models;
+        return this._throttledEvent(event, models, event);
       };
 
       Repository.prototype._throttledRemove = function() {
@@ -1079,8 +1070,12 @@
         event = Repository.prototype.REPOSITORY_REMOVE;
         models = _.values(this._throttledRemovedModels);
         this._throttledRemovedModels = {};
+        return this._throttledEvent(event, models, event);
+      };
+
+      Repository.prototype._throttledEvent = function(event, models, eventRef) {
         if (models.length > 0) {
-          this.trigger(event, models, event);
+          this.trigger(event, models, eventRef);
         }
         return models;
       };
