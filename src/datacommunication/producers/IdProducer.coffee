@@ -90,7 +90,10 @@ class IdProducer extends Producer
   produce: (ids) ->
     for id in ids
 
-      data = @decorate { id: id }
+      data = @currentData(id) or {}
+      data.id = id
+      data = @decorate data
+
       @_validateContract data
 
       _.each @registeredComponents, (component) ->
@@ -98,6 +101,8 @@ class IdProducer extends Producer
           component.callback data
       , @
 
+  currentData: (id) ->
+    # default implementation is a noop
 
   hasId: (id) ->
     @subscriptions[id]?

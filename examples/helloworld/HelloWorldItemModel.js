@@ -6,7 +6,9 @@ var app = app || {};
     defaults: {
       id: '',
       message: '',
-      count: 0
+      count: 0,
+      val1: undefined,
+      val2: undefined
     }
   });
 })(jQuery);

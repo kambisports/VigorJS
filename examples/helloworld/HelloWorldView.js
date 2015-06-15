@@ -19,10 +19,10 @@ var app = app || {};
     renderStaticContent: function () {
       var tmpl;
       tmpl = "Hello World component!";
-      tmpl += "<ul class='modularized__hello-world-items-list'></ul>";
+      tmpl += "<ul class='hello-world-items-list'></ul>";
       this.$el.html(tmpl);
 
-      this.$helloWorldItemsList = $('.modularized__hello-world-items-list', this.$el);
+      this.$helloWorldItemsList = $('.hello-world-items-list', this.$el);
 
       return this;
     },
