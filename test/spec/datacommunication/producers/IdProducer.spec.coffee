@@ -396,6 +396,101 @@ describe 'An IdProducer', ->
 
     dummyProducer.produceDataForIds()
 
+  it 'calls currentData when producing data and add the passed id to the data returned', ->
+    passedId = 1
+    expectedResult = { id: 1 }
+
+    sinon.stub dummyProducer, 'produce'
+
+    subscription =
+      id: passedId
+
+    component =
+      options: subscription
+      callback: sinon.spy()
+
+    dummyProducer.addComponent component
+
+    dummyProducer.produce.restore()
+
+    sinon.stub dummyProducer, 'currentData', (id) ->
+      assert id is passedId
+      return {}
+
+    dummyProducer.produce dummyProducer.allIds()
+
+    assert component.callback.calledOnce
+    assert component.callback.args.length is 1
+    assert component.callback.args[0].length is 1
+    assert.deepEqual component.callback.args[0][0], expectedResult
+
+  it 'if currentData doesnt return any data and empty object should be used', ->
+    passedId = 1
+    expectedResult = { id: 1 }
+
+    sinon.stub dummyProducer, 'produce'
+
+    subscription =
+      id: passedId
+
+    component =
+      options: subscription
+      callback: sinon.spy()
+
+    dummyProducer.addComponent component
+
+    dummyProducer.produce.restore()
+
+    sinon.stub dummyProducer, 'currentData', (id) ->
+      assert id is passedId
+      return undefined
+
+    dummyProducer.produce dummyProducer.allIds()
+
+    assert component.callback.calledOnce
+    assert component.callback.args.length is 1
+    assert component.callback.args[0].length is 1
+    assert.deepEqual component.callback.args[0][0], expectedResult
+
+  it 'passes along data from currentData to decorate to allow gathered data to be decorated', ->
+    passedId = 1
+    expectedResult = {
+      id: 1
+      val: 2
+      decoratedVal: 3
+    }
+
+    sinon.stub dummyProducer, 'produce'
+
+    subscription =
+      id: passedId
+
+    component =
+      options: subscription
+      callback: sinon.spy()
+
+    dummyProducer.addComponent component
+
+    dummyProducer.produce.restore()
+
+    sinon.stub dummyProducer, 'currentData', (id) ->
+      assert id is passedId
+      obj =
+        val: 2
+      return obj
+
+    decorator1 = sinon.spy (data) ->
+      data.decoratedVal = 3
+
+    dummyProducer.decorators = [decorator1]
+
+    dummyProducer.produce dummyProducer.allIds()
+
+    assert component.callback.calledOnce
+    assert component.callback.args.length is 1
+    assert component.callback.args[0].length is 1
+    assert.deepEqual component.callback.args[0][0], expectedResult
+
   it 'calls decorate when producing data', ->
     componentId = 1
     decoratedData = {}

@@ -388,14 +388,17 @@ Subsciption options. Can be used to get the id to unsubscribe from. This must be
               <p><strong>produce</strong><br/>
 @param [ids]: Array of idTypes<br/>
 List of ids to produce data for.</p>
-<p>Produce (decorated and validated) data for the ids.</p>
+<p>Produce (gathered, decorated and validated) data for the ids.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">produce</span>: <span class="hljs-function"><span class="hljs-params">(ids)</span> -&gt;</span>
     <span class="hljs-keyword">for</span> id <span class="hljs-keyword">in</span> ids
 
-      data = <span class="hljs-property">@decorate</span> { <span class="hljs-attribute">id</span>: id }
+      data = <span class="hljs-property">@currentData</span>(id) <span class="hljs-keyword">or</span> {}
+      data.id = id
+      data = <span class="hljs-property">@decorate</span> data
+
       <span class="hljs-property">@_validateContract</span> data
 
       _.each <span class="hljs-property">@registeredComponents</span>, <span class="hljs-function"><span class="hljs-params">(component)</span> -&gt;</span>
@@ -412,6 +415,36 @@ List of ids to produce data for.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
+              <p><strong>currentData</strong><br/>
+@param [id]: The id to produce data for</p>
+<p>This is where the actual collection of the data is done. <br/></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">currentData</span>: <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>default implementation is a noop</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
               <p><strong>hasId</strong><br/>
 @param [id]: idType<br/>
 The id to check for.</p>
@@ -427,11 +460,11 @@ True if there is a subscription for the given id, false otherwise.</p>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p><strong>shouldPropagateModelChange</strong><br/>
 @param [model]: Object<br/>
@@ -448,11 +481,11 @@ The repository which contains the model.<br/></p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p><strong>idForModel</strong><br/>
 @param [model]: Object<br/>
@@ -471,11 +504,11 @@ The internal id of the given model.</p>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p><strong>idForOptions</strong><br/>
 @param [options]: Object<br/>

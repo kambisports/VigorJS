@@ -13,6 +13,14 @@ var app = app || {};
 
     idType: typeof "",
 
+    currentData: function (id) {
+      var data = {
+        val: 10,
+        val2: 20
+      }
+      return data;
+    },
+
     decorators: [
       function(data) {
         $.extend(data, HelloWorldRepository.get(data.id).toJSON());

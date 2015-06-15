@@ -25,7 +25,6 @@ var app = app || {};
     },
 
     renderDynamicContent: function () {
-
       var tmpl,
           helloWorld = this.viewModel.helloWorld.toJSON(),
           id = helloWorld.id,

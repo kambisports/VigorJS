@@ -1,6 +1,6 @@
 /**
  * vigorjs - A small framework for structuring large scale Backbone applications
- * @version v0.0.2
+ * @version v0.0.3
  * @link 
  * @license ISC
  */
@@ -559,9 +559,9 @@
         results = [];
         for (i = 0, len = ids.length; i < len; i++) {
           id = ids[i];
-          data = this.decorate({
-            id: id
-          });
+          data = this.currentData(id) || {};
+          data.id = id;
+          data = this.decorate(data);
           this._validateContract(data);
           results.push(_.each(this.registeredComponents, function(component) {
             if (id === this.idForOptions(component.options)) {
@@ -571,6 +571,8 @@
         }
         return results;
       };
+
+      IdProducer.prototype.currentData = function(id) {};
 
       IdProducer.prototype.hasId = function(id) {
         return this.subscriptions[id] != null;
