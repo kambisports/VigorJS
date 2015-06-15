@@ -1,6 +1,6 @@
 /**
  * vigorjs - A small framework for structuring large scale Backbone applications
- * @version v0.0.1
+ * @version v0.0.2
  * @link 
  * @license ISC
  */
@@ -12,19 +12,20 @@
     slice = [].slice;
 
   (function(root, factory) {
-    var Backbone, _;
+    var $, Backbone, _;
     if (typeof define === "function" && define.amd) {
-      define(['backbone', 'underscore'], function(Backbone, _) {
-        return factory(root, Backbone, _);
+      define(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
+        return factory(root, Backbone, _, $);
       });
     } else if (typeof exports === "object") {
       Backbone = require('backbone');
       _ = require('underscore');
-      module.exports = factory(root, Backbone, _);
+      $ = require('jquery');
+      module.exports = factory(root, Backbone, _, $);
     } else {
-      root.Vigor = factory(root, root.Backbone, root._);
+      root.Vigor = factory(root, root.Backbone, root._, root.$);
     }
-  })(this, function(root, Backbone, _) {
+  })(this, function(root, Backbone, _, $) {
     var ComponentBase, ComponentView, ComponentViewModel, DataCommunicationManager, EventBus, EventRegistry, IdProducer, KEY_ALREADY_REGISTERED, NO_PRODUCERS_ERROR, NO_PRODUCER_FOUND_ERROR, Producer, Repository, ServiceRepository, Subscription, Vigor, previousVigor, producerManager, producerMapper, producers, producersByKey, setup, validateContract;
     previousVigor = root.Vigor;
     Vigor = Backbone.Vigor = {};

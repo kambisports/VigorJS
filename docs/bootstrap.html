@@ -149,12 +149,13 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    define [<span class="hljs-string">'backbone'</span>, <span class="hljs-string">'underscore'</span>], <span class="hljs-function"><span class="hljs-params">(Backbone, _)</span> -&gt;</span>
-        <span class="hljs-keyword">return</span> factory(root, Backbone, _)
+            <div class="content"><div class='highlight'><pre>    define [<span class="hljs-string">'backbone'</span>, <span class="hljs-string">'underscore'</span>, <span class="hljs-string">'jquery'</span>], <span class="hljs-function"><span class="hljs-params">(Backbone, _, $)</span> -&gt;</span>
+        <span class="hljs-keyword">return</span> factory(root, Backbone, _, $)
 
   <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> exports <span class="hljs-keyword">is</span> <span class="hljs-string">"object"</span>
     Backbone = <span class="hljs-built_in">require</span> <span class="hljs-string">'backbone'</span>
-    _ = <span class="hljs-built_in">require</span> <span class="hljs-string">'underscore'</span></pre></div></div>
+    _ = <span class="hljs-built_in">require</span> <span class="hljs-string">'underscore'</span>
+    $ = <span class="hljs-built_in">require</span> <span class="hljs-string">'jquery'</span></pre></div></div>
             
         </li>
         
@@ -171,7 +172,7 @@ like Node.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-built_in">module</span>.exports = factory(root, Backbone, _)
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-built_in">module</span>.exports = factory(root, Backbone, _, $)
   <span class="hljs-keyword">else</span></pre></div></div>
             
         </li>
@@ -187,10 +188,10 @@ like Node.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    root.Vigor = factory(root, root.Backbone, root._)
+            <div class="content"><div class='highlight'><pre>    root.Vigor = factory(root, root.Backbone, root._, root.$)
   <span class="hljs-keyword">return</span>
 
-) @, <span class="hljs-function"><span class="hljs-params">(root, Backbone, _)</span> -&gt;</span>
+) @, <span class="hljs-function"><span class="hljs-params">(root, Backbone, _, $)</span> -&gt;</span>
 
   previousVigor = root.Vigor
   Vigor = Backbone.Vigor = {}
