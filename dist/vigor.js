@@ -777,7 +777,7 @@
         };
 
         APIService.prototype.removeChannel = function(channel) {
-          return this.channels = _.without(this.channels, channel);
+          return delete this.channels[channel.name];
         };
 
         APIService.prototype.addSubscription = function(subscriber) {

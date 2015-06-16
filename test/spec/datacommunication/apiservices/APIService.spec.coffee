@@ -63,8 +63,8 @@ describe 'An ApiService', ->
       assert.equal _.keys(apiService.channels).length, 0
 
     it 'removes channels by params reference', ->
-      subscription1 = {}
-      subscription2 = {}
+      subscription1 = { }
+      subscription2 = { }
 
       sinon.stub apiService, 'channelForParams', -> 'test'
 
@@ -98,6 +98,25 @@ describe 'An ApiService', ->
       apiService.removeSubscription subscription1
 
       assert.equal _.keys(apiService.channels).length, 1
+
+    it 'removes only the given channel', ->
+      subscription1 = { params: { foo: 'bar' } }
+      subscription2 = { params: { foo: 'baz' } }
+
+      sinon.stub apiService, 'channelForParams', (params) -> params.foo
+
+      apiService.addSubscription subscription1
+      apiService.addSubscription subscription2
+
+      assert.equal _.keys(apiService.channels).length, 2
+
+      apiService.removeSubscription subscription1
+
+      assert.equal _.keys(apiService.channels).length, 1
+
+      apiService.removeSubscription subscription2
+
+      assert.equal _.keys(apiService.channels).length, 0
 
 
   describe 'returns the channel for params', ->
