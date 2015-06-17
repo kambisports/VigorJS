@@ -283,7 +283,7 @@ do ->
     #
     # Removes the given channel. Called by channels when they are no longer required.
     removeChannel: (channel) ->
-      @channels = _.without @channels, channel
+      delete @channels[channel.name]
 
     # **addSubscription**<br/>
     # @param [subscriber]: Object

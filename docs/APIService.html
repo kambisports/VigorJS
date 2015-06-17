@@ -816,7 +816,7 @@ The name of the channel to remove</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">removeChannel</span>: <span class="hljs-function"><span class="hljs-params">(channel)</span> -&gt;</span>
-      <span class="hljs-property">@channels</span> = _.without <span class="hljs-property">@channels</span>, channel</pre></div></div>
+      <span class="hljs-keyword">delete</span> <span class="hljs-property">@channels</span>[channel.name]</pre></div></div>
             
         </li>
         
