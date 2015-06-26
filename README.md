@@ -36,7 +36,7 @@ By introducing the concepts of ***Components***, ***Producers***, ***Repositorie
 
 ![](./docs/vigorjs.png)
 
-A simplified description of the responsibilities fore each concept is as follows:
+A simplified description of the responsibilities for each concept is as follows:
 
 
 ### Components
