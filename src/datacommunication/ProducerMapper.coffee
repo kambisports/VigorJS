@@ -4,7 +4,7 @@ producers = []
 producersByKey = {}
 
 # Error thrown when no producers at all have been registered and component starts a subscription
-NO_PRODUCERS_ERROR = "There are no producers registered - register producers through the DataCommunicationManager"
+NO_PRODUCERS_ERROR = "There are no producers registered - register producers through the ProducerManager"
 
 # Error thrown when a component tries to register a subscription and no producer has been registered for that subscription
 NO_PRODUCER_FOUND_ERROR = (key) ->

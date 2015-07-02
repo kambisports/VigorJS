@@ -184,14 +184,17 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p><strong>subscribeComponentToKey:</strong> </br>
-@param [subscriptionKey]: String <br/>
-@param [subscription]: Object <br/></p>
-<p>Adds a component to the producer for the given [subscriptionKey]</p>
+              <p><strong>subscribe:</strong> </br>
+@param [componentId]: String <br/>
+@param [subscriptionKey]: Object <br/>
+@param [callback]: Function <br/>
+@param [subscriptionOptions]: Object (default empty object) <br/></p>
+<p>Registers a component with [componentId] to recieve data changes on given [subscriptionKey] through the component [callback]</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">subscribeComponentToKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey, subscription)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">subscribe</span>: <span class="hljs-function"><span class="hljs-params">(componentId, subscriptionKey, callback, subscriptionOptions = {})</span> -&gt;</span>
+    subscription = <span class="hljs-keyword">new</span> Subscription componentId, callback, subscriptionOptions
     producer = <span class="hljs-property">@producerForKey</span> subscriptionKey
     producer.addComponent subscription</pre></div></div>
             
@@ -204,14 +207,14 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p><strong>unsubscribeComponentFromKey:</strong> </br>
-@param [subscriptionKey]: String <br/>
-@param [componentId]: String <br/></p>
+              <p><strong>unsubscribe:</strong> </br>
+@param [componentId]: String <br/>
+@param [subscriptionKey]: String <br/></p>
 <p>Unsubscribes a component with [componentId] from the producer for the given [subscriptionKey]</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribeComponentFromKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey, componentId)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribe</span>: <span class="hljs-function"><span class="hljs-params">(componentId, subscriptionKey)</span> -&gt;</span>
     producer = <span class="hljs-property">@producerForKey</span> subscriptionKey
     producer.removeComponent componentId</pre></div></div>
             
@@ -224,13 +227,13 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p><strong>unsubscribeComponent:</strong> </br>
+              <p><strong>unsubscribeAll:</strong> </br>
 @param [componentId]: String <br/></p>
 <p>Unsubscribes a component with [componentId] from any producer that might have it in its subscription</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribeComponent</span>: <span class="hljs-function"><span class="hljs-params">(componentId)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribeAll</span>: <span class="hljs-function"><span class="hljs-params">(componentId)</span> -&gt;</span>
     producerMapper.producers.forEach (producer) -&gt;
       <span class="hljs-attribute">producer</span>::getInstance().removeComponent componentId</pre></div></div>
             

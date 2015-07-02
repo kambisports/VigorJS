@@ -26,7 +26,7 @@
       root.Vigor = factory(root, root.Backbone, root._, root.$);
     }
   })(this, function(root, Backbone, _, $) {
-    var ComponentBase, ComponentView, ComponentViewModel, DataCommunicationManager, EventBus, EventRegistry, IdProducer, KEY_ALREADY_REGISTERED, NO_PRODUCERS_ERROR, NO_PRODUCER_FOUND_ERROR, Producer, Repository, ServiceRepository, Subscription, Vigor, previousVigor, producerManager, producerMapper, producers, producersByKey, setup, validateContract;
+    var ComponentBase, ComponentView, ComponentViewModel, EventBus, EventRegistry, IdProducer, KEY_ALREADY_REGISTERED, NO_PRODUCERS_ERROR, NO_PRODUCER_FOUND_ERROR, Producer, Repository, ServiceRepository, Subscription, Vigor, previousVigor, producerManager, producerMapper, producers, producersByKey, setup, validateContract;
     previousVigor = root.Vigor;
     Vigor = Backbone.Vigor = {};
     Vigor.helpers = {};
@@ -194,7 +194,7 @@
 
     producers = [];
     producersByKey = {};
-    NO_PRODUCERS_ERROR = "There are no producers registered - register producers through the DataCommunicationManager";
+    NO_PRODUCERS_ERROR = "There are no producers registered - register producers through the ProducerManager";
     NO_PRODUCER_FOUND_ERROR = function(key) {
       return "No producer found for subscription " + key + "!";
     };
@@ -248,43 +248,27 @@
         var producer;
         return producer = producerMapper.producerForKey(subscriptionKey);
       },
-      subscribeComponentToKey: function(subscriptionKey, subscription) {
-        var producer;
+      subscribe: function(componentId, subscriptionKey, callback, subscriptionOptions) {
+        var producer, subscription;
+        if (subscriptionOptions == null) {
+          subscriptionOptions = {};
+        }
+        subscription = new Subscription(componentId, callback, subscriptionOptions);
         producer = this.producerForKey(subscriptionKey);
         return producer.addComponent(subscription);
       },
-      unsubscribeComponentFromKey: function(subscriptionKey, componentId) {
+      unsubscribe: function(componentId, subscriptionKey) {
         var producer;
         producer = this.producerForKey(subscriptionKey);
         return producer.removeComponent(componentId);
       },
-      unsubscribeComponent: function(componentId) {
+      unsubscribeAll: function(componentId) {
         return producerMapper.producers.forEach(function(producer) {
           return producer.prototype.getInstance().removeComponent(componentId);
         });
       }
     };
 
-    DataCommunicationManager = {
-      registerProducers: function(producers) {
-        return producerManager.registerProducers(producers);
-      },
-      subscribe: function(componentId, subscriptionKey, callback, subscriptionOptions) {
-        var subscription;
-        if (subscriptionOptions == null) {
-          subscriptionOptions = {};
-        }
-        subscription = new Subscription(componentId, callback, subscriptionOptions);
-        return producerManager.subscribeComponentToKey(subscriptionKey, subscription);
-      },
-      unsubscribe: function(componentId, subscriptionKey) {
-        return producerManager.unsubscribeComponentFromKey(subscriptionKey, componentId);
-      },
-      unsubscribeAll: function(componentId) {
-        return producerManager.unsubscribeComponent(componentId);
-      }
-    };
-    Vigor.DataCommunicationManager = DataCommunicationManager;
     Producer = (function() {
       Producer.prototype.PRODUCTION_KEY = void 0;
 
@@ -939,9 +923,9 @@
     })(Backbone.View);
     Vigor.ComponentView = ComponentView;
     ComponentViewModel = (function() {
-      var dataCommunicationManager;
+      var ProducerManager;
 
-      dataCommunicationManager = Vigor.DataCommunicationManager;
+      ProducerManager = Vigor.ProducerManager;
 
       function ComponentViewModel() {
         this.id = "ComponentViewModel_" + (_.uniqueId());
@@ -952,15 +936,15 @@
       };
 
       ComponentViewModel.prototype.subscribe = function(key, callback, options) {
-        return dataCommunicationManager.subscribe(this.id, key, callback, options);
+        return ProducerManager.subscribe(this.id, key, callback, options);
       };
 
       ComponentViewModel.prototype.unsubscribe = function(key) {
-        return dataCommunicationManager.unsubscribe(this.id, key);
+        return ProducerManager.unsubscribe(this.id, key);
       };
 
       ComponentViewModel.prototype.unsubscribeAll = function() {
-        return dataCommunicationManager.unsubscribeAll(this.id);
+        return ProducerManager.unsubscribeAll(this.id);
       };
 
       ComponentViewModel.prototype.validateContract = function(contract, incommingData) {
