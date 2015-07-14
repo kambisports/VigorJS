@@ -2,20 +2,19 @@ Vigor = require '../../../dist/vigor'
 assert = require 'assert'
 sinon = require 'sinon'
 
-dataCommunicationManager = Vigor.DataCommunicationManager
 ComponentViewModel = Vigor.ComponentViewModel
 producerManager = Vigor.ProducerManager
 
 describe 'ComponentViewModel', ->
   beforeEach ->
-    sinon.stub producerManager, 'subscribeComponentToKey'
-    sinon.stub producerManager, 'unsubscribeComponentFromKey'
-    sinon.stub producerManager, 'unsubscribeComponent'
+    sinon.stub producerManager, 'subscribe'
+    sinon.stub producerManager, 'unsubscribe'
+    sinon.stub producerManager, 'unsubscribeAll'
 
   afterEach ->
-    do producerManager.subscribeComponentToKey.restore
-    do producerManager.unsubscribeComponentFromKey.restore
-    do producerManager.unsubscribeComponent.restore
+    do producerManager.subscribe.restore
+    do producerManager.unsubscribe.restore
+    do producerManager.unsubscribeAll.restore
 
   describe 'constructor', ->
     it 'should add a unique id as a public property', ->
@@ -33,39 +32,33 @@ describe 'ComponentViewModel', ->
       assert dispose.called
 
   describe 'subscribe', ->
-    it 'should call dataCommunicationManager.subscribe with id, key, callback and options', ->
+    it 'should call producerManager.subscribe with id, key, callback and options', ->
       viewModel = new ComponentViewModel()
       key = 'dummy'
       cb = ->
       options = {}
-      subscribe = sinon.spy dataCommunicationManager, 'subscribe'
 
       viewModel.subscribe key, cb, options
 
-      assert subscribe.calledWith viewModel.id, key, cb, options
-      subscribe.restore()
+      assert producerManager.subscribe.calledWith viewModel.id, key, cb, options
 
   describe 'unsubscribe', ->
-    it 'should call dataCommunicationManager.unsubscribe with id, key', ->
+    it 'should call producerManager.unsubscribe with id, key', ->
       viewModel = new ComponentViewModel()
       key = 'dummy'
-      unsubscribe = sinon.spy dataCommunicationManager, 'unsubscribe'
 
       viewModel.unsubscribe key
 
-      assert unsubscribe.calledWith viewModel.id, key
-      unsubscribe.restore()
+      assert producerManager.unsubscribe.calledWith viewModel.id, key
 
   describe 'unsubscribeAll', ->
-    it 'should call dataCommunicationManager.unsubscribeAll with id', ->
+    it 'should call producerManager.unsubscribeAll with id', ->
       viewModel = new ComponentViewModel()
       key = 'dummy'
-      unsubscribeAll = sinon.spy dataCommunicationManager, 'unsubscribeAll'
 
       viewModel.unsubscribeAll key
 
-      assert unsubscribeAll.calledWith viewModel.id
-      unsubscribeAll.restore()
+      assert producerManager.unsubscribeAll.calledWith viewModel.id
 
   describe 'validateContract', ->
     it 'should call Vigor.helpers.validateContract with contract, incommingData and id', ->

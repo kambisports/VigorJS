@@ -49,7 +49,7 @@ describe 'A ProducerMapper', ->
   describe 'when trying to find a producer when no producers are registered', ->
     it 'it should throw a "There are No producers registered" error', ->
       errorFn = -> producerMapper.producerClassForKey KEY
-      assert.throws (-> errorFn()), /There are no producers registered - register producers through the DataCommunicationManager/
+      assert.throws (-> errorFn()), /There are no producers registered - register producers through the ProducerManager/
 
   describe 'when trying to register a producer with an existing key', ->
     it 'should throw an "already registered" error', ->
