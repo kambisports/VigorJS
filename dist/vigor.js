@@ -476,15 +476,21 @@
         addRemoveMap = function(model) {
           var id;
           id = self.idForModel(model, repository);
-          if (self.hasId(id)) {
+          if (_.isArray(id)) {
+            return _.filter(id, self.hasId.bind(self));
+          } else if (self.hasId(id)) {
             return id;
           }
         };
         changeMap = function(model) {
           var id;
           id = self.idForModel(model, repository);
-          if ((self.hasId(id)) && (self.shouldPropagateModelChange(model, repository))) {
-            return id;
+          if (self.shouldPropagateModelChange(model, repository)) {
+            if (_.isArray(id)) {
+              return _.filter(id, self.hasId.bind(self));
+            } else if (self.hasId(id)) {
+              return id;
+            }
           }
         };
         addedModelIds = _.map(diff.added, addRemoveMap);
