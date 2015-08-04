@@ -268,7 +268,7 @@
         });
       }
     };
-
+    Vigor.ProducerManager = producerManager;
     Producer = (function() {
       Producer.prototype.PRODUCTION_KEY = void 0;
 

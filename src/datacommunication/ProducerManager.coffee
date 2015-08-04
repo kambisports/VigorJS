@@ -48,7 +48,4 @@ producerManager =
     producerMapper.producers.forEach (producer) ->
       producer::getInstance().removeComponent componentId
 
-### start-test-block ###
-# this will be removed in distribution build since the manager should be private
 Vigor.ProducerManager = producerManager
-### end-test-block ###
