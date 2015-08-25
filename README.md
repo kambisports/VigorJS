@@ -127,12 +127,3 @@ A simplified description of the responsibilities for each concept is as follows:
 - ***Vigorjs*** source files are written in Coffeescript
 
 
-
-## Code documentation
-
-
-
-## Hello World
-
-## Best practises
-(TODO: Create better examples showing how to use the library)
