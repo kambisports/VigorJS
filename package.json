@@ -1,7 +1,7 @@
 {
   "name": "vigorjs",
   "description": "A small framework for structuring large scale Backbone applications",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "homepage": "",
   "author": "Kambi Sports Solutions",
   "contributors": [
@@ -35,7 +35,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://Jonwalstedt@bitbucket.org/Jonwalstedt/vigorjs.git"
+    "url": "https://github.com/kambisports/VigorJS.git"
   },
   "license": "ISC",
   "dependencies": {
