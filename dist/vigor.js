@@ -8,8 +8,7 @@
   var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    hasProp = {}.hasOwnProperty,
-    slice = [].slice;
+    hasProp = {}.hasOwnProperty;
 
   (function(root, factory) {
     var $, Backbone, _;
@@ -1011,18 +1010,16 @@
         return this.models.length <= 0;
       };
 
-      Repository.prototype._onAll = function() {
-        var args, event;
-        event = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
+      Repository.prototype._onAll = function(event, model) {
         switch (event) {
           case 'add':
-            this._onAdd.apply(this, args);
+            this._onAdd.call(this, model);
             break;
           case 'change':
-            this._onChange.apply(this, args);
+            this._onChange.call(this, model);
             break;
           case 'remove':
-            this._onRemove.apply(this, args);
+            this._onRemove.call(this, model);
         }
         return this._throttledTriggerUpdates();
       };
