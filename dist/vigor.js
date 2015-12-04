@@ -1,6 +1,6 @@
 /**
  * vigorjs - A small framework for structuring large scale Backbone applications
- * @version v0.0.5
+ * @version v0.0.6
  * @link 
  * @license ISC
  */
