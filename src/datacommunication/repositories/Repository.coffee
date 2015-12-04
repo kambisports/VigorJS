@@ -51,9 +51,9 @@ class Repository extends Backbone.Collection
   # see *addThrottledListeners*
   _onAll: (event, model) ->
     switch event
-      when 'add' then @_onAdd.call(@, model)
-      when 'change' then @_onChange.call(@, model)
-      when 'remove' then @_onRemove.call(@, model)
+      when 'add' then @_onAdd model
+      when 'change' then @_onChange model
+      when 'remove' then @_onRemove model
 
     do @_throttledTriggerUpdates
 

@@ -1013,13 +1013,13 @@
       Repository.prototype._onAll = function(event, model) {
         switch (event) {
           case 'add':
-            this._onAdd.call(this, model);
+            this._onAdd(model);
             break;
           case 'change':
-            this._onChange.call(this, model);
+            this._onChange(model);
             break;
           case 'remove':
-            this._onRemove.call(this, model);
+            this._onRemove(model);
         }
         return this._throttledTriggerUpdates();
       };
