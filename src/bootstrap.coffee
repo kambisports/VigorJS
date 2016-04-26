@@ -7,7 +7,7 @@
 
   else if typeof exports is "object"
     Backbone = require 'backbone'
-    _ = require 'underscore'
+    _ = require 'lodash'
     $ = require 'jquery'
 
     # Node. Does not work with strict CommonJS, but

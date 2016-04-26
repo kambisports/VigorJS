@@ -1,7 +1,7 @@
 requireHelper = require './requireHelper'
 
 global.$ = global.jQuery = require 'jquery'
-global._ = require 'underscore'
+global._ = require 'lodash'
 global.Backbone = require 'backbone'
 global.Backbone.$ = global.$
 global.Vigor = {}

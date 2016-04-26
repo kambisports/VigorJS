@@ -78,7 +78,7 @@ class IdProducer extends Producer
     removedModelIds = _.map diff.removed, addRemoveMap
     updatedModelIds = _.map diff.changed, changeMap
 
-    @produceDataForIds _.filter _.flatten [addedModelIds, removedModelIds, updatedModelIds]
+    @produceDataForIds _.filter _.flattenDepth [addedModelIds, removedModelIds, updatedModelIds], 2
 
 
   # **produceDataForIds**<br/>

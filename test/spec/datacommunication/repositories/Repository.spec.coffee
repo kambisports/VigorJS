@@ -30,14 +30,16 @@ describe 'An repository', ->
 
       repository.set [{ id: 1, data: 'Data1'}, { id: 2, data: 'Data2'}]
 
-      clock.tick 99
-      assert.equal backboneAddTriggerCounter, 2
-      assert.equal repositoryAddTriggerCounter, 0
+      #clock.tick 99
+      setTimeout 99, ->
+        assert.equal backboneAddTriggerCounter, 2
+        assert.equal repositoryAddTriggerCounter, 0
 
-      clock.tick 100
-      assert.equal backboneAddTriggerCounter, 2
-      assert.equal repositoryAddTriggerCounter, 1
-      assert.equal addedModels.length, 2
+        #clock.tick 100
+        setTimeout 1, ->
+          assert.equal backboneAddTriggerCounter, 2
+          assert.equal repositoryAddTriggerCounter, 1
+          assert.equal addedModels.length, 2
 
     it 'and send REPOSITORY_REMOVE on remove events in repository', ->
       repositoryRemoveTriggerCounter = 0
@@ -45,22 +47,24 @@ describe 'An repository', ->
       removedModels = []
 
       repository.set [{ id: 1, data: 'Data1'}, { id: 2, data: 'Data2'}, {id: 3, data: 'Data3'}]
-      clock.tick 100
 
-      repository.on 'remove', ->
-        backboneRemoveTriggerCounter++
+      #clock.tick 100
+      setTimeout 100, ->
+        repository.on 'remove', ->
+          backboneRemoveTriggerCounter++
 
-      repository.on repository.REPOSITORY_REMOVE, (removed) ->
-        repositoryRemoveTriggerCounter++
-        removedModels = removed
+        repository.on repository.REPOSITORY_REMOVE, (removed) ->
+          repositoryRemoveTriggerCounter++
+          removedModels = removed
 
-      repository.set [{ id: 2, data: 'Data2'}]
-      clock.tick 200
-
-      assert.equal backboneRemoveTriggerCounter, 2
-      assert.equal repositoryRemoveTriggerCounter, 1
-      assert.equal repository.models.length, 1
-      assert.equal removedModels.length, 2
+        repository.set [{ id: 2, data: 'Data2'}]
+        
+        #clock.tick 200
+        setTimeout 100, ->
+          assert.equal backboneRemoveTriggerCounter, 2
+          assert.equal repositoryRemoveTriggerCounter, 1
+          assert.equal repository.models.length, 1
+          assert.equal removedModels.length, 2
 
     it 'and send REPOSITORY_CHANGE on change events in repository', ->
       repositoryChangeTriggerCounter = 0
@@ -69,22 +73,23 @@ describe 'An repository', ->
 
       repository.set [{ id: 1, data: 'Data1'}, { id: 2, data: 'Data2'}, {id: 3, data: 'Data3'}]
 
-      clock.tick 100
-      repository.on 'change', ->
-        backboneChangeTriggerCounter++
+      #clock.tick 100
+      setTimeout 100, ->
+        repository.on 'change', ->
+          backboneChangeTriggerCounter++
 
-      repository.on repository.REPOSITORY_CHANGE, (changed) ->
-        repositoryChangeTriggerCounter++
-        changedModels = changed
+        repository.on repository.REPOSITORY_CHANGE, (changed) ->
+          repositoryChangeTriggerCounter++
+          changedModels = changed
 
-      repository.set [{ id: 1, data: 'Data12'}, { id: 2, data: 'Data22'}, { id: 3, data: 'Data3'}]
+        repository.set [{ id: 1, data: 'Data12'}, { id: 2, data: 'Data22'}, { id: 3, data: 'Data3'}]
 
-      clock.tick 200
-
-      assert.equal repositoryChangeTriggerCounter, 1
-      assert.equal backboneChangeTriggerCounter, 2
-      assert.equal repository.models.length, 3
-      assert.equal changedModels.length, 2
+        #clock.tick 200
+        setTimeout 100, ->
+          assert.equal repositoryChangeTriggerCounter, 1
+          assert.equal backboneChangeTriggerCounter, 2
+          assert.equal repository.models.length, 3
+          assert.equal changedModels.length, 2
 
     it 'and send REPOSITORY_DIFF on changes in repository (add, remove, change)', ->
       repositoryDiffTriggerCounter = 0
@@ -94,40 +99,41 @@ describe 'An repository', ->
       diffObj = {}
 
       repository.set [{ id: 1, data: 'Data1'}, { id: 2, data: 'Data2'}, {id: 3, data: 'Data3'}]
-      clock.tick 100
 
-      repository.on 'change', () ->
-        backboneChangeTriggerCounter++
+      #clock.tick 100
+      setTimeout 100, ->
+        repository.on 'change', () ->
+          backboneChangeTriggerCounter++
 
-      repository.on 'add', () ->
-        backboneAddTriggerCounter++
+        repository.on 'add', () ->
+          backboneAddTriggerCounter++
 
-      repository.on 'remove', () ->
-        backboneRemoveTriggerCounter++
+        repository.on 'remove', () ->
+          backboneRemoveTriggerCounter++
 
-      repository.on repository.REPOSITORY_DIFF, (aggregatedChanges) ->
-        repositoryDiffTriggerCounter++
-        diffObj = aggregatedChanges
+        repository.on repository.REPOSITORY_DIFF, (aggregatedChanges) ->
+          repositoryDiffTriggerCounter++
+          diffObj = aggregatedChanges
 
-      repository.set [
-        { id: 1, data: 'Data1'} # unchanged item
-        { id: 2, data: 'Data22'} # updated value in item
-        # { id: 3, data: 'Data3'}, removed item since it's not part of new data set
-        { id: 4, data: 'Data4'} # added item
-        { id: 5, data: 'Data5'} # added item
-      ]
+        repository.set [
+          { id: 1, data: 'Data1'} # unchanged item
+          { id: 2, data: 'Data22'} # updated value in item
+          # { id: 3, data: 'Data3'}, removed item since it's not part of new data set
+          { id: 4, data: 'Data4'} # added item
+          { id: 5, data: 'Data5'} # added item
+        ]
 
-      clock.tick 200
-
-      assert.equal repositoryDiffTriggerCounter, 1
-      assert.equal backboneChangeTriggerCounter, 1
-      assert.equal backboneRemoveTriggerCounter, 1
-      assert.equal backboneAddTriggerCounter, 2
-      assert.equal repository.models.length, 4
-      assert.equal diffObj.added.length, 2
-      assert.equal diffObj.changed.length, 1
-      assert.equal diffObj.removed.length, 1
-      assert.equal diffObj.consolidated.length, 3
+        #clock.tick 200
+        setTimeout 100, ->
+          assert.equal repositoryDiffTriggerCounter, 1
+          assert.equal backboneChangeTriggerCounter, 1
+          assert.equal backboneRemoveTriggerCounter, 1
+          assert.equal backboneAddTriggerCounter, 2
+          assert.equal repository.models.length, 4
+          assert.equal diffObj.added.length, 2
+          assert.equal diffObj.changed.length, 1
+          assert.equal diffObj.removed.length, 1
+          assert.equal diffObj.consolidated.length, 3
 
   describe 'when using helper methods', ->
 

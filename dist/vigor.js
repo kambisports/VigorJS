@@ -18,7 +18,7 @@
       });
     } else if (typeof exports === "object") {
       Backbone = require('backbone');
-      _ = require('underscore');
+      _ = require('lodash');
       $ = require('jquery');
       module.exports = factory(root, Backbone, _, $);
     } else {
@@ -495,7 +495,7 @@
         addedModelIds = _.map(diff.added, addRemoveMap);
         removedModelIds = _.map(diff.removed, addRemoveMap);
         updatedModelIds = _.map(diff.changed, changeMap);
-        return this.produceDataForIds(_.filter(_.flatten([addedModelIds, removedModelIds, updatedModelIds])));
+        return this.produceDataForIds(_.filter(_.flattenDepth([addedModelIds, removedModelIds, updatedModelIds], 2)));
       };
 
       IdProducer.prototype.produceDataForIds = function(ids) {
@@ -703,9 +703,9 @@
           immediateRequests = _.filter(this.subscribers, function(subscriber) {
             return (subscriber.pollingInterval === void 0) || (subscriber.pollingInterval === 0);
           });
-          _.each(immediateRequests, function(immediateRequest) {
+          _.each(immediateRequests, _.bind(function(immediateRequest) {
             return this.removeSubscription(immediateRequest);
-          }, this);
+          }, this));
           return this.pollingInterval = this.getPollingInterval();
         };
 

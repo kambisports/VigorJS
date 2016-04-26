@@ -165,7 +165,7 @@ do ->
 
       # Remove the immediate requests. This will never trigger a
       # restart because the polling interval is zero and cannot be lowered
-      _.each immediateRequests, (immediateRequest) ->
+      _.each immediateRequests, _.bind (immediateRequest) ->
         @removeSubscription immediateRequest
       , @
 
