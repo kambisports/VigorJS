@@ -153,10 +153,11 @@ class IdProducer extends Producer
 
       @_validateContract data
 
-      _.each @registeredComponents, (component) ->
-        if id is @idForOptions component.options
-          component.callback data
-      , @
+      _.each @registeredComponents,
+        _.bind (component) ->
+          if id is @idForOptions component.options
+            component.callback data
+        , @
 
   # **currentData**<br/>
   # @param [id]: The id to produce data for

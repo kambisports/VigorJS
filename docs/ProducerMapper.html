@@ -202,8 +202,8 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <h2 id="producermapper">ProducerMapper</h2>
-<p>Mapper class to keep track of the available producers and their corresponding subscriptions</p>
+              <p>##ProducerMapper
+Mapper class to keep track of the available producers and their corresponding subscriptions</p>
 
             </div>
             
@@ -222,7 +222,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">producers</span>: producers</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  producers: producers</pre></div></div>
             
         </li>
         
@@ -241,7 +241,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">producerClassForKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  producerClassForKey: <span class="hljs-function"><span class="hljs-params">(subscriptionKey)</span> -&gt;</span>
     key = subscriptionKey.key
     <span class="hljs-keyword">if</span> producers.length <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
       <span class="hljs-keyword">throw</span> NO_PRODUCERS_ERROR
@@ -269,9 +269,9 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">producerForKey</span>: <span class="hljs-function"><span class="hljs-params">(subscriptionKey)</span> -&gt;</span>
-    producerClass = <span class="hljs-property">@producerClassForKey</span> subscriptionKey
-    <span class="hljs-attribute">producerClass</span>::getInstance()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  producerForKey: <span class="hljs-function"><span class="hljs-params">(subscriptionKey)</span> -&gt;</span>
+    producerClass = @producerClassForKey subscriptionKey
+    producerClass::getInstance()</pre></div></div>
             
         </li>
         
@@ -289,11 +289,11 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">register</span>: <span class="hljs-function"><span class="hljs-params">(producerClass)</span> -&gt;</span>
-    <span class="hljs-keyword">if</span> (producers.indexOf producerClass) <span class="hljs-keyword">is</span> -<span class="hljs-number">1</span>
+            <div class="content"><div class='highlight'><pre>  register: <span class="hljs-function"><span class="hljs-params">(producerClass)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> (producers.indexOf producerClass) <span class="hljs-keyword">is</span> <span class="hljs-number">-1</span>
       producers.push producerClass
 
-      subscriptionKey = <span class="hljs-attribute">producerClass</span>::PRODUCTION_KEY
+      subscriptionKey = producerClass::PRODUCTION_KEY
       key = subscriptionKey.key
 
       <span class="hljs-keyword">if</span> producersByKey[key]?
@@ -315,7 +315,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">reset</span>: <span class="hljs-function">-&gt;</span>
+            <div class="content"><div class='highlight'><pre>  reset: <span class="hljs-function">-&gt;</span>
     producers.length = <span class="hljs-number">0</span>
     producersByKey = {}</pre></div></div>
             

@@ -1,6 +1,6 @@
 /**
  * vigorjs - A small framework for structuring large scale Backbone applications
- * @version v0.0.6
+ * @version v0.0.7
  * @link 
  * @license ISC
  */
@@ -13,7 +13,7 @@
   (function(root, factory) {
     var $, Backbone, _;
     if (typeof define === "function" && define.amd) {
-      define(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
+      define(['backbone', 'lodash', 'jquery'], function(Backbone, _, $) {
         return factory(root, Backbone, _, $);
       });
     } else if (typeof exports === "object") {
@@ -552,11 +552,11 @@
           data.id = id;
           data = this.decorate(data);
           this._validateContract(data);
-          results.push(_.each(this.registeredComponents, function(component) {
+          results.push(_.each(this.registeredComponents, _.bind(function(component) {
             if (id === this.idForOptions(component.options)) {
               return component.callback(data);
             }
-          }, this));
+          }, this)));
         }
         return results;
       };
@@ -645,14 +645,14 @@
         };
 
         ServiceChannel.prototype.addSubscription = function(subscriber) {
-          if (!_.contains(this.subscribers, subscriber)) {
+          if (!_.includes(this.subscribers, subscriber)) {
             this.subscribers.push(subscriber);
             return this.onSubscriptionsChanged();
           }
         };
 
         ServiceChannel.prototype.removeSubscription = function(subscriber) {
-          if (_.contains(this.subscribers, subscriber)) {
+          if (_.includes(this.subscribers, subscriber)) {
             this.subscribers = _.without(this.subscribers, subscriber);
             if (this.subscribers.length === 0) {
               return this.stop();

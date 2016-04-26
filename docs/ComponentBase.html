@@ -125,8 +125,8 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h2 id="componentbase">ComponentBase</h2>
-<p>This class is intended to be the public interface for a component.</p>
+              <p>##ComponentBase
+This class is intended to be the public interface for a component.</p>
 <p>By default it exposes a render and a dispose method which should be overridden</p>
 <p>To create a component you would typically do a index file which extends ComponentBase
 and then instantiate any views, models, collections etc. that the component need
@@ -152,7 +152,7 @@ Override this method</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">render</span>: <span class="hljs-function">-&gt;</span>
+            <div class="content"><div class='highlight'><pre>  render: <span class="hljs-function">-&gt;</span>
     <span class="hljs-keyword">throw</span> <span class="hljs-string">'ComponentBase-&gt;render needs to be over-ridden'</span></pre></div></div>
             
         </li>
@@ -169,7 +169,7 @@ Override this method</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">dispose</span>: <span class="hljs-function">-&gt;</span>
+            <div class="content"><div class='highlight'><pre>  dispose: <span class="hljs-function">-&gt;</span>
     <span class="hljs-keyword">throw</span> <span class="hljs-string">'ComponentBase-&gt;dispose needs to be over-ridden'</span></pre></div></div>
             
         </li>

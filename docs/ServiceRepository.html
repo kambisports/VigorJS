@@ -147,7 +147,7 @@ subscriptions for services</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">services</span>: {}</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  services: {}</pre></div></div>
             
         </li>
         
@@ -167,7 +167,7 @@ The subscription to add to the service</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">addSubscriptionToService</span>: <span class="hljs-function"><span class="hljs-params">(service, subscription)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  addSubscriptionToService: <span class="hljs-function"><span class="hljs-params">(service, subscription)</span> -&gt;</span>
     service.addSubscription subscription</pre></div></div>
             
         </li>
@@ -188,7 +188,7 @@ The subscription to remove from the service</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">removeSubscriptionFromService</span>: <span class="hljs-function"><span class="hljs-params">(service, subscription)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  removeSubscriptionFromService: <span class="hljs-function"><span class="hljs-params">(service, subscription)</span> -&gt;</span>
     service.removeSubscription subscription</pre></div></div>
             
         </li>
@@ -209,9 +209,9 @@ Used to configure the service request</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">addSubscription</span>: <span class="hljs-function"><span class="hljs-params">(type, subscription)</span> -&gt;</span>
-    <span class="hljs-keyword">if</span> <span class="hljs-property">@services</span>[type]
-      <span class="hljs-property">@addSubscriptionToService</span> <span class="hljs-property">@services</span>[type], subscription</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  addSubscription: <span class="hljs-function"><span class="hljs-params">(type, subscription)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> @services[type]
+      @addSubscriptionToService @services[type], subscription</pre></div></div>
             
         </li>
         
@@ -231,9 +231,9 @@ Used to configure the service request</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">removeSubscription</span>: <span class="hljs-function"><span class="hljs-params">(type, subscription)</span> -&gt;</span>
-    <span class="hljs-keyword">if</span> <span class="hljs-property">@services</span>[type]
-      <span class="hljs-property">@removeSubscriptionFromService</span> <span class="hljs-property">@services</span>[type], subscription</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  removeSubscription: <span class="hljs-function"><span class="hljs-params">(type, subscription)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> @services[type]
+      @removeSubscriptionFromService @services[type], subscription</pre></div></div>
             
         </li>
         

@@ -149,7 +149,7 @@ _.extend EventRegistry.prototype, Backbone.Events</pre></div></div>
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EventBus</span></span>
-	<span class="hljs-attribute">eventRegistry</span>: <span class="hljs-keyword">new</span> EventRegistry()</pre></div></div>
+	eventRegistry: <span class="hljs-keyword">new</span> EventRegistry()</pre></div></div>
             
         </li>
         
@@ -167,11 +167,11 @@ bind the callback to all events fired.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">subscribe</span>: <span class="hljs-function"><span class="hljs-params">(key, callback)</span> -&gt;</span>
-		<span class="hljs-keyword">throw</span> <span class="hljs-string">"key '<span class="hljs-subst">#{key}</span>' does not exist in EventKeys"</span> <span class="hljs-keyword">unless</span> <span class="hljs-property">@_eventKeyExists</span> key
+            <div class="content"><div class='highlight'><pre>	subscribe: <span class="hljs-function"><span class="hljs-params">(key, callback)</span> -&gt;</span>
+		<span class="hljs-keyword">throw</span> <span class="hljs-string">"key '<span class="hljs-subst">#{key}</span>' does not exist in EventKeys"</span> <span class="hljs-keyword">unless</span> @_eventKeyExists key
 		<span class="hljs-keyword">throw</span> <span class="hljs-string">"callback is not a function"</span> <span class="hljs-keyword">unless</span> <span class="hljs-string">'function'</span> == <span class="hljs-keyword">typeof</span> callback
 
-		<span class="hljs-property">@eventRegistry</span>.<span class="hljs-literal">on</span> key, callback</pre></div></div>
+		@eventRegistry.<span class="hljs-literal">on</span> key, callback</pre></div></div>
             
         </li>
         
@@ -189,11 +189,11 @@ After the first time the callback is invoked, it will be removed.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">subscribeOnce</span>: <span class="hljs-function"><span class="hljs-params">(key, callback)</span> -&gt;</span>
-		<span class="hljs-keyword">throw</span> <span class="hljs-string">"key '<span class="hljs-subst">#{key}</span>' does not exist in EventKeys"</span> <span class="hljs-keyword">unless</span> <span class="hljs-property">@_eventKeyExists</span> key
+            <div class="content"><div class='highlight'><pre>	subscribeOnce: <span class="hljs-function"><span class="hljs-params">(key, callback)</span> -&gt;</span>
+		<span class="hljs-keyword">throw</span> <span class="hljs-string">"key '<span class="hljs-subst">#{key}</span>' does not exist in EventKeys"</span> <span class="hljs-keyword">unless</span> @_eventKeyExists key
 		<span class="hljs-keyword">throw</span> <span class="hljs-string">"callback is not a function"</span> <span class="hljs-keyword">unless</span> <span class="hljs-string">'function'</span> == <span class="hljs-keyword">typeof</span> callback
 
-		<span class="hljs-property">@eventRegistry</span>.once key, callback</pre></div></div>
+		@eventRegistry.once key, callback</pre></div></div>
             
         </li>
         
@@ -210,11 +210,11 @@ After the first time the callback is invoked, it will be removed.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">unsubscribe</span>: <span class="hljs-function"><span class="hljs-params">(key, callback)</span> -&gt;</span>
-		<span class="hljs-keyword">throw</span> <span class="hljs-string">"key '<span class="hljs-subst">#{key}</span>' does not exist in EventKeys"</span> <span class="hljs-keyword">unless</span> <span class="hljs-property">@_eventKeyExists</span> key
+            <div class="content"><div class='highlight'><pre>	unsubscribe: <span class="hljs-function"><span class="hljs-params">(key, callback)</span> -&gt;</span>
+		<span class="hljs-keyword">throw</span> <span class="hljs-string">"key '<span class="hljs-subst">#{key}</span>' does not exist in EventKeys"</span> <span class="hljs-keyword">unless</span> @_eventKeyExists key
 		<span class="hljs-keyword">throw</span> <span class="hljs-string">"callback is not a function"</span> <span class="hljs-keyword">unless</span> <span class="hljs-string">'function'</span> == <span class="hljs-keyword">typeof</span> callback
 
-		<span class="hljs-property">@eventRegistry</span>.<span class="hljs-literal">off</span> key, callback</pre></div></div>
+		@eventRegistry.<span class="hljs-literal">off</span> key, callback</pre></div></div>
             
         </li>
         
@@ -234,12 +234,12 @@ argument).</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">send</span>: <span class="hljs-function"><span class="hljs-params">(key, message)</span> -&gt;</span>
-		<span class="hljs-keyword">throw</span> <span class="hljs-string">"key '<span class="hljs-subst">#{key}</span>' does not exist in EventKeys"</span> <span class="hljs-keyword">unless</span> <span class="hljs-property">@_eventKeyExists</span> key
+            <div class="content"><div class='highlight'><pre>	send: <span class="hljs-function"><span class="hljs-params">(key, message)</span> -&gt;</span>
+		<span class="hljs-keyword">throw</span> <span class="hljs-string">"key '<span class="hljs-subst">#{key}</span>' does not exist in EventKeys"</span> <span class="hljs-keyword">unless</span> @_eventKeyExists key
 
-		<span class="hljs-property">@eventRegistry</span>.trigger key, message
+		@eventRegistry.trigger key, message
 
-	<span class="hljs-attribute">_eventKeyExists</span>: <span class="hljs-function"><span class="hljs-params">(key)</span> -&gt;</span>
+	_eventKeyExists: <span class="hljs-function"><span class="hljs-params">(key)</span> -&gt;</span>
 		key <span class="hljs-keyword">in</span> (value <span class="hljs-keyword">for</span> property, value <span class="hljs-keyword">of</span> Vigor.EventKeys)
 
 Vigor.EventBus = <span class="hljs-keyword">new</span> EventBus()</pre></div></div>
