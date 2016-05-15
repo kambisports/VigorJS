@@ -61,13 +61,18 @@ class IdProducer extends Producer
 
     addRemoveMap = (model) ->
       id = self.idForModel model, repository
-      if self.hasId id
+      if _.isArray id
+        _.filter id, self.hasId.bind self
+      else if self.hasId id
         id
 
     changeMap = (model) ->
       id = self.idForModel model, repository
-      if (self.hasId id) and (self.shouldPropagateModelChange model, repository)
-        id
+      if self.shouldPropagateModelChange model, repository
+        if _.isArray id
+          _.filter id, self.hasId.bind self
+        else if self.hasId id
+          id
 
     addedModelIds = _.map diff.added, addRemoveMap
     removedModelIds = _.map diff.removed, addRemoveMap
@@ -190,10 +195,10 @@ class IdProducer extends Producer
   # @param [repository]: [Repository](Repository.html)<br/>
   # The repository which contains the model.
   #
-  # @returns [id]: idType<br/>
-  # The internal id of the given model.
+  # @returns [id]: idType or array of idTypes<br/>
+  # The internal id of the given model, or an array of internal ids which correspond to the given model.
   #
-  # Translates a model to an id of type idType which uniquely identifies the model internally to this producer.
+  # Translates a model to an id or array of ids of type idType which uniquely identifies the model internally to this producer.
   idForModel: (model, repository) ->
     model.id
 

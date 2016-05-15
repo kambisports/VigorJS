@@ -162,6 +162,35 @@ describe 'An IdProducer', ->
 
     setTimeout done, 250
 
+  it 'should allow idForModel to return an array for added items', (done) ->
+    componentId1 = 1
+    componentId2 = 2
+
+    sinon.stub dummyProducer, 'produce'
+    (sinon.stub dummyProducer, 'idForModel').returns [componentId1, componentId2]
+
+    subscription1 =
+      id: componentId1
+
+    subscription2 =
+      id: componentId2
+
+    dummyProducer.subscribe subscription1
+    dummyProducer.subscribe subscription2
+
+    dummyProducer.produce.restore()
+
+    sinon.stub dummyProducer, 'produce', (ids) ->
+      assert.deepEqual ids, [componentId1, componentId2]
+      done()
+
+    dummyProducer.onDiffInRepository dummyProducer.repositories[0],
+      added: [
+        id: 'foo'
+      ]
+      removed: []
+      changed: []
+
   it 'should eventually produce removed items', (done) ->
     componentId = 1
 
@@ -209,7 +238,7 @@ describe 'An IdProducer', ->
       ]
       changed: []
 
-  it 'should not produce on added items that are not subscribed to', (done) ->
+  it 'should not produce on removed items that are not subscribed to', (done) ->
     componentId = 1
 
     sinon.stub dummyProducer, 'produce', ->
@@ -223,6 +252,36 @@ describe 'An IdProducer', ->
       changed: []
 
     setTimeout done, 250
+
+
+  it 'should allow idForModel to return an array for removed items', (done) ->
+    componentId1 = 1
+    componentId2 = 2
+
+    sinon.stub dummyProducer, 'produce'
+    (sinon.stub dummyProducer, 'idForModel').returns [componentId1, componentId2]
+
+    subscription1 =
+      id: componentId1
+
+    subscription2 =
+      id: componentId2
+
+    dummyProducer.subscribe subscription1
+    dummyProducer.subscribe subscription2
+
+    dummyProducer.produce.restore()
+
+    sinon.stub dummyProducer, 'produce', (ids) ->
+      assert.deepEqual ids, [componentId1, componentId2]
+      done()
+
+    dummyProducer.onDiffInRepository dummyProducer.repositories[0],
+      added: []
+      removed: [
+        id: 'foo'
+      ]
+      changed: []
 
 
   it 'should eventually produce changed items', (done) ->
@@ -248,7 +307,7 @@ describe 'An IdProducer', ->
         id: subscription.id
       ]
 
-  it 'should eventually produce removed items on the idForModel', (done) ->
+  it 'should eventually produce changed items on the idForModel', (done) ->
     componentId = 1
 
     sinon.stub dummyProducer, 'produce'
@@ -286,6 +345,36 @@ describe 'An IdProducer', ->
       ]
 
     setTimeout done, 250
+
+
+  it 'should allow idForModel to return an array for removed items', (done) ->
+    componentId1 = 1
+    componentId2 = 2
+
+    sinon.stub dummyProducer, 'produce'
+    (sinon.stub dummyProducer, 'idForModel').returns [componentId1, componentId2]
+
+    subscription1 =
+      id: componentId1
+
+    subscription2 =
+      id: componentId2
+
+    dummyProducer.subscribe subscription1
+    dummyProducer.subscribe subscription2
+
+    dummyProducer.produce.restore()
+
+    sinon.stub dummyProducer, 'produce', (ids) ->
+      assert.deepEqual ids, [componentId1, componentId2]
+      done()
+
+    dummyProducer.onDiffInRepository dummyProducer.repositories[0],
+      added: []
+      removed: []
+      changed: [
+        id: 'foo'
+      ]
 
 
   it 'should eventually produce on ids that were changed if shouldPropagateModelChange is true', (done) ->

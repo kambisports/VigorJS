@@ -46,7 +46,7 @@ removeComponent2 = sinon.spy DummyProducer2.prototype, 'removeComponent'
 
 describe 'A ProducerManager', ->
   beforeEach ->
-    dataCommunicationManager.registerProducers [DummyProducer1, DummyProducer2]
+    producerManager.registerProducers [DummyProducer1, DummyProducer2]
 
   afterEach ->
     do producerMapper.reset
@@ -65,10 +65,11 @@ describe 'A ProducerManager', ->
     describe 'to subscribe', ->
       it 'should call the producer\'s addComponent method', ->
 
-        options = {}
-
         addComponent.reset()
-        producerManager.subscribeComponentToKey SubscriptionKeys.EXAMPLE_KEY1, options
+        callback = ->
+        id = 123
+        options = {}
+        producerManager.subscribe id, SubscriptionKeys.EXAMPLE_KEY1, callback, options
 
         instance = addComponent.thisValues[0]
         args = addComponent.args[0]
@@ -77,14 +78,42 @@ describe 'A ProducerManager', ->
         assert.ok instance instanceof DummyProducer1
 
         assert.equal args.length, 1
-        assert.equal args[0], options
+        subscription = args[0]
+        assert.equal subscription.id, id
+        assert.equal subscription.callback, callback
+        assert.equal subscription.options, options
+
+      it 'should add multiple components for same subscription', ->
+        
+        addComponent.reset()
+        
+        component1 =
+          id: 123
+          key: SubscriptionKeys.EXAMPLE_KEY1
+          callback: ->
+          options: {}
+
+        component2 =
+          id: 456
+          key: SubscriptionKeys.EXAMPLE_KEY1
+          callback: ->
+          options: {}
+
+        producerManager.subscribe component1.id, component1.key, component1.callback, component1.options
+        producerManager.subscribe component2.id, component2.key, component2.callback, component2.options
+
+        assert addComponent.calledTwice
+        subscription = addComponent.lastCall.args[0]
+        assert.equal subscription.id, component2.id
+        assert.equal subscription.callback, component2.callback
+        assert.equal subscription.options, component2.options
 
     describe 'to unsubscribe', ->
       it 'should call the producer\'s removeComponent method', ->
         componentId = 'dummy'
 
         removeComponent.reset()
-        producerManager.unsubscribeComponentFromKey SubscriptionKeys.EXAMPLE_KEY1, componentId
+        producerManager.unsubscribe componentId, SubscriptionKeys.EXAMPLE_KEY1
 
         instance = removeComponent.thisValues[0]
         args = removeComponent.args[0]
@@ -100,7 +129,7 @@ describe 'A ProducerManager', ->
         componentId = 'dummy'
 
         removeComponent.reset()
-        producerManager.unsubscribeComponent componentId
+        producerManager.unsubscribeAll componentId
 
         instance = removeComponent.thisValues[0]
         args = removeComponent.args[0]
@@ -120,3 +149,6 @@ describe 'A ProducerManager', ->
 
         assert.equal args.length, 1
         assert.equal args[0], componentId
+
+    describe 'using subscribe', ->
+      it 'should add multiple components for same subscription', ->

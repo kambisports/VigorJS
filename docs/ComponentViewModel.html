@@ -55,11 +55,6 @@
                 </a>
               
                 
-                <a class="source" href="DataCommunicationManager.html">
-                  DataCommunicationManager.coffee
-                </a>
-              
-                
                 <a class="source" href="ProducerManager.html">
                   ProducerManager.coffee
                 </a>
@@ -133,12 +128,14 @@
               <h2 id="componentviewmodel">ComponentViewModel</h2>
 <p>This class is intended to be the base class for all view models in a component</p>
 <p>A ComponentViewModel handles communication with producers through the
-dataCommunicationManager</p>
+ProducerManager</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ComponentViewModel</span></span></pre></div></div>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ComponentViewModel</span></span>
+
+  ProducerManager = Vigor.ProducerManager</pre></div></div>
             
         </li>
         
@@ -149,24 +146,9 @@ dataCommunicationManager</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>@property dataCommunicationManager: DataCommunicationManager</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  dataCommunicationManager = Vigor.DataCommunicationManager</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-3">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
-              </div>
               <p><strong>constructor</strong> <br/>
 The constructor generates a unique id for the ViewModel that will be used to
-handle subscriptions in the dataCommunicationManager</p>
+handle subscriptions in the ProducerManager</p>
 
             </div>
             
@@ -176,11 +158,11 @@ handle subscriptions in the dataCommunicationManager</p>
         </li>
         
         
-        <li id="section-4">
+        <li id="section-3">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-4">&#182;</a>
+                <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
               <p><strong>dispose</strong> <br/>
 Remves all subscriptions</p>
@@ -193,11 +175,11 @@ Remves all subscriptions</p>
         </li>
         
         
-        <li id="section-5">
+        <li id="section-4">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
+                <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
               <p><strong>subscribe</strong> <br/>
 @param [key]: Object <br/>
@@ -206,13 +188,32 @@ A Vigor.SubscriptionKey containing a key and contract property<br/>
 Callback function that takes care of produced data
 @param [options]: Object (optional)<br/>
 Pass any optional data that might be needed by a Producer</p>
-<p>Adds a subscription on a specific SubscriptionKey to the dataCommunicationManager.
+<p>Adds a subscription on a specific SubscriptionKey to the ProducerManager.
 Whenever new data is produced the callback will be called with new data as param</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">subscribe</span>: <span class="hljs-function"><span class="hljs-params">(key, callback, options)</span> -&gt;</span>
-    dataCommunicationManager.subscribe <span class="hljs-property">@id</span>, key, callback, options</pre></div></div>
+    ProducerManager.subscribe <span class="hljs-property">@id</span>, key, callback, options</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p><strong>unsubscribe</strong> <br/>
+@param [key]: Object <br/>
+A Vigor.SubscriptionKey containing a key and contract property<br/></p>
+<p>Removes a subscription on specific key</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribe</span>: <span class="hljs-function"><span class="hljs-params">(key)</span> -&gt;</span>
+    ProducerManager.unsubscribe <span class="hljs-property">@id</span>, key</pre></div></div>
             
         </li>
         
@@ -223,15 +224,13 @@ Whenever new data is produced the callback will be called with new data as param
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p><strong>unsubscribe</strong> <br/>
-@param [key]: Object <br/>
-A Vigor.SubscriptionKey containing a key and contract property<br/></p>
-<p>Removes a subscription on specific key</p>
+              <p><strong>unsubscribeAll</strong> <br/>
+Removes all subscriptions</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribe</span>: <span class="hljs-function"><span class="hljs-params">(key)</span> -&gt;</span>
-    dataCommunicationManager.unsubscribe <span class="hljs-property">@id</span>, key</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribeAll</span>: <span class="hljs-function">-&gt;</span>
+    ProducerManager.unsubscribeAll <span class="hljs-property">@id</span></pre></div></div>
             
         </li>
         
@@ -241,23 +240,6 @@ A Vigor.SubscriptionKey containing a key and contract property<br/></p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
-              </div>
-              <p><strong>unsubscribeAll</strong> <br/>
-Removes all subscriptions</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribeAll</span>: <span class="hljs-function">-&gt;</span>
-    dataCommunicationManager.unsubscribeAll <span class="hljs-property">@id</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-8">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p><strong>validateContract</strong> <br/>
 @param [contract]: Object <br/>

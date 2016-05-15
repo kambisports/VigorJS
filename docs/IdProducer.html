@@ -55,11 +55,6 @@
                 </a>
               
                 
-                <a class="source" href="DataCommunicationManager.html">
-                  DataCommunicationManager.coffee
-                </a>
-              
-                
                 <a class="source" href="ProducerManager.html">
                   ProducerManager.coffee
                 </a>
@@ -250,13 +245,18 @@ and produces data for them.</p>
 <span class="hljs-function">
     <span class="hljs-title">addRemoveMap</span> = <span class="hljs-params">(model)</span> -&gt;</span>
       id = self.idForModel model, repository
-      <span class="hljs-keyword">if</span> self.hasId id
+      <span class="hljs-keyword">if</span> _.isArray id
+        _.filter id, self.hasId.bind self
+      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> self.hasId id
         id
 <span class="hljs-function">
     <span class="hljs-title">changeMap</span> = <span class="hljs-params">(model)</span> -&gt;</span>
       id = self.idForModel model, repository
-      <span class="hljs-keyword">if</span> (self.hasId id) <span class="hljs-keyword">and</span> (self.shouldPropagateModelChange model, repository)
-        id
+      <span class="hljs-keyword">if</span> self.shouldPropagateModelChange model, repository
+        <span class="hljs-keyword">if</span> _.isArray id
+          _.filter id, self.hasId.bind self
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> self.hasId id
+          id
 
     addedModelIds = _.map diff.added, addRemoveMap
     removedModelIds = _.map diff.removed, addRemoveMap
@@ -492,9 +492,9 @@ The repository which contains the model.<br/></p>
 A model</p>
 <p>@param [repository]: <a href="Repository.html">Repository</a><br/>
 The repository which contains the model.</p>
-<p>@returns [id]: idType<br/>
-The internal id of the given model.</p>
-<p>Translates a model to an id of type idType which uniquely identifies the model internally to this producer.</p>
+<p>@returns [id]: idType or array of idTypes<br/>
+The internal id of the given model, or an array of internal ids which correspond to the given model.</p>
+<p>Translates a model to an id or array of ids of type idType which uniquely identifies the model internally to this producer.</p>
 
             </div>
             

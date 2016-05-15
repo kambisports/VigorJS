@@ -19,33 +19,33 @@ producerManager =
   producerForKey: (subscriptionKey) ->
     producer = producerMapper.producerForKey subscriptionKey
 
-  # **subscribeComponentToKey:** </br>
-  # @param [subscriptionKey]: String <br/>
-  # @param [subscription]: Object <br/>
+  # **subscribe:** </br>
+  # @param [componentId]: String <br/>
+  # @param [subscriptionKey]: Object <br/>
+  # @param [callback]: Function <br/>
+  # @param [subscriptionOptions]: Object (default empty object) <br/>
   #
-  # Adds a component to the producer for the given [subscriptionKey]
-  subscribeComponentToKey: (subscriptionKey, subscription) ->
+  # Registers a component with [componentId] to recieve data changes on given [subscriptionKey] through the component [callback]
+  subscribe: (componentId, subscriptionKey, callback, subscriptionOptions = {}) ->
+    subscription = new Subscription componentId, callback, subscriptionOptions
     producer = @producerForKey subscriptionKey
     producer.addComponent subscription
 
-  # **unsubscribeComponentFromKey:** </br>
-  # @param [subscriptionKey]: String <br/>
+  # **unsubscribe:** </br>
   # @param [componentId]: String <br/>
+  # @param [subscriptionKey]: String <br/>
   #
   # Unsubscribes a component with [componentId] from the producer for the given [subscriptionKey]
-  unsubscribeComponentFromKey: (subscriptionKey, componentId) ->
+  unsubscribe: (componentId, subscriptionKey) ->
     producer = @producerForKey subscriptionKey
     producer.removeComponent componentId
 
-  # **unsubscribeComponent:** </br>
+  # **unsubscribeAll:** </br>
   # @param [componentId]: String <br/>
   #
   # Unsubscribes a component with [componentId] from any producer that might have it in its subscription
-  unsubscribeComponent: (componentId) ->
+  unsubscribeAll: (componentId) ->
     producerMapper.producers.forEach (producer) ->
       producer::getInstance().removeComponent componentId
 
-### start-test-block ###
-# this will be removed in distribution build since the manager should be private
 Vigor.ProducerManager = producerManager
-### end-test-block ###

@@ -1,6 +1,6 @@
 /**
  * vigorjs - A small framework for structuring large scale Backbone applications
- * @version v0.0.4
+ * @version v0.0.6
  * @link 
  * @license ISC
  */
@@ -8,8 +8,7 @@
   var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    hasProp = {}.hasOwnProperty,
-    slice = [].slice;
+    hasProp = {}.hasOwnProperty;
 
   (function(root, factory) {
     var $, Backbone, _;
@@ -26,7 +25,7 @@
       root.Vigor = factory(root, root.Backbone, root._, root.$);
     }
   })(this, function(root, Backbone, _, $) {
-    var ComponentBase, ComponentView, ComponentViewModel, DataCommunicationManager, EventBus, EventRegistry, IdProducer, KEY_ALREADY_REGISTERED, NO_PRODUCERS_ERROR, NO_PRODUCER_FOUND_ERROR, Producer, Repository, ServiceRepository, Subscription, Vigor, previousVigor, producerManager, producerMapper, producers, producersByKey, setup, validateContract;
+    var ComponentBase, ComponentView, ComponentViewModel, EventBus, EventRegistry, IdProducer, KEY_ALREADY_REGISTERED, NO_PRODUCERS_ERROR, NO_PRODUCER_FOUND_ERROR, Producer, Repository, ServiceRepository, Subscription, Vigor, previousVigor, producerManager, producerMapper, producers, producersByKey, setup, validateContract;
     previousVigor = root.Vigor;
     Vigor = Backbone.Vigor = {};
     Vigor.helpers = {};
@@ -194,7 +193,7 @@
 
     producers = [];
     producersByKey = {};
-    NO_PRODUCERS_ERROR = "There are no producers registered - register producers through the DataCommunicationManager";
+    NO_PRODUCERS_ERROR = "There are no producers registered - register producers through the ProducerManager";
     NO_PRODUCER_FOUND_ERROR = function(key) {
       return "No producer found for subscription " + key + "!";
     };
@@ -248,43 +247,27 @@
         var producer;
         return producer = producerMapper.producerForKey(subscriptionKey);
       },
-      subscribeComponentToKey: function(subscriptionKey, subscription) {
-        var producer;
+      subscribe: function(componentId, subscriptionKey, callback, subscriptionOptions) {
+        var producer, subscription;
+        if (subscriptionOptions == null) {
+          subscriptionOptions = {};
+        }
+        subscription = new Subscription(componentId, callback, subscriptionOptions);
         producer = this.producerForKey(subscriptionKey);
         return producer.addComponent(subscription);
       },
-      unsubscribeComponentFromKey: function(subscriptionKey, componentId) {
+      unsubscribe: function(componentId, subscriptionKey) {
         var producer;
         producer = this.producerForKey(subscriptionKey);
         return producer.removeComponent(componentId);
       },
-      unsubscribeComponent: function(componentId) {
+      unsubscribeAll: function(componentId) {
         return producerMapper.producers.forEach(function(producer) {
           return producer.prototype.getInstance().removeComponent(componentId);
         });
       }
     };
-
-    DataCommunicationManager = {
-      registerProducers: function(producers) {
-        return producerManager.registerProducers(producers);
-      },
-      subscribe: function(componentId, subscriptionKey, callback, subscriptionOptions) {
-        var subscription;
-        if (subscriptionOptions == null) {
-          subscriptionOptions = {};
-        }
-        subscription = new Subscription(componentId, callback, subscriptionOptions);
-        return producerManager.subscribeComponentToKey(subscriptionKey, subscription);
-      },
-      unsubscribe: function(componentId, subscriptionKey) {
-        return producerManager.unsubscribeComponentFromKey(subscriptionKey, componentId);
-      },
-      unsubscribeAll: function(componentId) {
-        return producerManager.unsubscribeComponent(componentId);
-      }
-    };
-    Vigor.DataCommunicationManager = DataCommunicationManager;
+    Vigor.ProducerManager = producerManager;
     Producer = (function() {
       Producer.prototype.PRODUCTION_KEY = void 0;
 
@@ -492,15 +475,21 @@
         addRemoveMap = function(model) {
           var id;
           id = self.idForModel(model, repository);
-          if (self.hasId(id)) {
+          if (_.isArray(id)) {
+            return _.filter(id, self.hasId.bind(self));
+          } else if (self.hasId(id)) {
             return id;
           }
         };
         changeMap = function(model) {
           var id;
           id = self.idForModel(model, repository);
-          if ((self.hasId(id)) && (self.shouldPropagateModelChange(model, repository))) {
-            return id;
+          if (self.shouldPropagateModelChange(model, repository)) {
+            if (_.isArray(id)) {
+              return _.filter(id, self.hasId.bind(self));
+            } else if (self.hasId(id)) {
+              return id;
+            }
           }
         };
         addedModelIds = _.map(diff.added, addRemoveMap);
@@ -939,9 +928,9 @@
     })(Backbone.View);
     Vigor.ComponentView = ComponentView;
     ComponentViewModel = (function() {
-      var dataCommunicationManager;
+      var ProducerManager;
 
-      dataCommunicationManager = Vigor.DataCommunicationManager;
+      ProducerManager = Vigor.ProducerManager;
 
       function ComponentViewModel() {
         this.id = "ComponentViewModel_" + (_.uniqueId());
@@ -952,15 +941,15 @@
       };
 
       ComponentViewModel.prototype.subscribe = function(key, callback, options) {
-        return dataCommunicationManager.subscribe(this.id, key, callback, options);
+        return ProducerManager.subscribe(this.id, key, callback, options);
       };
 
       ComponentViewModel.prototype.unsubscribe = function(key) {
-        return dataCommunicationManager.unsubscribe(this.id, key);
+        return ProducerManager.unsubscribe(this.id, key);
       };
 
       ComponentViewModel.prototype.unsubscribeAll = function() {
-        return dataCommunicationManager.unsubscribeAll(this.id);
+        return ProducerManager.unsubscribeAll(this.id);
       };
 
       ComponentViewModel.prototype.validateContract = function(contract, incommingData) {
@@ -1021,18 +1010,16 @@
         return this.models.length <= 0;
       };
 
-      Repository.prototype._onAll = function() {
-        var args, event;
-        event = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
+      Repository.prototype._onAll = function(event, model) {
         switch (event) {
           case 'add':
-            this._onAdd.apply(this, args);
+            this._onAdd(model);
             break;
           case 'change':
-            this._onChange.apply(this, args);
+            this._onChange(model);
             break;
           case 'remove':
-            this._onRemove.apply(this, args);
+            this._onRemove(model);
         }
         return this._throttledTriggerUpdates();
       };
