@@ -67,8 +67,8 @@ class IdProducer extends Producer
         id
 
     changeMap = (model) ->
-      id = self.idForModel model, repository
       if self.shouldPropagateModelChange model, repository
+        id = self.idForModel model, repository
         if _.isArray id
           _.filter id, self.hasId.bind self
         else if self.hasId id

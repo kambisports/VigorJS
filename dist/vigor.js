@@ -483,8 +483,8 @@
         };
         changeMap = function(model) {
           var id;
-          id = self.idForModel(model, repository);
           if (self.shouldPropagateModelChange(model, repository)) {
+            id = self.idForModel(model, repository);
             if (_.isArray(id)) {
               return _.filter(id, self.hasId.bind(self));
             } else if (self.hasId(id)) {
