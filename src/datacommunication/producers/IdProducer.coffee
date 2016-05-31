@@ -78,7 +78,7 @@ class IdProducer extends Producer
     removedModelIds = _.map diff.removed, addRemoveMap
     updatedModelIds = _.map diff.changed, changeMap
 
-    @produceDataForIds _.filter _.flatten [addedModelIds, removedModelIds, updatedModelIds]
+    @produceDataForIds _.filter _.flattenDepth [addedModelIds, removedModelIds, updatedModelIds], 2
 
 
   # **produceDataForIds**<br/>
@@ -153,10 +153,11 @@ class IdProducer extends Producer
 
       @_validateContract data
 
-      _.each @registeredComponents, (component) ->
-        if id is @idForOptions component.options
-          component.callback data
-      , @
+      _.each @registeredComponents,
+        _.bind (component) ->
+          if id is @idForOptions component.options
+            component.callback data
+        , @
 
   # **currentData**<br/>
   # @param [id]: The id to produce data for

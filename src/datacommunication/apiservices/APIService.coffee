@@ -87,7 +87,7 @@ do ->
     #
     # Add a subscription to the channel, causing the params to update. A fetch may be scheduled or rescheduled.
     addSubscription: (subscriber) ->
-      unless _.contains @subscribers, subscriber
+      unless _.includes @subscribers, subscriber
         @subscribers.push subscriber
 
         @onSubscriptionsChanged()
@@ -100,7 +100,7 @@ do ->
     # Remove a subscription to the channel, causing the params to update. The next fetch may be rescheduled or the
     # channel may be stopped if this is the last subscriber.
     removeSubscription: (subscriber) ->
-      if _.contains @subscribers, subscriber
+      if _.includes @subscribers, subscriber
         @subscribers = _.without @subscribers, subscriber
 
         if @subscribers.length is 0
@@ -165,7 +165,7 @@ do ->
 
       # Remove the immediate requests. This will never trigger a
       # restart because the polling interval is zero and cannot be lowered
-      _.each immediateRequests, (immediateRequest) ->
+      _.each immediateRequests, _.bind (immediateRequest) ->
         @removeSubscription immediateRequest
       , @
 

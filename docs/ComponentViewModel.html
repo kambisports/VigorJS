@@ -125,8 +125,8 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h2 id="componentviewmodel">ComponentViewModel</h2>
-<p>This class is intended to be the base class for all view models in a component</p>
+              <p>##ComponentViewModel
+This class is intended to be the base class for all view models in a component</p>
 <p>A ComponentViewModel handles communication with producers through the
 ProducerManager</p>
 
@@ -152,8 +152,8 @@ handle subscriptions in the ProducerManager</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">constructor</span>: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-property">@id</span> = <span class="hljs-string">"ComponentViewModel_<span class="hljs-subst">#{_.uniqueId()}</span>"</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  constructor: <span class="hljs-function">-&gt;</span>
+    @id = <span class="hljs-string">"ComponentViewModel_<span class="hljs-subst">#{_.uniqueId()}</span>"</span></pre></div></div>
             
         </li>
         
@@ -169,8 +169,8 @@ Remves all subscriptions</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">dispose</span>: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">do</span> <span class="hljs-property">@unsubscribeAll</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  dispose: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-keyword">do</span> @unsubscribeAll</pre></div></div>
             
         </li>
         
@@ -193,8 +193,8 @@ Whenever new data is produced the callback will be called with new data as param
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">subscribe</span>: <span class="hljs-function"><span class="hljs-params">(key, callback, options)</span> -&gt;</span>
-    ProducerManager.subscribe <span class="hljs-property">@id</span>, key, callback, options</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  subscribe: <span class="hljs-function"><span class="hljs-params">(key, callback, options)</span> -&gt;</span>
+    ProducerManager.subscribe @id, key, callback, options</pre></div></div>
             
         </li>
         
@@ -212,8 +212,8 @@ A Vigor.SubscriptionKey containing a key and contract property<br/></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribe</span>: <span class="hljs-function"><span class="hljs-params">(key)</span> -&gt;</span>
-    ProducerManager.unsubscribe <span class="hljs-property">@id</span>, key</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  unsubscribe: <span class="hljs-function"><span class="hljs-params">(key)</span> -&gt;</span>
+    ProducerManager.unsubscribe @id, key</pre></div></div>
             
         </li>
         
@@ -229,8 +229,8 @@ Removes all subscriptions</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribeAll</span>: <span class="hljs-function">-&gt;</span>
-    ProducerManager.unsubscribeAll <span class="hljs-property">@id</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  unsubscribeAll: <span class="hljs-function">-&gt;</span>
+    ProducerManager.unsubscribeAll @id</pre></div></div>
             
         </li>
         
@@ -252,8 +252,8 @@ validate incoming data</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">validateContract</span>: <span class="hljs-function"><span class="hljs-params">(contract, incommingData)</span> -&gt;</span>
-    Vigor.helpers.validateContract(contract, incommingData, <span class="hljs-property">@id</span>)
+            <div class="content"><div class='highlight'><pre>  validateContract: <span class="hljs-function"><span class="hljs-params">(contract, incommingData)</span> -&gt;</span>
+    Vigor.helpers.validateContract(contract, incommingData, @id)
 
 ComponentViewModel.extend = Vigor.extend
 Vigor.ComponentViewModel = ComponentViewModel</pre></div></div>

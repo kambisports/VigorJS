@@ -2,12 +2,12 @@
   if typeof define is "function" and define.amd
 
     # AMD. Register as an anonymous module.
-    define ['backbone', 'underscore', 'jquery'], (Backbone, _, $) ->
+    define ['backbone', 'lodash', 'jquery'], (Backbone, _, $) ->
         return factory(root, Backbone, _, $)
 
   else if typeof exports is "object"
     Backbone = require 'backbone'
-    _ = require 'underscore'
+    _ = require 'lodash'
     $ = require 'jquery'
 
     # Node. Does not work with strict CommonJS, but
