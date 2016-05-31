@@ -125,8 +125,8 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h2 id="componentview">ComponentView</h2>
-<p>This class is intended to be used as a base class for all views within a component
+              <p>##ComponentView
+This class is intended to be used as a base class for all views within a component
 It enforces five methods to unify the structure of ComponentViews accross a large application:</p>
 <ul>
 <li>renderStaticContent</li>
@@ -154,7 +154,7 @@ It enforces five methods to unify the structure of ComponentViews accross a larg
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">viewModel</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  viewModel: <span class="hljs-literal">undefined</span></pre></div></div>
             
         </li>
         
@@ -169,7 +169,7 @@ It enforces five methods to unify the structure of ComponentViews accross a larg
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">constructor</span>: <span class="hljs-function">-&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  constructor: <span class="hljs-function">-&gt;</span></pre></div></div>
             
         </li>
         
@@ -186,7 +186,7 @@ you don’t need them).</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_checkIfImplemented</span> [
+            <div class="content"><div class='highlight'><pre>    @_checkIfImplemented [
       <span class="hljs-string">'renderStaticContent'</span>,
       <span class="hljs-string">'renderDynamicContent'</span>,
       <span class="hljs-string">'addSubscriptions'</span>,
@@ -212,10 +212,10 @@ view options, usually containing a viewModel instance <br/></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">initialize</span>: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  initialize: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
     <span class="hljs-keyword">super</span>
     <span class="hljs-keyword">if</span> options?.viewModel
-      <span class="hljs-property">@viewModel</span> = options.viewModel
+      @viewModel = options.viewModel
     <span class="hljs-keyword">return</span> @</pre></div></div>
             
         </li>
@@ -233,9 +233,9 @@ the views render method, it will call @renderStaticContent and @addSubscriptions
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">render</span>: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">do</span> <span class="hljs-property">@renderStaticContent</span>
-    <span class="hljs-keyword">do</span> <span class="hljs-property">@addSubscriptions</span>
+            <div class="content"><div class='highlight'><pre>  render: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-keyword">do</span> @renderStaticContent
+    <span class="hljs-keyword">do</span> @addSubscriptions
     <span class="hljs-keyword">return</span> @</pre></div></div>
             
         </li>
@@ -254,7 +254,7 @@ Render parts of component that don’t rely on model. <br/></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">renderStaticContent</span>: <span class="hljs-function">-&gt;</span>
+            <div class="content"><div class='highlight'><pre>  renderStaticContent: <span class="hljs-function">-&gt;</span>
     <span class="hljs-keyword">return</span> @</pre></div></div>
             
         </li>
@@ -273,7 +273,7 @@ Render parts of component that relies on model. <br/></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">renderDynamicContent</span>: <span class="hljs-function">-&gt;</span>
+            <div class="content"><div class='highlight'><pre>  renderDynamicContent: <span class="hljs-function">-&gt;</span>
     <span class="hljs-keyword">return</span> @</pre></div></div>
             
         </li>
@@ -292,7 +292,7 @@ Add view model subscriptions if needed. <br/></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">addSubscriptions</span>: <span class="hljs-function">-&gt;</span>
+            <div class="content"><div class='highlight'><pre>  addSubscriptions: <span class="hljs-function">-&gt;</span>
     <span class="hljs-keyword">return</span> @</pre></div></div>
             
         </li>
@@ -311,7 +311,7 @@ Remove view model subscriptions.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">removeSubscriptions</span>: <span class="hljs-function">-&gt;</span>
+            <div class="content"><div class='highlight'><pre>  removeSubscriptions: <span class="hljs-function">-&gt;</span>
     <span class="hljs-keyword">return</span> @</pre></div></div>
             
         </li>
@@ -329,13 +329,13 @@ Override this, and call super.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">dispose</span>: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">do</span> <span class="hljs-property">@model</span>?.unbind
-    <span class="hljs-keyword">do</span> <span class="hljs-property">@removeSubscriptions</span>
-    <span class="hljs-keyword">do</span> <span class="hljs-property">@stopListening</span>
-    <span class="hljs-keyword">do</span> <span class="hljs-property">@$el</span>.<span class="hljs-literal">off</span>
-    <span class="hljs-keyword">do</span> <span class="hljs-property">@$el</span>.remove
-    <span class="hljs-keyword">do</span> <span class="hljs-property">@off</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  dispose: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-keyword">do</span> @model?.unbind
+    <span class="hljs-keyword">do</span> @removeSubscriptions
+    <span class="hljs-keyword">do</span> @stopListening
+    <span class="hljs-keyword">do</span> @$el.<span class="hljs-literal">off</span>
+    <span class="hljs-keyword">do</span> @$el.remove
+    <span class="hljs-keyword">do</span> @off</pre></div></div>
             
         </li>
         
@@ -352,10 +352,10 @@ Ensures that passed methods are implemented in the view</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_checkIfImplemented</span>: <span class="hljs-function"><span class="hljs-params">(methodNames)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  _checkIfImplemented: <span class="hljs-function"><span class="hljs-params">(methodNames)</span> -&gt;</span>
     <span class="hljs-keyword">for</span> methodName <span class="hljs-keyword">in</span> methodNames
-      <span class="hljs-keyword">unless</span> <span class="hljs-property">@constructor</span>.prototype.hasOwnProperty(methodName)
-        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"<span class="hljs-subst">#{<span class="hljs-property">@constructor</span>.name}</span> - <span class="hljs-subst">#{methodName}</span>() must be implemented in View."</span>)</pre></div></div>
+      <span class="hljs-keyword">unless</span> @constructor.prototype.hasOwnProperty(methodName)
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"<span class="hljs-subst">#{@constructor.name}</span> - <span class="hljs-subst">#{methodName}</span>() must be implemented in View."</span>)</pre></div></div>
             
         </li>
         

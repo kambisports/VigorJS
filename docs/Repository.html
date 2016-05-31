@@ -147,7 +147,7 @@ and adds functionality for diffing and throttling data</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_throttledAddedModels</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  _throttledAddedModels: <span class="hljs-literal">undefined</span></pre></div></div>
             
         </li>
         
@@ -162,7 +162,7 @@ and adds functionality for diffing and throttling data</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_throttledChangedModels</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  _throttledChangedModels: <span class="hljs-literal">undefined</span></pre></div></div>
             
         </li>
         
@@ -177,7 +177,7 @@ and adds functionality for diffing and throttling data</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_throttledRemovedModels</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  _throttledRemovedModels: <span class="hljs-literal">undefined</span></pre></div></div>
             
         </li>
         
@@ -193,17 +193,17 @@ function in order to avoid flooding the listeners</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_throttledTriggerUpdates</span>: <span class="hljs-literal">undefined</span>
+            <div class="content"><div class='highlight'><pre>  _throttledTriggerUpdates: <span class="hljs-literal">undefined</span>
 
-  <span class="hljs-attribute">initialize</span>: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-property">@cid</span> = <span class="hljs-property">@cid</span> <span class="hljs-keyword">or</span> _.uniqueId <span class="hljs-string">'c'</span>
-    <span class="hljs-property">@_throttledAddedModels</span> = {}
-    <span class="hljs-property">@_throttledChangedModels</span> = {}
-    <span class="hljs-property">@_throttledRemovedModels</span> = {}
+  initialize: <span class="hljs-function">-&gt;</span>
+    @cid = @cid <span class="hljs-keyword">or</span> _.uniqueId <span class="hljs-string">'c'</span>
+    @_throttledAddedModels = {}
+    @_throttledChangedModels = {}
+    @_throttledRemovedModels = {}
 
-    <span class="hljs-property">@_throttledTriggerUpdates</span> = _.throttle <span class="hljs-property">@_triggerUpdates</span>, <span class="hljs-number">100</span>, <span class="hljs-attribute">leading</span>: <span class="hljs-literal">no</span>
+    @_throttledTriggerUpdates = _.throttle @_triggerUpdates, <span class="hljs-number">100</span>, leading: <span class="hljs-literal">no</span>
 
-    <span class="hljs-keyword">do</span> <span class="hljs-property">@addThrottledListeners</span>
+    <span class="hljs-keyword">do</span> @addThrottledListeners
     <span class="hljs-keyword">super</span></pre></div></div>
             
         </li>
@@ -221,8 +221,8 @@ It still bubbles the event for outside subscribers.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">addThrottledListeners</span>: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-property">@on</span> <span class="hljs-string">'all'</span>, <span class="hljs-property">@_onAll</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  addThrottledListeners: <span class="hljs-function">-&gt;</span>
+    @on <span class="hljs-string">'all'</span>, @_onAll</pre></div></div>
             
         </li>
         
@@ -239,14 +239,14 @@ It still bubbles the event for outside subscribers.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">getByIds</span>: <span class="hljs-function"><span class="hljs-params">(ids)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  getByIds: <span class="hljs-function"><span class="hljs-params">(ids)</span> -&gt;</span>
     models = []
     <span class="hljs-keyword">for</span> id <span class="hljs-keyword">in</span> ids
-      models.push <span class="hljs-property">@get</span> id
+      models.push @get id
     <span class="hljs-keyword">return</span> models
 
-  <span class="hljs-attribute">isEmpty</span>: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">return</span> <span class="hljs-property">@models</span>.length &lt;= <span class="hljs-number">0</span></pre></div></div>
+  isEmpty: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-keyword">return</span> @models.length &lt;= <span class="hljs-number">0</span></pre></div></div>
             
         </li>
         
@@ -262,44 +262,44 @@ see <em>addThrottledListeners</em></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_onAll</span>: <span class="hljs-function"><span class="hljs-params">(event, args...)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  _onAll: <span class="hljs-function"><span class="hljs-params">(event, model)</span> -&gt;</span>
     <span class="hljs-keyword">switch</span> event
-      <span class="hljs-keyword">when</span> <span class="hljs-string">'add'</span> <span class="hljs-keyword">then</span> <span class="hljs-property">@_onAdd</span>.apply(@, args)
-      <span class="hljs-keyword">when</span> <span class="hljs-string">'change'</span> <span class="hljs-keyword">then</span> <span class="hljs-property">@_onChange</span>.apply(@, args)
-      <span class="hljs-keyword">when</span> <span class="hljs-string">'remove'</span> <span class="hljs-keyword">then</span> <span class="hljs-property">@_onRemove</span>.apply(@, args)
+      <span class="hljs-keyword">when</span> <span class="hljs-string">'add'</span> <span class="hljs-keyword">then</span> @_onAdd model
+      <span class="hljs-keyword">when</span> <span class="hljs-string">'change'</span> <span class="hljs-keyword">then</span> @_onChange model
+      <span class="hljs-keyword">when</span> <span class="hljs-string">'remove'</span> <span class="hljs-keyword">then</span> @_onRemove model
 
-    <span class="hljs-keyword">do</span> <span class="hljs-property">@_throttledTriggerUpdates</span>
+    <span class="hljs-keyword">do</span> @_throttledTriggerUpdates
 
-  <span class="hljs-attribute">_onAdd</span>: <span class="hljs-function"><span class="hljs-params">(model)</span> =&gt;</span>
-    <span class="hljs-property">@_throttledAddedModels</span>[model.id] = model
+  _onAdd: <span class="hljs-function"><span class="hljs-params">(model)</span> =&gt;</span>
+    @_throttledAddedModels[model.id] = model
 
-  <span class="hljs-attribute">_onChange</span>: <span class="hljs-function"><span class="hljs-params">(model)</span> =&gt;</span>
-    <span class="hljs-property">@_throttledChangedModels</span>[model.id] = model
+  _onChange: <span class="hljs-function"><span class="hljs-params">(model)</span> =&gt;</span>
+    @_throttledChangedModels[model.id] = model
 
-  <span class="hljs-attribute">_onRemove</span>: <span class="hljs-function"><span class="hljs-params">(model)</span> =&gt;</span>
-    <span class="hljs-property">@_throttledRemovedModels</span>[model.id] = model
+  _onRemove: <span class="hljs-function"><span class="hljs-params">(model)</span> =&gt;</span>
+    @_throttledRemovedModels[model.id] = model
 
-  <span class="hljs-attribute">_throttledAdd</span>: <span class="hljs-function">-&gt;</span>
-    event = <span class="hljs-attribute">Repository</span>::REPOSITORY_ADD
-    models = _.values <span class="hljs-property">@_throttledAddedModels</span>
-    <span class="hljs-property">@_throttledAddedModels</span> = {}
-    <span class="hljs-property">@_throttledEvent</span> event, models, event
+  _throttledAdd: <span class="hljs-function">-&gt;</span>
+    event = Repository::REPOSITORY_ADD
+    models = _.values @_throttledAddedModels
+    @_throttledAddedModels = {}
+    @_throttledEvent event, models, event
 
-  <span class="hljs-attribute">_throttledChange</span>: <span class="hljs-function">-&gt;</span>
-    event = <span class="hljs-attribute">Repository</span>::REPOSITORY_CHANGE
-    models = _.values <span class="hljs-property">@_throttledChangedModels</span>
-    <span class="hljs-property">@_throttledChangedModels</span> = {}
-    <span class="hljs-property">@_throttledEvent</span> event, models, event
+  _throttledChange: <span class="hljs-function">-&gt;</span>
+    event = Repository::REPOSITORY_CHANGE
+    models = _.values @_throttledChangedModels
+    @_throttledChangedModels = {}
+    @_throttledEvent event, models, event
 
-  <span class="hljs-attribute">_throttledRemove</span>: <span class="hljs-function">-&gt;</span>
-    event = <span class="hljs-attribute">Repository</span>::REPOSITORY_REMOVE
-    models = _.values <span class="hljs-property">@_throttledRemovedModels</span>
-    <span class="hljs-property">@_throttledRemovedModels</span> = {}
-    <span class="hljs-property">@_throttledEvent</span> event, models, event
+  _throttledRemove: <span class="hljs-function">-&gt;</span>
+    event = Repository::REPOSITORY_REMOVE
+    models = _.values @_throttledRemovedModels
+    @_throttledRemovedModels = {}
+    @_throttledEvent event, models, event
 
-  <span class="hljs-attribute">_throttledEvent</span>: <span class="hljs-function"><span class="hljs-params">(event, models, eventRef)</span> -&gt;</span>
+  _throttledEvent: <span class="hljs-function"><span class="hljs-params">(event, models, eventRef)</span> -&gt;</span>
     <span class="hljs-keyword">if</span> models.length &gt; <span class="hljs-number">0</span>
-      <span class="hljs-property">@trigger</span> event, models, eventRef
+      @trigger event, models, eventRef
     <span class="hljs-keyword">return</span> models</pre></div></div>
             
         </li>
@@ -320,8 +320,8 @@ response with all the added, removed and updated models since last throttled bat
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_throttledDiff</span>: <span class="hljs-function"><span class="hljs-params">(added, changed, removed)</span> -&gt;</span>
-    event = <span class="hljs-attribute">Repository</span>::REPOSITORY_DIFF
+            <div class="content"><div class='highlight'><pre>  _throttledDiff: <span class="hljs-function"><span class="hljs-params">(added, changed, removed)</span> -&gt;</span>
+    event = Repository::REPOSITORY_DIFF
     <span class="hljs-keyword">if</span>  added.length <span class="hljs-keyword">or</span> \
         changed.length <span class="hljs-keyword">or</span> \
         removed.length
@@ -330,20 +330,20 @@ response with all the added, removed and updated models since last throttled bat
       consolidated = _.uniq added.concat(changed)
 
       models =
-        <span class="hljs-attribute">added</span>: added
-        <span class="hljs-attribute">changed</span>: changed
-        <span class="hljs-attribute">removed</span>: removed
-        <span class="hljs-attribute">consolidated</span>: consolidated
+        added: added
+        changed: changed
+        removed: removed
+        consolidated: consolidated
 
-      <span class="hljs-property">@trigger</span> event, models, event
+      @trigger event, models, event
 
-  <span class="hljs-attribute">_triggerUpdates</span>: <span class="hljs-function">=&gt;</span>
-    <span class="hljs-property">@_throttledDiff</span> <span class="hljs-property">@_throttledAdd</span>(), <span class="hljs-property">@_throttledChange</span>(), <span class="hljs-property">@_throttledRemove</span>()
+  _triggerUpdates: <span class="hljs-function">=&gt;</span>
+    @_throttledDiff @_throttledAdd(), @_throttledChange(), @_throttledRemove()
 
-  <span class="hljs-attribute">REPOSITORY_DIFF</span>: <span class="hljs-string">'repository_diff'</span>
-  <span class="hljs-attribute">REPOSITORY_ADD</span>: <span class="hljs-string">'repository_add'</span>
-  <span class="hljs-attribute">REPOSITORY_CHANGE</span>: <span class="hljs-string">'repository_change'</span>
-  <span class="hljs-attribute">REPOSITORY_REMOVE</span>: <span class="hljs-string">'repository_remove'</span>
+  REPOSITORY_DIFF: <span class="hljs-string">'repository_diff'</span>
+  REPOSITORY_ADD: <span class="hljs-string">'repository_add'</span>
+  REPOSITORY_CHANGE: <span class="hljs-string">'repository_change'</span>
+  REPOSITORY_REMOVE: <span class="hljs-string">'repository_remove'</span>
 
 Vigor.Repository = Repository</pre></div></div>
             

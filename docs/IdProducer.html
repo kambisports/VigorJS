@@ -153,7 +153,7 @@ or updated since the last time data was produced</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">updatedIds</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  updatedIds: <span class="hljs-literal">undefined</span></pre></div></div>
             
         </li>
         
@@ -169,7 +169,7 @@ and the values are arrays of subscription options objects.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">subscriptions</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  subscriptions: <span class="hljs-literal">undefined</span></pre></div></div>
             
         </li>
         
@@ -186,13 +186,13 @@ Trying to add a subscription with an invalid type throws an error.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">idType</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-number">0</span>
+            <div class="content"><div class='highlight'><pre>  idType: <span class="hljs-keyword">typeof</span> <span class="hljs-number">0</span>
 
 
-  <span class="hljs-attribute">constructor</span>: <span class="hljs-function">-&gt;</span>
+  constructor: <span class="hljs-function">-&gt;</span>
     <span class="hljs-keyword">super</span>
-    <span class="hljs-property">@updatedIds</span> = []
-    <span class="hljs-property">@subscriptions</span> = {}</pre></div></div>
+    @updatedIds = []
+    @subscriptions = {}</pre></div></div>
             
         </li>
         
@@ -210,16 +210,16 @@ Subsciption options. Can be used to get the id to unsubscribe from.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">subscribe</span>: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
-    id = <span class="hljs-property">@idForOptions</span> options
-    <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> id <span class="hljs-keyword">isnt</span> <span class="hljs-property">@idType</span>
-      <span class="hljs-keyword">throw</span> <span class="hljs-string">"expected the subscription key to be a <span class="hljs-subst">#{<span class="hljs-property">@idType</span>}</span> but got a <span class="hljs-subst">#{<span class="hljs-keyword">typeof</span> subscriptionKey}</span>"</span>
-    <span class="hljs-keyword">if</span> <span class="hljs-property">@subscriptions</span>[id]
-      <span class="hljs-property">@subscriptions</span>[id].push options
+            <div class="content"><div class='highlight'><pre>  subscribe: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
+    id = @idForOptions options
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> id <span class="hljs-keyword">isnt</span> @idType
+      <span class="hljs-keyword">throw</span> <span class="hljs-string">"expected the subscription key to be a <span class="hljs-subst">#{@idType}</span> but got a <span class="hljs-subst">#{<span class="hljs-keyword">typeof</span> subscriptionKey}</span>"</span>
+    <span class="hljs-keyword">if</span> @subscriptions[id]
+      @subscriptions[id].push options
     <span class="hljs-keyword">else</span>
-      <span class="hljs-property">@subscriptions</span>[id] = [options]
+      @subscriptions[id] = [options]
 
-    <span class="hljs-property">@produceDataSync</span> id</pre></div></div>
+    @produceDataSync id</pre></div></div>
             
         </li>
         
@@ -240,7 +240,7 @@ and produces data for them.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">onDiffInRepository</span>: <span class="hljs-function"><span class="hljs-params">(repository, diff)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  onDiffInRepository: <span class="hljs-function"><span class="hljs-params">(repository, diff)</span> -&gt;</span>
     self = @
 <span class="hljs-function">
     <span class="hljs-title">addRemoveMap</span> = <span class="hljs-params">(model)</span> -&gt;</span>
@@ -262,7 +262,7 @@ and produces data for them.</p>
     removedModelIds = _.map diff.removed, addRemoveMap
     updatedModelIds = _.map diff.changed, changeMap
 
-    <span class="hljs-property">@produceDataForIds</span> _.filter _.flatten [addedModelIds, removedModelIds, updatedModelIds]</pre></div></div>
+    @produceDataForIds _.filter _.flatten [addedModelIds, removedModelIds, updatedModelIds]</pre></div></div>
             
         </li>
         
@@ -280,9 +280,9 @@ An array of model ids to produce data for. Defaults to all subscribed models.<br
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">produceDataForIds</span>: <span class="hljs-function"><span class="hljs-params">(ids = <span class="hljs-property">@allIds</span>())</span> -&gt;</span>
-    <span class="hljs-property">@updatedIds</span> = _.uniq <span class="hljs-property">@updatedIds</span>.concat ids
-    <span class="hljs-property">@produceData</span>()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  produceDataForIds: <span class="hljs-function"><span class="hljs-params">(ids = @allIds())</span> -&gt;</span>
+    @updatedIds = _.uniq @updatedIds.concat ids
+    @produceData()</pre></div></div>
             
         </li>
         
@@ -300,10 +300,10 @@ All subscribed ids.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">allIds</span>: <span class="hljs-function">-&gt;</span>
-    ids = _.keys <span class="hljs-property">@subscriptions</span>
+            <div class="content"><div class='highlight'><pre>  allIds: <span class="hljs-function">-&gt;</span>
+    ids = _.keys @subscriptions
 
-    <span class="hljs-keyword">if</span> <span class="hljs-property">@idType</span> <span class="hljs-keyword">is</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-number">0</span>)
+    <span class="hljs-keyword">if</span> @idType <span class="hljs-keyword">is</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-number">0</span>)
       ids = _.map ids, <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span>
         parseInt id, <span class="hljs-number">10</span>
 
@@ -339,15 +339,15 @@ The id to produce data for. Defaults to all ids whose data has changed since the
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">produceDataSync</span>: <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  produceDataSync: <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span>
     <span class="hljs-keyword">if</span> id?
-      <span class="hljs-property">@produce</span> [id]
+      @produce [id]
 
-    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@updatedIds</span>.length &gt; <span class="hljs-number">0</span>
-      ids = <span class="hljs-property">@updatedIds</span>.slice()
-      <span class="hljs-property">@updatedIds</span>.length = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> @updatedIds.length &gt; <span class="hljs-number">0</span>
+      ids = @updatedIds.slice()
+      @updatedIds.length = <span class="hljs-number">0</span>
 
-      <span class="hljs-property">@produce</span> ids</pre></div></div>
+      @produce ids</pre></div></div>
             
         </li>
         
@@ -365,16 +365,16 @@ Subsciption options. Can be used to get the id to unsubscribe from. This must be
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">unsubscribe</span>: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
-    id = <span class="hljs-property">@idForOptions</span> options
-    subscription = <span class="hljs-property">@subscriptions</span>[id]
+            <div class="content"><div class='highlight'><pre>  unsubscribe: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
+    id = @idForOptions options
+    subscription = @subscriptions[id]
     <span class="hljs-keyword">if</span> subscription?
       index = subscription.indexOf options
-      <span class="hljs-keyword">unless</span> index <span class="hljs-keyword">is</span> -<span class="hljs-number">1</span>
+      <span class="hljs-keyword">unless</span> index <span class="hljs-keyword">is</span> <span class="hljs-number">-1</span>
         subscription.splice index, <span class="hljs-number">1</span>
 
         <span class="hljs-keyword">if</span> subscription.length <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
-          <span class="hljs-keyword">delete</span> <span class="hljs-property">@subscriptions</span>[id]</pre></div></div>
+          <span class="hljs-keyword">delete</span> @subscriptions[id]</pre></div></div>
             
         </li>
         
@@ -392,19 +392,20 @@ List of ids to produce data for.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">produce</span>: <span class="hljs-function"><span class="hljs-params">(ids)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  produce: <span class="hljs-function"><span class="hljs-params">(ids)</span> -&gt;</span>
     <span class="hljs-keyword">for</span> id <span class="hljs-keyword">in</span> ids
 
-      data = <span class="hljs-property">@currentData</span>(id) <span class="hljs-keyword">or</span> {}
+      data = @currentData(id) <span class="hljs-keyword">or</span> {}
       data.id = id
-      data = <span class="hljs-property">@decorate</span> data
+      data = @decorate data
 
-      <span class="hljs-property">@_validateContract</span> data
+      @_validateContract data
 
-      _.each <span class="hljs-property">@registeredComponents</span>, <span class="hljs-function"><span class="hljs-params">(component)</span> -&gt;</span>
-        <span class="hljs-keyword">if</span> id <span class="hljs-keyword">is</span> <span class="hljs-property">@idForOptions</span> component.options
-          component.callback data
-      , @</pre></div></div>
+      _.each @registeredComponents,
+        _.bind (component) -&gt;
+          <span class="hljs-keyword">if</span> id <span class="hljs-keyword">is</span> @idForOptions component.options
+            component.callback data
+        , @</pre></div></div>
             
         </li>
         
@@ -421,7 +422,7 @@ List of ids to produce data for.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">currentData</span>: <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  currentData: <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -454,8 +455,8 @@ True if there is a subscription for the given id, false otherwise.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">hasId</span>: <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span>
-    <span class="hljs-property">@subscriptions</span>[id]?</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  hasId: <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span>
+    @subscriptions[id]?</pre></div></div>
             
         </li>
         
@@ -475,7 +476,7 @@ The repository which contains the model.<br/></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">shouldPropagateModelChange</span>: <span class="hljs-function"><span class="hljs-params">(model, repository)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  shouldPropagateModelChange: <span class="hljs-function"><span class="hljs-params">(model, repository)</span> -&gt;</span>
     <span class="hljs-literal">true</span></pre></div></div>
             
         </li>
@@ -498,7 +499,7 @@ The internal id of the given model, or an array of internal ids which correspond
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">idForModel</span>: <span class="hljs-function"><span class="hljs-params">(model, repository)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  idForModel: <span class="hljs-function"><span class="hljs-params">(model, repository)</span> -&gt;</span>
     model.id</pre></div></div>
             
         </li>
@@ -519,7 +520,7 @@ The internal id of the model that the subscription options refer to.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">idForOptions</span>: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  idForOptions: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
     options.id
 
 
