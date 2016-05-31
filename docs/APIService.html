@@ -526,7 +526,7 @@ restart because the polling interval is zero and cannot be lowered</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      _.each immediateRequests, <span class="hljs-function"><span class="hljs-params">(immediateRequest)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>      _.each immediateRequests, _.bind (immediateRequest) -&gt;
         @removeSubscription immediateRequest
       , @
 
