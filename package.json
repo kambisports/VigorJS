@@ -35,7 +35,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://stash.services.kambi.com/scm/bc/vigorjs.git"
+    "url": "https://github.com/kambisports/VigorJS.git"
   },
   "license": "ISC",
   "dependencies": {
