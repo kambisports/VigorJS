@@ -1,7 +1,7 @@
 {
   "name": "vigorjs",
   "description": "A small framework for structuring large scale Backbone applications",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "homepage": "",
   "author": "Kambi Sports Solutions",
   "contributors": [
