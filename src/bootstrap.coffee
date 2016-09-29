@@ -22,7 +22,7 @@
 
 ) @, (root, Backbone, _, $) ->
 
-  previousVigor = root.Vigor
+  previousVigor = root?.Vigor
   Vigor = Backbone.Vigor = {}
   Vigor.helpers = {}
   Vigor.settings = {}

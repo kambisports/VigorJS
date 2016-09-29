@@ -26,7 +26,7 @@
     }
   })(this, function(root, Backbone, _, $) {
     var ComponentBase, ComponentView, ComponentViewModel, EventBus, EventRegistry, IdProducer, KEY_ALREADY_REGISTERED, NO_PRODUCERS_ERROR, NO_PRODUCER_FOUND_ERROR, Producer, Repository, ServiceRepository, Subscription, Vigor, previousVigor, producerManager, producerMapper, producers, producersByKey, setup, validateContract;
-    previousVigor = root.Vigor;
+    previousVigor = root != null ? root.Vigor : void 0;
     Vigor = Backbone.Vigor = {};
     Vigor.helpers = {};
     Vigor.settings = {};
