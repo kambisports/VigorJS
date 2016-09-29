@@ -251,8 +251,8 @@ and produces data for them.</p>
         id
 <span class="hljs-function">
     <span class="hljs-title">changeMap</span> = <span class="hljs-params">(model)</span> -&gt;</span>
-      id = self.idForModel model, repository
       <span class="hljs-keyword">if</span> self.shouldPropagateModelChange model, repository
+        id = self.idForModel model, repository
         <span class="hljs-keyword">if</span> _.isArray id
           _.filter id, self.hasId.bind self
         <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> self.hasId id

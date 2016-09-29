@@ -1,6 +1,6 @@
 /**
  * vigorjs - A small framework for structuring large scale Backbone applications
- * @version v0.0.7
+ * @version v0.0.8
  * @link 
  * @license ISC
  */
@@ -483,8 +483,8 @@
         };
         changeMap = function(model) {
           var id;
-          id = self.idForModel(model, repository);
           if (self.shouldPropagateModelChange(model, repository)) {
+            id = self.idForModel(model, repository);
             if (_.isArray(id)) {
               return _.filter(id, self.hasId.bind(self));
             } else if (self.hasId(id)) {
