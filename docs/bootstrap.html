@@ -149,7 +149,7 @@
 
   <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> exports <span class="hljs-keyword">is</span> <span class="hljs-string">"object"</span>
     Backbone = <span class="hljs-built_in">require</span> <span class="hljs-string">'backbone'</span>
-    _ = <span class="hljs-built_in">require</span> <span class="hljs-string">'underscore'</span>
+    _ = <span class="hljs-built_in">require</span> <span class="hljs-string">'lodash'</span>
     $ = <span class="hljs-built_in">require</span> <span class="hljs-string">'jquery'</span></pre></div></div>
             
         </li>
@@ -188,7 +188,7 @@ like Node.</p>
 
 ) @, <span class="hljs-function"><span class="hljs-params">(root, Backbone, _, $)</span> -&gt;</span>
 
-  previousVigor = root.Vigor
+  previousVigor = root?.Vigor
   Vigor = Backbone.Vigor = {}
   Vigor.helpers = {}
   Vigor.settings = {}

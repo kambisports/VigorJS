@@ -30,7 +30,7 @@ var app = app || {};
     renderDynamicContent: function () {
       _.each(this._helloWorldItems, function (helloWorldItemView) {
         this.$helloWorldItemsList.append(helloWorldItemView.el);
-      }, this);
+      }.bind(this));
 
       return this;
     },

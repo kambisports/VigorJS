@@ -262,7 +262,7 @@ and produces data for them.</p>
     removedModelIds = _.map diff.removed, addRemoveMap
     updatedModelIds = _.map diff.changed, changeMap
 
-    @produceDataForIds _.filter _.flatten [addedModelIds, removedModelIds, updatedModelIds]</pre></div></div>
+    @produceDataForIds _.filter _.flattenDepth [addedModelIds, removedModelIds, updatedModelIds], <span class="hljs-number">2</span></pre></div></div>
             
         </li>
         
