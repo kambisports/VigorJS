@@ -33,7 +33,7 @@ describe('An ApiService', () => {
 
   beforeEach(() => {
     windowStub = new WindowStub();
-    return apiService = new APIService(windowStub);
+    apiService = new APIService(windowStub);
   });
 
   describe('handles subscriptions', () => {
@@ -119,10 +119,10 @@ describe('An ApiService', () => {
 
       apiService.removeSubscription(subscription1);
 
-      return assert.equal(_.keys(apiService.channels).length, 1);
+      assert.equal(_.keys(apiService.channels).length, 1);
     });
 
-    return it('removes only the given channel', () => {
+    it('removes only the given channel', () => {
       let subscription1 = { params: { foo: 'bar' } };
       let subscription2 = { params: { foo: 'baz' } };
       let fake = params => params.foo;
@@ -140,7 +140,7 @@ describe('An ApiService', () => {
 
       apiService.removeSubscription(subscription2);
 
-      return assert.equal(_.keys(apiService.channels).length, 0);
+      assert.equal(_.keys(apiService.channels).length, 0);
     });
   });
 
@@ -154,7 +154,7 @@ describe('An ApiService', () => {
       apiService.addSubscription({
         params});
 
-      return assert(spy.withArgs(params).calledOnce);
+      assert(spy.withArgs(params).calledOnce);
     });
 
     it('returns the stringified params by default', () => {
@@ -162,14 +162,14 @@ describe('An ApiService', () => {
         {foo: 'bar'};
 
       let channel = apiService.channelForParams(params);
-      return assert.equal(channel, JSON.stringify(params));
+      assert.equal(channel, JSON.stringify(params));
     });
 
-    return it('returns the stringified empty object for null params', () => {
+    it('returns the stringified empty object for null params', () => {
       let channelForUndefined = apiService.channelForParams(undefined);
       let channelForEmpty = apiService.channelForParams({});
 
-      return assert.equal(channelForUndefined, channelForEmpty);
+      assert.equal(channelForUndefined, channelForEmpty);
     });
   });
 
@@ -194,7 +194,7 @@ describe('An ApiService', () => {
       assert.equal(args[0][0], params);
 
       // channel name
-      return assert.equal(args[1], '{}');
+      assert.equal(args[1], '{}');
     });
 
 
@@ -217,24 +217,22 @@ describe('An ApiService', () => {
       // check params
       assert.equal(args[0].length, 2);
       assert.equal(args[0][0], params1);
-      return assert.equal(args[0][1], params2);
+      assert.equal(args[0][1], params2);
     });
 
-    return it('returns the first params by default', () => {
+    it('returns the first params by default', () => {
       let firstParams = {};
       let result = apiService.consolidateParams([firstParams, {}]);
-      return assert.equal(result, firstParams);
+      assert.equal(result, firstParams);
     });
   });
 
-  describe('returns whether to fetch on params update', () =>
+  describe('returns whether to fetch on params update', () => {
     it('returns true by default', () => {
       let shouldFetch = apiService.shouldFetchOnParamsUpdate();
-      return assert.ok(shouldFetch);
-    }
-    )
-  
-  );
+      assert.ok(shouldFetch);
+    });
+  });
 
   describe('fetches data', () => {
     it('does one-off fetches', () => {
@@ -257,7 +255,7 @@ describe('An ApiService', () => {
       callback();
 
       assert(fetch.calledOnce);
-      return assert.equal(_.keys(apiService.services).length, 0);
+      assert.equal(_.keys(apiService.services).length, 0);
     });
 
     it('does polled fetches', () => {
@@ -293,7 +291,7 @@ describe('An ApiService', () => {
 
       assert(fetch.calledTwice);
       assert.equal(_.keys(apiService.services).length, 0);
-      return assert(windowStub.setTimeout.calledThrice);
+      assert(windowStub.setTimeout.calledThrice);
     });
 
     it('asks whether to fetch immediately when params change', () => {
@@ -338,7 +336,7 @@ describe('An ApiService', () => {
       let { args } = apiService.shouldFetchOnParamsUpdate.lastCall;
       assert.ok(_.isEqual(args[0], consolidatedParams[1]));
       assert.ok(_.isEqual(args[1], consolidatedParams[0]));
-      return assert.equal(args[2], channelName);
+      assert.equal(args[2], channelName);
     });
 
     it('fetches immediately when params change if shouldFetchOnParamsUpdate is true', () => {
@@ -422,7 +420,7 @@ describe('An ApiService', () => {
       });
 
       let timeout = windowStub.setTimeout.lastCall.args[1];
-      return assert.equal(timeout, 100);
+      assert.equal(timeout, 100);
     });
 
     it('does not ask to fetch immediately if params did not change', () => {
@@ -453,7 +451,7 @@ describe('An ApiService', () => {
         params: params2
       });
 
-      return assert.equal(shouldFetchOnParamsUpdate.callCount, 0);
+      assert.equal(shouldFetchOnParamsUpdate.callCount, 0);
     });
 
     it('does not ask to fetch immediately if params change on different channels', () => {
@@ -492,7 +490,7 @@ describe('An ApiService', () => {
       let callback = windowStub.setTimeout.lastCall.args[0];
       callback();
 
-      return apiService.addSubscription({
+      apiService.addSubscription({
         pollingInterval,
         params: params2
       },
@@ -530,7 +528,7 @@ describe('An ApiService', () => {
       });
 
       let timeout = windowStub.setTimeout.lastCall.args[1];
-      return assert.equal(timeout, 50);
+      assert.equal(timeout, 50);
     });
 
     it('does not update the polling interval if the new value is less frequent', () => {
@@ -569,7 +567,7 @@ describe('An ApiService', () => {
       });
 
       timeout = windowStub.setTimeout.lastCall.args[1];
-      return assert.equal(timeout, 50);
+      assert.equal(timeout, 50);
     });
 
     it('passes the correct remaining timeout when the polling interval changes', () => {
@@ -610,10 +608,10 @@ describe('An ApiService', () => {
       });
 
       let timeout = windowStub.setTimeout.lastCall.args[1];
-      return assert.equal(timeout, remainingTime);
+      assert.equal(timeout, remainingTime);
     });
 
-    return it('passes the correct remaining timeout when interval does not update', () => {
+    it('passes the correct remaining timeout when interval does not update', () => {
 
       let params1 = {};
       let params2 = {};
@@ -656,11 +654,11 @@ describe('An ApiService', () => {
       });
 
       let timeout = windowStub.setTimeout.lastCall.args[1];
-      return assert.equal(timeout, remainingTime);
+      assert.equal(timeout, remainingTime);
     });
   });
 
-  return describe('fetches data', () => {
+  describe('fetches data', () => {
     describe('default model', () => {
       it('syncs', () => {
         let model = new apiService.Model();
@@ -678,7 +676,7 @@ describe('An ApiService', () => {
         assert.equal(args[0], method);
         assert.equal(args[1], model);
         assert.equal(args[2], options);
-        return assert.equal(sync.lastCall.thisValue, apiService);
+        assert.equal(sync.lastCall.thisValue, apiService);
       }
       );
 
@@ -692,7 +690,7 @@ describe('An ApiService', () => {
         let { args } = url.lastCall;
         assert.equal(args.length, 1);
         assert.equal(args[0], model);
-        return assert.equal(url.lastCall.thisValue, apiService);
+        assert.equal(url.lastCall.thisValue, apiService);
       }
       );
 
@@ -710,11 +708,11 @@ describe('An ApiService', () => {
         assert.equal(args[0], response);
         assert.equal(args[1], options);
         assert.equal(args[2], model);
-        return assert.equal(parse.lastCall.thisValue, apiService);
+        assert.equal(parse.lastCall.thisValue, apiService);
       }
       );
 
-      return it('can be overridden by getModelInstance', () => {
+      it('can be overridden by getModelInstance', () => {
         let model = new Model();
         model.fetch = sinon.spy();
 
@@ -735,7 +733,7 @@ describe('An ApiService', () => {
         assert(model.fetch.calledOnce);
 
         let { args } = model.fetch.lastCall;
-        return assert.ok(_.isEqual(args[0], callbacks));
+        assert.ok(_.isEqual(args[0], callbacks));
       }
       );
     });
@@ -756,10 +754,10 @@ describe('An ApiService', () => {
       assert(fetch.calledOnce);
 
       let { args } = fetch.lastCall;
-      return assert.equal(args[0], consolidatedParams);
+      assert.equal(args[0], consolidatedParams);
     });
 
-    return it('calls fetch on the model', () => {
+    it('calls fetch on the model', () => {
 
       let consolidatedParams = {};
 
@@ -785,7 +783,7 @@ describe('An ApiService', () => {
 
       assert(modelFetch.calledOnce);
       let { args } = modelFetch.lastCall;
-      return assert.ok(_.isEqual(args[0], callbacks));
+      assert.ok(_.isEqual(args[0], callbacks));
     });
   });
 });
