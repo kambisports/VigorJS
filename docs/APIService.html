@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>APIService.coffee</title>
+  <title>APIService.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -21,87 +21,87 @@
               
                 
                 <a class="source" href="bootstrap.html">
-                  bootstrap.coffee
+                  bootstrap.js
                 </a>
               
                 
                 <a class="source" href="EventBus.html">
-                  EventBus.coffee
+                  EventBus.js
                 </a>
               
                 
                 <a class="source" href="EventKeys.html">
-                  EventKeys.coffee
+                  EventKeys.js
                 </a>
               
                 
                 <a class="source" href="SubscriptionKeys.html">
-                  SubscriptionKeys.coffee
+                  SubscriptionKeys.js
                 </a>
               
                 
                 <a class="source" href="ComponentBase.html">
-                  ComponentBase.coffee
+                  ComponentBase.js
                 </a>
               
                 
                 <a class="source" href="ComponentView.html">
-                  ComponentView.coffee
+                  ComponentView.js
                 </a>
               
                 
                 <a class="source" href="ComponentViewModel.html">
-                  ComponentViewModel.coffee
+                  ComponentViewModel.js
                 </a>
               
                 
                 <a class="source" href="ProducerManager.html">
-                  ProducerManager.coffee
+                  ProducerManager.js
                 </a>
               
                 
                 <a class="source" href="ProducerMapper.html">
-                  ProducerMapper.coffee
+                  ProducerMapper.js
                 </a>
               
                 
                 <a class="source" href="Subscription.html">
-                  Subscription.coffee
+                  Subscription.js
                 </a>
               
                 
                 <a class="source" href="APIService.html">
-                  APIService.coffee
+                  APIService.js
                 </a>
               
                 
                 <a class="source" href="IdProducer.html">
-                  IdProducer.coffee
+                  IdProducer.js
                 </a>
               
                 
                 <a class="source" href="Producer.html">
-                  Producer.coffee
+                  Producer.js
                 </a>
               
                 
                 <a class="source" href="Repository.html">
-                  Repository.coffee
+                  Repository.js
                 </a>
               
                 
                 <a class="source" href="ServiceRepository.html">
-                  ServiceRepository.coffee
+                  ServiceRepository.js
+                </a>
+              
+                
+                <a class="source" href="settings.html">
+                  settings.js
                 </a>
               
                 
                 <a class="source" href="validateContract.html">
-                  validateContract.coffee
-                </a>
-              
-                
-                <a class="source" href="setup.html">
-                  setup.coffee
+                  validateContract.js
                 </a>
               
             </div>
@@ -113,7 +113,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>APIService.coffee</h1>
+                  <h1>APIService.js</h1>
               </div>
           </li>
         
@@ -128,7 +128,8 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">do</span> -&gt;</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">import</span> _ <span class="hljs-keyword">from</span> <span class="hljs-string">'underscore'</span>;
+<span class="hljs-keyword">import</span> {Model, Events} <span class="hljs-keyword">from</span> <span class="hljs-string">'backbone'</span>;</pre></div></div>
             
         </li>
         
@@ -150,7 +151,7 @@ and cannot be polled.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ServiceChannel</span></span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ServiceChannel</span> </span>{</pre></div></div>
             
         </li>
         
@@ -161,11 +162,13 @@ and cannot be polled.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>An array of subscription objects, each of which may contain a pollingInterval in ms, and a params object</p>
+              <p>If subscribers are provided, the requests will start immediately.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    subscribers: <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">constructor</span>(_window, name, service, subscribers) {
+    <span class="hljs-keyword">this</span>._window = _window;
+    <span class="hljs-keyword">this</span>.service = service;</pre></div></div>
             
         </li>
         
@@ -176,11 +179,11 @@ and cannot be polled.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>The minimum polling interval of the subscribers, or 0</p>
+              <p>The name of this channel; used by the API service to uniquely identify it.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    pollingInterval: <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.name = name;</pre></div></div>
             
         </li>
         
@@ -191,11 +194,11 @@ and cannot be polled.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>The unix timestamp of the last poll</p>
+              <p>An array of subscription objects, each of which may contain a pollingInterval in ms, and a params object</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    lastPollTime: <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.subscribers = subscribers;</pre></div></div>
             
         </li>
         
@@ -206,11 +209,11 @@ and cannot be polled.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>A timeout id, as returned by window.setTimeout, for the next poll.</p>
+              <p>The minimum polling interval of the subscribers, or 0</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    timeout: <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.pollingInterval = <span class="hljs-literal">undefined</span>;</pre></div></div>
             
         </li>
         
@@ -221,11 +224,11 @@ and cannot be polled.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>The name of this channel; used by the API service to uniquely identify it.</p>
+              <p>The unix timestamp of the last poll</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    name: <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.lastPollTime = <span class="hljs-literal">undefined</span>;</pre></div></div>
             
         </li>
         
@@ -236,14 +239,16 @@ and cannot be polled.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p><strong>constructor</strong><br/>
-If subscribers are provided, the requests will start immediately.</p>
+              <p>A timeout id, as returned by window.setTimeout, for the next poll.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    constructor: <span class="hljs-function"><span class="hljs-params">(@_window, @name, @service, @subscribers)</span> -&gt;</span>
-      @params = @getParams()
-      @restart()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.timeout = <span class="hljs-literal">undefined</span>;
+
+    <span class="hljs-keyword">this</span>.params = <span class="hljs-keyword">this</span>.getParams();
+
+    <span class="hljs-keyword">this</span>.restart();
+  }</pre></div></div>
             
         </li>
         
@@ -260,16 +265,17 @@ This method can be called at any time, since it takes into account the time sinc
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    restart: <span class="hljs-function">-&gt;</span>
-      @pollingInterval = @getPollingInterval()
-
-      <span class="hljs-keyword">if</span> @lastPollTime?
-        elapsedWait = @_window.Date.now() - @lastPollTime
-        wait = Math.max @pollingInterval - elapsedWait, <span class="hljs-number">0</span>
-      <span class="hljs-keyword">else</span>
-        wait = <span class="hljs-number">0</span>
-
-      @setupNextFetch wait</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  restart() {
+    <span class="hljs-keyword">let</span> wait;
+    <span class="hljs-keyword">this</span>.pollingInterval = <span class="hljs-keyword">this</span>.getPollingInterval();
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.lastPollTime != <span class="hljs-literal">null</span>) {
+      <span class="hljs-keyword">const</span> elapsedWait = <span class="hljs-keyword">this</span>._window.Date.now() - <span class="hljs-keyword">this</span>.lastPollTime;
+      wait = <span class="hljs-built_in">Math</span>.max(<span class="hljs-keyword">this</span>.pollingInterval - elapsedWait, <span class="hljs-number">0</span>);
+    } <span class="hljs-keyword">else</span> {
+      wait = <span class="hljs-number">0</span>;
+    }
+    <span class="hljs-keyword">this</span>.setupNextFetch(wait);
+  }</pre></div></div>
             
         </li>
         
@@ -285,12 +291,13 @@ Stops the channel and asks the service to remove it.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    stop: <span class="hljs-function">-&gt;</span>
-      @_window.clearTimeout @timeout
-      @timeout = <span class="hljs-literal">undefined</span>
-      @subscribers = <span class="hljs-literal">undefined</span>
-      @params = <span class="hljs-literal">undefined</span>
-      @service.removeChannel @</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  stop() {
+    <span class="hljs-keyword">this</span>._window.clearTimeout(<span class="hljs-keyword">this</span>.timeout);
+    <span class="hljs-keyword">this</span>.timeout = <span class="hljs-literal">undefined</span>;
+    <span class="hljs-keyword">this</span>.subscribers = <span class="hljs-literal">undefined</span>;
+    <span class="hljs-keyword">this</span>.params = <span class="hljs-literal">undefined</span>;
+    <span class="hljs-keyword">this</span>.service.removeChannel(<span class="hljs-keyword">this</span>);
+  }</pre></div></div>
             
         </li>
         
@@ -308,13 +315,12 @@ The amount of time to wait until the fetch. Defaults to the current polling inte
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    setupNextFetch: <span class="hljs-function"><span class="hljs-params">(wait = @pollingInterval)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>  setupNextFetch(wait = <span class="hljs-keyword">this</span>.pollingInterval) {
+    <span class="hljs-keyword">this</span>._window.clearTimeout(<span class="hljs-keyword">this</span>.timeout);
 
-      @_window.clearTimeout @timeout
-
-      @timeout = @_window.setTimeout (_.bind -&gt;
-        @lastPollTime = @_window.Date.now()
-        @service.fetch @params</pre></div></div>
+    <span class="hljs-keyword">this</span>.timeout = <span class="hljs-keyword">this</span>._window.setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+      <span class="hljs-keyword">this</span>.lastPollTime = <span class="hljs-keyword">this</span>._window.Date.now();
+      <span class="hljs-keyword">this</span>.service.fetch(<span class="hljs-keyword">this</span>.params);</pre></div></div>
             
         </li>
         
@@ -329,7 +335,7 @@ The amount of time to wait until the fetch. Defaults to the current polling inte
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        @cullImmediateRequests()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">this</span>.cullImmediateRequests();</pre></div></div>
             
         </li>
         
@@ -345,7 +351,7 @@ immediate requests</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> @subscribers?</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.subscribers) {</pre></div></div>
             
         </li>
         
@@ -360,11 +366,14 @@ immediate requests</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> @pollingInterval &gt; <span class="hljs-number">0</span>
-            @setupNextFetch()
-          <span class="hljs-keyword">else</span>
-            @timeout = <span class="hljs-literal">undefined</span>
-      , @), wait</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.pollingInterval &gt; <span class="hljs-number">0</span>) {
+          <span class="hljs-keyword">this</span>.setupNextFetch();
+        } <span class="hljs-keyword">else</span> {
+          <span class="hljs-keyword">this</span>.timeout = <span class="hljs-literal">undefined</span>;
+        }
+      }
+    }, wait);
+  }</pre></div></div>
             
         </li>
         
@@ -382,11 +391,13 @@ The subscription to add. May contain a pollingInterval in ms, and a params objec
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    addSubscription: <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
-      <span class="hljs-keyword">unless</span> _.includes @subscribers, subscriber
-        @subscribers.push subscriber
+            <div class="content"><div class='highlight'><pre>  addSubscription(subscriber) {
+    <span class="hljs-keyword">if</span> (!_.includes(<span class="hljs-keyword">this</span>.subscribers, subscriber)) {
+      <span class="hljs-keyword">this</span>.subscribers.push(subscriber);
 
-        @onSubscriptionsChanged()</pre></div></div>
+      <span class="hljs-keyword">this</span>.onSubscriptionsChanged();
+    }
+  }</pre></div></div>
             
         </li>
         
@@ -405,14 +416,17 @@ channel may be stopped if this is the last subscriber.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    removeSubscription: <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
-      <span class="hljs-keyword">if</span> _.includes @subscribers, subscriber
-        @subscribers = _.without @subscribers, subscriber
+            <div class="content"><div class='highlight'><pre>  removeSubscription(subscriber) {
+    <span class="hljs-keyword">if</span> (_.includes(<span class="hljs-keyword">this</span>.subscribers, subscriber)) {
+      <span class="hljs-keyword">this</span>.subscribers = _.without(<span class="hljs-keyword">this</span>.subscribers, subscriber);
 
-        <span class="hljs-keyword">if</span> @subscribers.length <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
-          @stop()
-        <span class="hljs-keyword">else</span>
-          @onSubscriptionsChanged()</pre></div></div>
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.subscribers.length === <span class="hljs-number">0</span>) {
+        <span class="hljs-keyword">this</span>.stop();
+      } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">this</span>.onSubscriptionsChanged();
+      }
+    }
+  }</pre></div></div>
             
         </li>
         
@@ -428,24 +442,27 @@ Updates the params and reschedules the next fetch if necessary.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    onSubscriptionsChanged: <span class="hljs-function">-&gt;</span>
-      params = @getParams()
-      didParamsChange = <span class="hljs-keyword">not</span> _.isEqual params, @params
+            <div class="content"><div class='highlight'><pre>  onSubscriptionsChanged() {
+    <span class="hljs-keyword">const</span> params = <span class="hljs-keyword">this</span>.getParams();
+    <span class="hljs-keyword">const</span> didParamsChange = !_.isEqual(params, <span class="hljs-keyword">this</span>.params);
 
-      oldParams = @params
-      @params = params
+    <span class="hljs-keyword">const</span> oldParams = <span class="hljs-keyword">this</span>.params;
+    <span class="hljs-keyword">this</span>.params = params;
 
-      shouldFetchImmediately = <span class="hljs-literal">false</span>
+    <span class="hljs-keyword">let</span> shouldFetchImmediately = <span class="hljs-literal">false</span>;
 
-      <span class="hljs-keyword">if</span> didParamsChange
-        shouldFetchImmediately = @service.shouldFetchOnParamsUpdate @params, oldParams, @name
+    <span class="hljs-keyword">if</span> (didParamsChange) {
+      shouldFetchImmediately = <span class="hljs-keyword">this</span>.service.shouldFetchOnParamsUpdate(<span class="hljs-keyword">this</span>.params, oldParams, <span class="hljs-keyword">this</span>.name);
+    }
 
-      <span class="hljs-keyword">if</span> shouldFetchImmediately
-        @lastPollTime = <span class="hljs-literal">undefined</span>
-        @restart()
+    <span class="hljs-keyword">if</span> (shouldFetchImmediately) {
+      <span class="hljs-keyword">this</span>.lastPollTime = <span class="hljs-literal">undefined</span>;
+      <span class="hljs-keyword">this</span>.restart();
 
-      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> @getPollingInterval() <span class="hljs-keyword">isnt</span> @pollingInterval
-        @restart()</pre></div></div>
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.getPollingInterval() !== <span class="hljs-keyword">this</span>.pollingInterval) {
+      <span class="hljs-keyword">this</span>.restart();
+    }
+  }</pre></div></div>
             
         </li>
         
@@ -464,12 +481,15 @@ returns 0 which represents an immediate request.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    getPollingInterval: <span class="hljs-function">-&gt;</span>
-
-      pollingInterval = _.min _.map @subscribers, <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
-        subscriber.pollingInterval
-
-      <span class="hljs-keyword">if</span> pollingInterval <span class="hljs-keyword">is</span> Infinity <span class="hljs-keyword">then</span> <span class="hljs-number">0</span> <span class="hljs-keyword">else</span> pollingInterval</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  getPollingInterval() {
+    <span class="hljs-keyword">const</span> pollingIntervals = _.map(<span class="hljs-keyword">this</span>.subscribers, subscriber =&gt; subscriber.pollingInterval);
+    <span class="hljs-keyword">const</span> pollingInterval = _.min(pollingIntervals);
+    <span class="hljs-keyword">if</span> (pollingInterval === <span class="hljs-literal">Infinity</span>) {
+      <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">return</span> pollingInterval;
+    }
+  }</pre></div></div>
             
         </li>
         
@@ -489,10 +509,11 @@ added or removed.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    getParams: <span class="hljs-function">-&gt;</span>
-      @service.consolidateParams (_.filter _.map @subscribers, <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
-        subscriber.params
-      ), @name</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  getParams() {
+    <span class="hljs-keyword">let</span> params = _.map(<span class="hljs-keyword">this</span>.subscribers, subscriber =&gt; subscriber.params);
+    params = _.compact(params);
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.service.consolidateParams(params, <span class="hljs-keyword">this</span>.name);
+  }</pre></div></div>
             
         </li>
         
@@ -508,9 +529,10 @@ Removes all subscribers that do not have a polling interval.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    cullImmediateRequests: <span class="hljs-function">-&gt;</span>
-      immediateRequests = _.filter @subscribers, <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
-        (subscriber.pollingInterval <span class="hljs-keyword">is</span> <span class="hljs-literal">undefined</span>) <span class="hljs-keyword">or</span> (subscriber.pollingInterval <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  cullImmediateRequests() {
+    <span class="hljs-keyword">let</span> immediateRequests = _.filter(<span class="hljs-keyword">this</span>.subscribers, (subscriber) =&gt; {
+      <span class="hljs-keyword">return</span> (subscriber.pollingInterval === <span class="hljs-literal">undefined</span>) || (subscriber.pollingInterval === <span class="hljs-number">0</span>);
+    });</pre></div></div>
             
         </li>
         
@@ -526,11 +548,13 @@ restart because the polling interval is zero and cannot be lowered</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      _.each immediateRequests, _.bind (immediateRequest) -&gt;
-        @removeSubscription immediateRequest
-      , @
+            <div class="content"><div class='highlight'><pre>    _.each(immediateRequests, (immediateRequest) =&gt; {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.removeSubscription(immediateRequest);
+    });
 
-      @pollingInterval = @getPollingInterval()</pre></div></div>
+    <span class="hljs-keyword">this</span>.pollingInterval = <span class="hljs-keyword">this</span>.getPollingInterval();
+  }
+}</pre></div></div>
             
         </li>
         
@@ -546,7 +570,11 @@ restart because the polling interval is zero and cannot be lowered</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">APIService</span></span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">APIService</span> </span>{
+
+  <span class="hljs-keyword">static</span> get extend() {
+    <span class="hljs-keyword">return</span> Model.extend;
+  }</pre></div></div>
             
         </li>
         
@@ -557,11 +585,12 @@ restart because the polling interval is zero and cannot be lowered</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              <p>An object referencing the channels owned by this service by name</p>
+              <p>Optionally pass in a window object to stub Date, set/clearTimeout for testing</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    channels: <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">constructor</span>(_window = window) {
+    <span class="hljs-keyword">const</span> service = <span class="hljs-keyword">this</span>;</pre></div></div>
             
         </li>
         
@@ -572,24 +601,27 @@ restart because the polling interval is zero and cannot be lowered</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
-              <p>Optionally pass in a window object to stub Date, set/clearTimeout for testing</p>
+              <p>An object referencing the channels owned by this service by name</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    constructor: <span class="hljs-function"><span class="hljs-params">(@_window = <span class="hljs-built_in">window</span>)</span> -&gt;</span>
-      @channels = {}
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.channels = {};
+    <span class="hljs-keyword">this</span>._window = _window;
 
-      service = @
+    <span class="hljs-keyword">this</span>.Model = Model.extend({
+      sync(method, model, options) {
+        <span class="hljs-keyword">return</span> service.sync(method, model, options);
+      },
 
-      @Model = Backbone.Model.extend
-        sync: <span class="hljs-function"><span class="hljs-params">(method, model, options)</span> -&gt;</span>
-          service.sync method, model, options
+      url() {
+        <span class="hljs-keyword">return</span> service.url(<span class="hljs-keyword">this</span>);
+      },
 
-        url: <span class="hljs-function">-&gt;</span>
-          service.url @
-
-        parse: <span class="hljs-function"><span class="hljs-params">(resp, options)</span> -&gt;</span>
-          service.parse resp, options, @</pre></div></div>
+      parse(resp, options) {
+        <span class="hljs-keyword">return</span> service.parse(resp, options, <span class="hljs-keyword">this</span>);
+      }
+    });
+  }</pre></div></div>
             
         </li>
         
@@ -614,8 +646,9 @@ channelForParams because all the params are identical anyway.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    consolidateParams: <span class="hljs-function"><span class="hljs-params">(paramsArray, channelName)</span> -&gt;</span>
-      paramsArray[<span class="hljs-number">0</span>]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  consolidateParams(paramsArray, channelName) {
+    <span class="hljs-keyword">return</span> paramsArray[<span class="hljs-number">0</span>];
+  }</pre></div></div>
             
         </li>
         
@@ -636,7 +669,7 @@ By default, only subscribers with identical params are put on the same channel</
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    channelForParams: <span class="hljs-function"><span class="hljs-params">(params)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  channelForParams(params) {</pre></div></div>
             
         </li>
         
@@ -651,7 +684,8 @@ By default, only subscribers with identical params are put on the same channel</
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      (JSON.stringify params) <span class="hljs-keyword">or</span> <span class="hljs-string">"{}"</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">return</span> (<span class="hljs-built_in">JSON</span>.stringify(params)) || <span class="hljs-string">"{}"</span>;
+  }</pre></div></div>
             
         </li>
         
@@ -676,8 +710,9 @@ The default implementation always returns true, forcing an immediate fetch.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    shouldFetchOnParamsUpdate: <span class="hljs-function"><span class="hljs-params">(newParams, oldParams, channelName)</span> -&gt;</span>
-      <span class="hljs-literal">true</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  shouldFetchOnParamsUpdate(newParams, oldParams, channelName) {
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+  }</pre></div></div>
             
         </li>
         
@@ -693,7 +728,7 @@ Called when a fetch is successful.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    onFetchSuccess: <span class="hljs-function">-&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  onFetchSuccess() {}</pre></div></div>
             
         </li>
         
@@ -709,7 +744,7 @@ Called when a fetch is unsuccessful.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    onFetchError: <span class="hljs-function">-&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  onFetchError() {}</pre></div></div>
             
         </li>
         
@@ -725,7 +760,7 @@ Called when a post request is successful.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    onPostSuccess: <span class="hljs-function">-&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  onPostSuccess() {}</pre></div></div>
             
         </li>
         
@@ -741,7 +776,7 @@ Called when a post request is unsuccessful.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    onPostError: <span class="hljs-function">-&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  onPostError() {}</pre></div></div>
             
         </li>
         
@@ -757,8 +792,9 @@ See <a href="http://backbonejs.org/#Model-sync">Backbone.Model.sync</a></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    sync: <span class="hljs-function"><span class="hljs-params">(method, model, options)</span> -&gt;</span>
-      Backbone.Model.prototype.sync.call model, method, model, options</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  sync(method, model, options) {
+    <span class="hljs-keyword">return</span> Model.prototype.sync.call(model, method, model, options);
+  }</pre></div></div>
             
         </li>
         
@@ -774,8 +810,9 @@ See <a href="http://backbonejs.org/#Model-url">Backbone.Model.url</a></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    url: <span class="hljs-function"><span class="hljs-params">(model)</span> -&gt;</span>
-      Backbone.Model.prototype.url.call model</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  url(model) {
+    Model.prototype.url.call(model);
+  }</pre></div></div>
             
         </li>
         
@@ -787,12 +824,13 @@ See <a href="http://backbonejs.org/#Model-url">Backbone.Model.url</a></p>
                 <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p><strong>parse</strong><br/>
-See <a href="http://backbonejs.org/#Model-parse">Backbone.model.parse</a></p>
+See <a href="http://backbonejs.org/#Model-parse">Backbone.Model.parse</a></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    parse: <span class="hljs-function"><span class="hljs-params">(resp, options, model)</span> -&gt;</span>
-      Backbone.Model.prototype.parse.call model</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  parse(resp, options, model) {
+    Model.prototype.parse.call(model);
+  }</pre></div></div>
             
         </li>
         
@@ -810,8 +848,9 @@ The name of the channel to remove</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    removeChannel: <span class="hljs-function"><span class="hljs-params">(channel)</span> -&gt;</span>
-      <span class="hljs-keyword">delete</span> @channels[channel.name]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  removeChannel(channel) {
+    <span class="hljs-keyword">delete</span> <span class="hljs-keyword">this</span>.channels[channel.name];
+  }</pre></div></div>
             
         </li>
         
@@ -831,17 +870,19 @@ For posts, this should contain a <code>postParams</code> object.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    addSubscription: <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
-      method = subscriber.method <span class="hljs-keyword">or</span> <span class="hljs-string">'GET'</span>
-      <span class="hljs-keyword">switch</span> method
-        <span class="hljs-keyword">when</span> <span class="hljs-string">'GET'</span>
-          @addGetSubscription subscriber
-        <span class="hljs-keyword">when</span> <span class="hljs-string">'POST'</span>
-          @post subscriber.postParams
-        <span class="hljs-keyword">when</span> <span class="hljs-string">'PUT'</span>
-          <span class="hljs-keyword">throw</span> <span class="hljs-string">'PUT not yet implemented'</span>
-        <span class="hljs-keyword">when</span> <span class="hljs-string">'DELETE'</span>
-          <span class="hljs-keyword">throw</span> <span class="hljs-string">'DELETE not yet implemented'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  addSubscription(subscriber) {
+    <span class="hljs-keyword">const</span> method = subscriber.method || <span class="hljs-string">'GET'</span>;
+    <span class="hljs-keyword">switch</span> (method) {
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'GET'</span>:
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.addGetSubscription(subscriber);
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'POST'</span>:
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.post(subscriber.postParams);
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'PUT'</span>:
+        <span class="hljs-keyword">throw</span> <span class="hljs-string">'PUT not yet implemented'</span>;
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'DELETE'</span>:
+        <span class="hljs-keyword">throw</span> <span class="hljs-string">'DELETE not yet implemented'</span>;
+    }
+  }</pre></div></div>
             
         </li>
         
@@ -859,15 +900,17 @@ A subscription to the service. This should contain a params object and optionall
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    addGetSubscription: <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
-      channelName = @channelForParams subscriber.params
-      channel = @channels[channelName]
+            <div class="content"><div class='highlight'><pre>  addGetSubscription(subscriber) {
+    <span class="hljs-keyword">const</span> channelName = <span class="hljs-keyword">this</span>.channelForParams(subscriber.params);
+    <span class="hljs-keyword">const</span> channel = <span class="hljs-keyword">this</span>.channels[channelName];
 
-      <span class="hljs-keyword">if</span> channel?
-        channel.addSubscription subscriber
+    <span class="hljs-keyword">if</span> (channel) {
+      channel.addSubscription(subscriber);
 
-      <span class="hljs-keyword">else</span>
-        @channels[channelName] = <span class="hljs-keyword">new</span> ServiceChannel @_window, channelName, @, [subscriber]</pre></div></div>
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">this</span>.channels[channelName] = <span class="hljs-keyword">new</span> ServiceChannel(<span class="hljs-keyword">this</span>._window, channelName, <span class="hljs-keyword">this</span>, [subscriber]);
+    }
+  }</pre></div></div>
             
         </li>
         
@@ -885,13 +928,16 @@ A subscription to the service. This must be the same reference as the object use
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    removeSubscription: <span class="hljs-function"><span class="hljs-params">(subscriber)</span> -&gt;</span>
-      <span class="hljs-keyword">if</span> subscriber?
-        channelId = @channelForParams subscriber.params
-        channel = @channels[channelId]
+            <div class="content"><div class='highlight'><pre>  removeSubscription(subscriber) {
+    <span class="hljs-keyword">if</span> (subscriber) {
+      <span class="hljs-keyword">const</span> channelId = <span class="hljs-keyword">this</span>.channelForParams(subscriber.params);
+      <span class="hljs-keyword">const</span> channel = <span class="hljs-keyword">this</span>.channels[channelId];
 
-        <span class="hljs-keyword">if</span> channel?
-          channel.removeSubscription subscriber</pre></div></div>
+      <span class="hljs-keyword">if</span> (channel) {
+        channel.removeSubscription(subscriber);
+      }
+    }
+  }</pre></div></div>
             
         </li>
         
@@ -911,8 +957,9 @@ The Backbone model on which XHR requests are performed.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    getModelInstance: <span class="hljs-function"><span class="hljs-params">(params)</span> -&gt;</span>
-      <span class="hljs-keyword">new</span> @Model params</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  getModelInstance(params) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-keyword">this</span>.Model(params);
+  }</pre></div></div>
             
         </li>
         
@@ -928,8 +975,9 @@ See <a href="http://backbonejs.org/#Events-trigger">Backbone.Events.trigger</a><
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    propagateResponse: <span class="hljs-function"><span class="hljs-params">(key, responseData)</span> -&gt;</span>
-      @trigger key, responseData</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  propagateResponse(key, responseData) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.trigger(key, responseData);
+  }</pre></div></div>
             
         </li>
         
@@ -948,11 +996,13 @@ will be called when the request is resolved.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    fetch: <span class="hljs-function"><span class="hljs-params">(params)</span> -&gt;</span>
-      model = @getModelInstance params
-      model.fetch
-        success: @onFetchSuccess
-        error: @onFetchError</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  fetch(params) {
+    <span class="hljs-keyword">const</span> model = <span class="hljs-keyword">this</span>.getModelInstance(params);
+    <span class="hljs-keyword">return</span> model.fetch({
+      <span class="hljs-attr">success</span>: <span class="hljs-keyword">this</span>.onFetchSuccess,
+      <span class="hljs-attr">error</span>: <span class="hljs-keyword">this</span>.onFetchError
+    });
+  }</pre></div></div>
             
         </li>
         
@@ -971,15 +1021,18 @@ will be called when the request is resolved.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    post: <span class="hljs-function"><span class="hljs-params">(params)</span> -&gt;</span>
-      model = @getModelInstance params
-      model.save <span class="hljs-literal">undefined</span>,
-        success: @onPostSuccess
-        error: @onPostError
+            <div class="content"><div class='highlight'><pre>  post(params) {
+    <span class="hljs-keyword">const</span> model = <span class="hljs-keyword">this</span>.getModelInstance(params);
+    <span class="hljs-keyword">return</span> model.save(<span class="hljs-literal">undefined</span>, {
+      <span class="hljs-attr">success</span>: <span class="hljs-keyword">this</span>.onPostSuccess,
+      <span class="hljs-attr">error</span>: <span class="hljs-keyword">this</span>.onPostError
+    });
+  }
+}
 
-  _.extend APIService.prototype, Backbone.Events
-  APIService.extend = Vigor.extend
-  Vigor.APIService = APIService</pre></div></div>
+_.extend(APIService.prototype, Events);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> APIService;</pre></div></div>
             
         </li>
         

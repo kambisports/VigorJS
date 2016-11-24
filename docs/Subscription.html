@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>Subscription.coffee</title>
+  <title>Subscription.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -21,87 +21,87 @@
               
                 
                 <a class="source" href="bootstrap.html">
-                  bootstrap.coffee
+                  bootstrap.js
                 </a>
               
                 
                 <a class="source" href="EventBus.html">
-                  EventBus.coffee
+                  EventBus.js
                 </a>
               
                 
                 <a class="source" href="EventKeys.html">
-                  EventKeys.coffee
+                  EventKeys.js
                 </a>
               
                 
                 <a class="source" href="SubscriptionKeys.html">
-                  SubscriptionKeys.coffee
+                  SubscriptionKeys.js
                 </a>
               
                 
                 <a class="source" href="ComponentBase.html">
-                  ComponentBase.coffee
+                  ComponentBase.js
                 </a>
               
                 
                 <a class="source" href="ComponentView.html">
-                  ComponentView.coffee
+                  ComponentView.js
                 </a>
               
                 
                 <a class="source" href="ComponentViewModel.html">
-                  ComponentViewModel.coffee
+                  ComponentViewModel.js
                 </a>
               
                 
                 <a class="source" href="ProducerManager.html">
-                  ProducerManager.coffee
+                  ProducerManager.js
                 </a>
               
                 
                 <a class="source" href="ProducerMapper.html">
-                  ProducerMapper.coffee
+                  ProducerMapper.js
                 </a>
               
                 
                 <a class="source" href="Subscription.html">
-                  Subscription.coffee
+                  Subscription.js
                 </a>
               
                 
                 <a class="source" href="APIService.html">
-                  APIService.coffee
+                  APIService.js
                 </a>
               
                 
                 <a class="source" href="IdProducer.html">
-                  IdProducer.coffee
+                  IdProducer.js
                 </a>
               
                 
                 <a class="source" href="Producer.html">
-                  Producer.coffee
+                  Producer.js
                 </a>
               
                 
                 <a class="source" href="Repository.html">
-                  Repository.coffee
+                  Repository.js
                 </a>
               
                 
                 <a class="source" href="ServiceRepository.html">
-                  ServiceRepository.coffee
+                  ServiceRepository.js
+                </a>
+              
+                
+                <a class="source" href="settings.html">
+                  settings.js
                 </a>
               
                 
                 <a class="source" href="validateContract.html">
-                  validateContract.coffee
-                </a>
-              
-                
-                <a class="source" href="setup.html">
-                  setup.coffee
+                  validateContract.js
                 </a>
               
             </div>
@@ -113,7 +113,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>Subscription.coffee</h1>
+                  <h1>Subscription.js</h1>
               </div>
           </li>
         
@@ -128,42 +128,15 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Subscription</span></span>
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Subscription</span> </span>{
+  <span class="hljs-keyword">constructor</span>(id, callback, options) {
+    <span class="hljs-keyword">this</span>.id = id;
+    <span class="hljs-keyword">this</span>.callback = callback;
+    <span class="hljs-keyword">this</span>.options = options;
+  }
+}
 
-  id: <span class="hljs-literal">undefined</span>
-  callback: <span class="hljs-literal">undefined</span>
-  options: <span class="hljs-literal">undefined</span>
-
-  constructor: <span class="hljs-function"><span class="hljs-params">(@id, @callback, @options)</span> -&gt;</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-2">&#182;</a>
-              </div>
-              <h2 id="start-test-block">start-test-block</h2>
-<p>this will be removed in distribution build</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>Vigor.Subscription = Subscription</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-3">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
-              </div>
-              <h2 id="end-test-block">end-test-block</h2>
-
-            </div>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> Subscription;</pre></div></div>
             
         </li>
         

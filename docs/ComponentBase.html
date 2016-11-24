@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>ComponentBase.coffee</title>
+  <title>ComponentBase.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -21,87 +21,87 @@
               
                 
                 <a class="source" href="bootstrap.html">
-                  bootstrap.coffee
+                  bootstrap.js
                 </a>
               
                 
                 <a class="source" href="EventBus.html">
-                  EventBus.coffee
+                  EventBus.js
                 </a>
               
                 
                 <a class="source" href="EventKeys.html">
-                  EventKeys.coffee
+                  EventKeys.js
                 </a>
               
                 
                 <a class="source" href="SubscriptionKeys.html">
-                  SubscriptionKeys.coffee
+                  SubscriptionKeys.js
                 </a>
               
                 
                 <a class="source" href="ComponentBase.html">
-                  ComponentBase.coffee
+                  ComponentBase.js
                 </a>
               
                 
                 <a class="source" href="ComponentView.html">
-                  ComponentView.coffee
+                  ComponentView.js
                 </a>
               
                 
                 <a class="source" href="ComponentViewModel.html">
-                  ComponentViewModel.coffee
+                  ComponentViewModel.js
                 </a>
               
                 
                 <a class="source" href="ProducerManager.html">
-                  ProducerManager.coffee
+                  ProducerManager.js
                 </a>
               
                 
                 <a class="source" href="ProducerMapper.html">
-                  ProducerMapper.coffee
+                  ProducerMapper.js
                 </a>
               
                 
                 <a class="source" href="Subscription.html">
-                  Subscription.coffee
+                  Subscription.js
                 </a>
               
                 
                 <a class="source" href="APIService.html">
-                  APIService.coffee
+                  APIService.js
                 </a>
               
                 
                 <a class="source" href="IdProducer.html">
-                  IdProducer.coffee
+                  IdProducer.js
                 </a>
               
                 
                 <a class="source" href="Producer.html">
-                  Producer.coffee
+                  Producer.js
                 </a>
               
                 
                 <a class="source" href="Repository.html">
-                  Repository.coffee
+                  Repository.js
                 </a>
               
                 
                 <a class="source" href="ServiceRepository.html">
-                  ServiceRepository.coffee
+                  ServiceRepository.js
+                </a>
+              
+                
+                <a class="source" href="settings.html">
+                  settings.js
                 </a>
               
                 
                 <a class="source" href="validateContract.html">
-                  validateContract.coffee
-                </a>
-              
-                
-                <a class="source" href="setup.html">
-                  setup.coffee
+                  validateContract.js
                 </a>
               
             </div>
@@ -113,7 +113,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>ComponentBase.coffee</h1>
+                  <h1>ComponentBase.js</h1>
               </div>
           </li>
         
@@ -125,18 +125,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <p>##ComponentBase
-This class is intended to be the public interface for a component.</p>
-<p>By default it exposes a render and a dispose method which should be overridden</p>
-<p>To create a component you would typically do a index file which extends ComponentBase
-and then instantiate any views, models, collections etc. that the component need
-within the index file.</p>
-
+              
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ComponentBase</span></span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">import</span> _ <span class="hljs-keyword">from</span> <span class="hljs-string">'underscore'</span>;
+<span class="hljs-keyword">import</span> {Events, Model} <span class="hljs-keyword">from</span> <span class="hljs-string">'backbone'</span>;</pre></div></div>
             
         </li>
         
@@ -147,13 +140,17 @@ within the index file.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p><strong>render:</strong> <br/>
-Override this method</p>
+              <p>##ComponentBase
+This class is intended to be the public interface for a component.</p>
+<p>By default it exposes a render and a dispose method which should be overridden</p>
+<p>To create a component you would typically do a index file which extends ComponentBase
+and then instantiate any views, models, collections etc. that the component need
+within the index file.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  render: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">throw</span> <span class="hljs-string">'ComponentBase-&gt;render needs to be over-ridden'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ComponentBase</span> </span>{</pre></div></div>
             
         </li>
         
@@ -164,13 +161,15 @@ Override this method</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p><strong>dispose:</strong> <br/>
-Override this method</p>
+              <p>ComponentBase.extend = Backbone.Model.extend;
+Add Vigor.extend (Backbone.Model.extend) <br/>
+<a href="http://backbonejs.org/#Model-extend">Backbone.Model.extend</a></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  dispose: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">throw</span> <span class="hljs-string">'ComponentBase-&gt;dispose needs to be over-ridden'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">static</span> get extend() {
+    <span class="hljs-keyword">return</span> Model.extend;
+  }</pre></div></div>
             
         </li>
         
@@ -181,12 +180,14 @@ Override this method</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>Extends Backbone.Events <br/>
-<a href="http://backbonejs.org/#Events">Backbone.Events</a></p>
+              <p><strong>render:</strong> <br/>
+Override this method</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>_.extend ComponentBase.prototype, Backbone.Events</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  render() {
+    <span class="hljs-keyword">throw</span> <span class="hljs-string">'ComponentBase-&gt;render needs to be over-ridden'</span>;
+  }</pre></div></div>
             
         </li>
         
@@ -197,12 +198,15 @@ Override this method</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>Add Vigor.extend (Backbone.Model.extend) <br/>
-<a href="http://backbonejs.org/#Model-extend">Backbone.Model.extend</a></p>
+              <p><strong>dispose:</strong> <br/>
+Override this method</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>ComponentBase.extend = Vigor.extend</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  dispose() {
+    <span class="hljs-keyword">throw</span> <span class="hljs-string">'ComponentBase-&gt;dispose needs to be over-ridden'</span>;
+  }
+}</pre></div></div>
             
         </li>
         
@@ -213,11 +217,14 @@ Override this method</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>Expose ComponentBase on the Vigor object</p>
+              <p>Extends Backbone.Events <br/>
+<a href="http://backbonejs.org/#Events">Backbone.Events</a></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>Vigor.ComponentBase = ComponentBase</pre></div></div>
+            <div class="content"><div class='highlight'><pre>_.extend(ComponentBase.prototype, Events);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> ComponentBase;</pre></div></div>
             
         </li>
         

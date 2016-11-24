@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>settings.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="bootstrap.html">
+                  bootstrap.js
+                </a>
+              
+                
+                <a class="source" href="EventBus.html">
+                  EventBus.js
+                </a>
+              
+                
+                <a class="source" href="EventKeys.html">
+                  EventKeys.js
+                </a>
+              
+                
+                <a class="source" href="SubscriptionKeys.html">
+                  SubscriptionKeys.js
+                </a>
+              
+                
+                <a class="source" href="ComponentBase.html">
+                  ComponentBase.js
+                </a>
+              
+                
+                <a class="source" href="ComponentView.html">
+                  ComponentView.js
+                </a>
+              
+                
+                <a class="source" href="ComponentViewModel.html">
+                  ComponentViewModel.js
+                </a>
+              
+                
+                <a class="source" href="ProducerManager.html">
+                  ProducerManager.js
+                </a>
+              
+                
+                <a class="source" href="ProducerMapper.html">
+                  ProducerMapper.js
+                </a>
+              
+                
+                <a class="source" href="Subscription.html">
+                  Subscription.js
+                </a>
+              
+                
+                <a class="source" href="APIService.html">
+                  APIService.js
+                </a>
+              
+                
+                <a class="source" href="IdProducer.html">
+                  IdProducer.js
+                </a>
+              
+                
+                <a class="source" href="Producer.html">
+                  Producer.js
+                </a>
+              
+                
+                <a class="source" href="Repository.html">
+                  Repository.js
+                </a>
+              
+                
+                <a class="source" href="ServiceRepository.html">
+                  ServiceRepository.js
+                </a>
+              
+                
+                <a class="source" href="settings.html">
+                  settings.js
+                </a>
+              
+                
+                <a class="source" href="validateContract.html">
+                  validateContract.js
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>settings.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">import</span> _ <span class="hljs-keyword">from</span> <span class="hljs-string">'underscore'</span>;
+
+<span class="hljs-keyword">const</span> settings = {
+	<span class="hljs-attr">shouldValidateContract</span>: <span class="hljs-literal">false</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setup</span> (<span class="hljs-params">newSettings</span>) </span>{
+  _.extend(settings, newSettings);
+}
+
+<span class="hljs-keyword">export</span> {
+	settings,
+	setup
+}</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

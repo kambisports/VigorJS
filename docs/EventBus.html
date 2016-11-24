@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>EventBus.coffee</title>
+  <title>EventBus.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -21,87 +21,87 @@
               
                 
                 <a class="source" href="bootstrap.html">
-                  bootstrap.coffee
+                  bootstrap.js
                 </a>
               
                 
                 <a class="source" href="EventBus.html">
-                  EventBus.coffee
+                  EventBus.js
                 </a>
               
                 
                 <a class="source" href="EventKeys.html">
-                  EventKeys.coffee
+                  EventKeys.js
                 </a>
               
                 
                 <a class="source" href="SubscriptionKeys.html">
-                  SubscriptionKeys.coffee
+                  SubscriptionKeys.js
                 </a>
               
                 
                 <a class="source" href="ComponentBase.html">
-                  ComponentBase.coffee
+                  ComponentBase.js
                 </a>
               
                 
                 <a class="source" href="ComponentView.html">
-                  ComponentView.coffee
+                  ComponentView.js
                 </a>
               
                 
                 <a class="source" href="ComponentViewModel.html">
-                  ComponentViewModel.coffee
+                  ComponentViewModel.js
                 </a>
               
                 
                 <a class="source" href="ProducerManager.html">
-                  ProducerManager.coffee
+                  ProducerManager.js
                 </a>
               
                 
                 <a class="source" href="ProducerMapper.html">
-                  ProducerMapper.coffee
+                  ProducerMapper.js
                 </a>
               
                 
                 <a class="source" href="Subscription.html">
-                  Subscription.coffee
+                  Subscription.js
                 </a>
               
                 
                 <a class="source" href="APIService.html">
-                  APIService.coffee
+                  APIService.js
                 </a>
               
                 
                 <a class="source" href="IdProducer.html">
-                  IdProducer.coffee
+                  IdProducer.js
                 </a>
               
                 
                 <a class="source" href="Producer.html">
-                  Producer.coffee
+                  Producer.js
                 </a>
               
                 
                 <a class="source" href="Repository.html">
-                  Repository.coffee
+                  Repository.js
                 </a>
               
                 
                 <a class="source" href="ServiceRepository.html">
-                  ServiceRepository.coffee
+                  ServiceRepository.js
+                </a>
+              
+                
+                <a class="source" href="settings.html">
+                  settings.js
                 </a>
               
                 
                 <a class="source" href="validateContract.html">
-                  validateContract.coffee
-                </a>
-              
-                
-                <a class="source" href="setup.html">
-                  setup.coffee
+                  validateContract.js
                 </a>
               
             </div>
@@ -113,7 +113,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>EventBus.coffee</h1>
+                  <h1>EventBus.js</h1>
               </div>
           </li>
         
@@ -128,9 +128,13 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EventRegistry</span></span>
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">import</span> _ <span class="hljs-keyword">from</span> <span class="hljs-string">'underscore'</span>;
+<span class="hljs-keyword">import</span> Events <span class="hljs-keyword">from</span> <span class="hljs-string">'backbone'</span>;
+<span class="hljs-keyword">import</span> EventKeys <span class="hljs-keyword">from</span> <span class="hljs-string">'./EventKeys'</span>;
 
-_.extend EventRegistry.prototype, Backbone.Events</pre></div></div>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EventRegistry</span> </span>{}
+
+_.extend(EventRegistry.prototype, Events);</pre></div></div>
             
         </li>
         
@@ -144,12 +148,11 @@ _.extend EventRegistry.prototype, Backbone.Events</pre></div></div>
               <p>A global EventBus for the entire application</p>
 <p>@example How to subscribe to events
   EventBus.subscribe EventKeys.EXAMPLE_EVENT_KEY, (event) -&gt;</p>
-<pre><code>    <span class="hljs-comment"># do something with `event` here...</span>
+<pre><code>    # do something with `event` here...
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EventBus</span></span>
-	eventRegistry: <span class="hljs-keyword">new</span> EventRegistry()</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EventBus</span> </span>{</pre></div></div>
             
         </li>
         
@@ -167,11 +170,17 @@ bind the callback to all events fired.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>	subscribe: <span class="hljs-function"><span class="hljs-params">(key, callback)</span> -&gt;</span>
-		<span class="hljs-keyword">throw</span> <span class="hljs-string">"key '<span class="hljs-subst">#{key}</span>' does not exist in EventKeys"</span> <span class="hljs-keyword">unless</span> @_eventKeyExists key
-		<span class="hljs-keyword">throw</span> <span class="hljs-string">"callback is not a function"</span> <span class="hljs-keyword">unless</span> <span class="hljs-string">'function'</span> == <span class="hljs-keyword">typeof</span> callback
+            <div class="content"><div class='highlight'><pre>	subscribe(key, callback) {
+		<span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>._eventKeyExists(key)) {
+			<span class="hljs-keyword">throw</span> <span class="hljs-string">`key '<span class="hljs-subst">${key}</span>' does not exist in EventKeys`</span>;
+		}
 
-		@eventRegistry.<span class="hljs-literal">on</span> key, callback</pre></div></div>
+		<span class="hljs-keyword">if</span> (<span class="hljs-string">'function'</span> !== <span class="hljs-keyword">typeof</span> callback) {
+			<span class="hljs-keyword">throw</span> <span class="hljs-string">'callback is not a function'</span>;
+		}
+
+		<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.eventRegistry.on(key, callback);
+	}</pre></div></div>
             
         </li>
         
@@ -189,11 +198,17 @@ After the first time the callback is invoked, it will be removed.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>	subscribeOnce: <span class="hljs-function"><span class="hljs-params">(key, callback)</span> -&gt;</span>
-		<span class="hljs-keyword">throw</span> <span class="hljs-string">"key '<span class="hljs-subst">#{key}</span>' does not exist in EventKeys"</span> <span class="hljs-keyword">unless</span> @_eventKeyExists key
-		<span class="hljs-keyword">throw</span> <span class="hljs-string">"callback is not a function"</span> <span class="hljs-keyword">unless</span> <span class="hljs-string">'function'</span> == <span class="hljs-keyword">typeof</span> callback
+            <div class="content"><div class='highlight'><pre>	subscribeOnce(key, callback) {
+		<span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>._eventKeyExists(key)) {
+			<span class="hljs-keyword">throw</span> <span class="hljs-string">`key '<span class="hljs-subst">${key}</span>' does not exist in EventKeys`</span>;
+		}
 
-		@eventRegistry.once key, callback</pre></div></div>
+		<span class="hljs-keyword">if</span> (<span class="hljs-string">'function'</span> !== <span class="hljs-keyword">typeof</span> callback) {
+			<span class="hljs-keyword">throw</span> <span class="hljs-string">'callback is not a function'</span>;
+		}
+
+		<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.eventRegistry.once(key, callback);
+	}</pre></div></div>
             
         </li>
         
@@ -210,11 +225,17 @@ After the first time the callback is invoked, it will be removed.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>	unsubscribe: <span class="hljs-function"><span class="hljs-params">(key, callback)</span> -&gt;</span>
-		<span class="hljs-keyword">throw</span> <span class="hljs-string">"key '<span class="hljs-subst">#{key}</span>' does not exist in EventKeys"</span> <span class="hljs-keyword">unless</span> @_eventKeyExists key
-		<span class="hljs-keyword">throw</span> <span class="hljs-string">"callback is not a function"</span> <span class="hljs-keyword">unless</span> <span class="hljs-string">'function'</span> == <span class="hljs-keyword">typeof</span> callback
+            <div class="content"><div class='highlight'><pre>	unsubscribe(key, callback) {
+		<span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>._eventKeyExists(key)) {
+			<span class="hljs-keyword">throw</span> <span class="hljs-string">`key '<span class="hljs-subst">${key}</span>' does not exist in EventKeys`</span>;
+		}
 
-		@eventRegistry.<span class="hljs-literal">off</span> key, callback</pre></div></div>
+		<span class="hljs-keyword">if</span> (<span class="hljs-string">'function'</span> !== <span class="hljs-keyword">typeof</span> callback) {
+			<span class="hljs-keyword">throw</span> <span class="hljs-string">'callback is not a function'</span>;
+		}
+
+		<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.eventRegistry.off(key, callback);
+	}</pre></div></div>
             
         </li>
         
@@ -234,15 +255,27 @@ argument).</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>	send: <span class="hljs-function"><span class="hljs-params">(key, message)</span> -&gt;</span>
-		<span class="hljs-keyword">throw</span> <span class="hljs-string">"key '<span class="hljs-subst">#{key}</span>' does not exist in EventKeys"</span> <span class="hljs-keyword">unless</span> @_eventKeyExists key
+            <div class="content"><div class='highlight'><pre>	send(key, message) {
+		<span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>._eventKeyExists(key)) {
+			<span class="hljs-keyword">throw</span> <span class="hljs-string">`key '<span class="hljs-subst">${key}</span>' does not exist in EventKeys`</span>;
+		}
 
-		@eventRegistry.trigger key, message
+		<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.eventRegistry.trigger(key, message);
+	}
 
-	_eventKeyExists: <span class="hljs-function"><span class="hljs-params">(key)</span> -&gt;</span>
-		key <span class="hljs-keyword">in</span> (value <span class="hljs-keyword">for</span> property, value <span class="hljs-keyword">of</span> Vigor.EventKeys)
+	_eventKeyExists(key) {
+		<span class="hljs-keyword">const</span> keys = [];
+		<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> property <span class="hljs-keyword">in</span> EventKeys) {
+			<span class="hljs-keyword">let</span> value = EventKeys[property];
+			keys.push(value);
+		}
+		<span class="hljs-keyword">return</span> keys.indexOf(key) &gt;= <span class="hljs-number">0</span>;
+	}
+}
 
-Vigor.EventBus = <span class="hljs-keyword">new</span> EventBus()</pre></div></div>
+EventBus.prototype.eventRegistry = <span class="hljs-keyword">new</span> EventRegistry();
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-keyword">new</span> EventBus();</pre></div></div>
             
         </li>
         

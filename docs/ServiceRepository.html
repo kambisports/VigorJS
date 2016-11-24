@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>ServiceRepository.coffee</title>
+  <title>ServiceRepository.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -21,87 +21,87 @@
               
                 
                 <a class="source" href="bootstrap.html">
-                  bootstrap.coffee
+                  bootstrap.js
                 </a>
               
                 
                 <a class="source" href="EventBus.html">
-                  EventBus.coffee
+                  EventBus.js
                 </a>
               
                 
                 <a class="source" href="EventKeys.html">
-                  EventKeys.coffee
+                  EventKeys.js
                 </a>
               
                 
                 <a class="source" href="SubscriptionKeys.html">
-                  SubscriptionKeys.coffee
+                  SubscriptionKeys.js
                 </a>
               
                 
                 <a class="source" href="ComponentBase.html">
-                  ComponentBase.coffee
+                  ComponentBase.js
                 </a>
               
                 
                 <a class="source" href="ComponentView.html">
-                  ComponentView.coffee
+                  ComponentView.js
                 </a>
               
                 
                 <a class="source" href="ComponentViewModel.html">
-                  ComponentViewModel.coffee
+                  ComponentViewModel.js
                 </a>
               
                 
                 <a class="source" href="ProducerManager.html">
-                  ProducerManager.coffee
+                  ProducerManager.js
                 </a>
               
                 
                 <a class="source" href="ProducerMapper.html">
-                  ProducerMapper.coffee
+                  ProducerMapper.js
                 </a>
               
                 
                 <a class="source" href="Subscription.html">
-                  Subscription.coffee
+                  Subscription.js
                 </a>
               
                 
                 <a class="source" href="APIService.html">
-                  APIService.coffee
+                  APIService.js
                 </a>
               
                 
                 <a class="source" href="IdProducer.html">
-                  IdProducer.coffee
+                  IdProducer.js
                 </a>
               
                 
                 <a class="source" href="Producer.html">
-                  Producer.coffee
+                  Producer.js
                 </a>
               
                 
                 <a class="source" href="Repository.html">
-                  Repository.coffee
+                  Repository.js
                 </a>
               
                 
                 <a class="source" href="ServiceRepository.html">
-                  ServiceRepository.coffee
+                  ServiceRepository.js
+                </a>
+              
+                
+                <a class="source" href="settings.html">
+                  settings.js
                 </a>
               
                 
                 <a class="source" href="validateContract.html">
-                  validateContract.coffee
-                </a>
-              
-                
-                <a class="source" href="setup.html">
-                  setup.coffee
+                  validateContract.js
                 </a>
               
             </div>
@@ -113,7 +113,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>ServiceRepository.coffee</h1>
+                  <h1>ServiceRepository.js</h1>
               </div>
           </li>
         
@@ -125,14 +125,10 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h2 id="servicerepository">ServiceRepository</h2>
-<p>A ServiceRepository extends the Repository class and enables
-subscriptions for services</p>
-
+              
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ServiceRepository</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Vigor</span>.<span class="hljs-title">Repository</span></span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">import</span> Repository <span class="hljs-keyword">from</span> <span class="hljs-string">'datacommunication/repositories/Repository'</span>;</pre></div></div>
             
         </li>
         
@@ -143,11 +139,22 @@ subscriptions for services</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>Holds the services</p>
+              <h2 id="servicerepository">ServiceRepository</h2>
+<p>A ServiceRepository extends the Repository class and enables
+subscriptions for services</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  services: {}</pre></div></div>
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ServiceRepository</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Repository</span> </span>{
+
+  get services() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._services || {};
+  }
+
+  set services(services) {
+    <span class="hljs-keyword">this</span>._services = services;
+  }</pre></div></div>
             
         </li>
         
@@ -167,8 +174,9 @@ The subscription to add to the service</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  addSubscriptionToService: <span class="hljs-function"><span class="hljs-params">(service, subscription)</span> -&gt;</span>
-    service.addSubscription subscription</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  addSubscriptionToService(service, subscription) {
+    service.addSubscription(subscription);
+  }</pre></div></div>
             
         </li>
         
@@ -188,8 +196,9 @@ The subscription to remove from the service</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  removeSubscriptionFromService: <span class="hljs-function"><span class="hljs-params">(service, subscription)</span> -&gt;</span>
-    service.removeSubscription subscription</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  removeSubscriptionFromService(service, subscription) {
+    service.removeSubscription(subscription);
+  }</pre></div></div>
             
         </li>
         
@@ -209,9 +218,11 @@ Used to configure the service request</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  addSubscription: <span class="hljs-function"><span class="hljs-params">(type, subscription)</span> -&gt;</span>
-    <span class="hljs-keyword">if</span> @services[type]
-      @addSubscriptionToService @services[type], subscription</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  addSubscription(type, subscription) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.services[type]) {
+      <span class="hljs-keyword">this</span>.addSubscriptionToService(<span class="hljs-keyword">this</span>.services[type], subscription);
+    }
+  }</pre></div></div>
             
         </li>
         
@@ -231,9 +242,12 @@ Used to configure the service request</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  removeSubscription: <span class="hljs-function"><span class="hljs-params">(type, subscription)</span> -&gt;</span>
-    <span class="hljs-keyword">if</span> @services[type]
-      @removeSubscriptionFromService @services[type], subscription</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  removeSubscription(type, subscription) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.services[type]) {
+      <span class="hljs-keyword">this</span>.removeSubscriptionFromService(<span class="hljs-keyword">this</span>.services[type], subscription);
+    }
+  }
+}</pre></div></div>
             
         </li>
         
@@ -248,7 +262,7 @@ Used to configure the service request</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>Vigor.ServiceRepository = ServiceRepository</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> ServiceRepository;</pre></div></div>
             
         </li>
         

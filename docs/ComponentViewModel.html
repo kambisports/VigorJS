@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>ComponentViewModel.coffee</title>
+  <title>ComponentViewModel.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -21,87 +21,87 @@
               
                 
                 <a class="source" href="bootstrap.html">
-                  bootstrap.coffee
+                  bootstrap.js
                 </a>
               
                 
                 <a class="source" href="EventBus.html">
-                  EventBus.coffee
+                  EventBus.js
                 </a>
               
                 
                 <a class="source" href="EventKeys.html">
-                  EventKeys.coffee
+                  EventKeys.js
                 </a>
               
                 
                 <a class="source" href="SubscriptionKeys.html">
-                  SubscriptionKeys.coffee
+                  SubscriptionKeys.js
                 </a>
               
                 
                 <a class="source" href="ComponentBase.html">
-                  ComponentBase.coffee
+                  ComponentBase.js
                 </a>
               
                 
                 <a class="source" href="ComponentView.html">
-                  ComponentView.coffee
+                  ComponentView.js
                 </a>
               
                 
                 <a class="source" href="ComponentViewModel.html">
-                  ComponentViewModel.coffee
+                  ComponentViewModel.js
                 </a>
               
                 
                 <a class="source" href="ProducerManager.html">
-                  ProducerManager.coffee
+                  ProducerManager.js
                 </a>
               
                 
                 <a class="source" href="ProducerMapper.html">
-                  ProducerMapper.coffee
+                  ProducerMapper.js
                 </a>
               
                 
                 <a class="source" href="Subscription.html">
-                  Subscription.coffee
+                  Subscription.js
                 </a>
               
                 
                 <a class="source" href="APIService.html">
-                  APIService.coffee
+                  APIService.js
                 </a>
               
                 
                 <a class="source" href="IdProducer.html">
-                  IdProducer.coffee
+                  IdProducer.js
                 </a>
               
                 
                 <a class="source" href="Producer.html">
-                  Producer.coffee
+                  Producer.js
                 </a>
               
                 
                 <a class="source" href="Repository.html">
-                  Repository.coffee
+                  Repository.js
                 </a>
               
                 
                 <a class="source" href="ServiceRepository.html">
-                  ServiceRepository.coffee
+                  ServiceRepository.js
+                </a>
+              
+                
+                <a class="source" href="settings.html">
+                  settings.js
                 </a>
               
                 
                 <a class="source" href="validateContract.html">
-                  validateContract.coffee
-                </a>
-              
-                
-                <a class="source" href="setup.html">
-                  setup.coffee
+                  validateContract.js
                 </a>
               
             </div>
@@ -113,7 +113,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>ComponentViewModel.coffee</h1>
+                  <h1>ComponentViewModel.js</h1>
               </div>
           </li>
         
@@ -125,17 +125,13 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <p>##ComponentViewModel
-This class is intended to be the base class for all view models in a component</p>
-<p>A ComponentViewModel handles communication with producers through the
-ProducerManager</p>
-
+              
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ComponentViewModel</span></span>
-
-  ProducerManager = Vigor.ProducerManager</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">import</span> _ <span class="hljs-keyword">from</span> <span class="hljs-string">'underscore'</span>;
+<span class="hljs-keyword">import</span> {Model} <span class="hljs-keyword">from</span> <span class="hljs-string">'backbone'</span>;
+<span class="hljs-keyword">import</span> ProducerManager <span class="hljs-keyword">from</span> <span class="hljs-string">'datacommunication/ProducerManager'</span>;
+<span class="hljs-keyword">import</span> validateContract <span class="hljs-keyword">from</span> <span class="hljs-string">'utils/validateContract'</span>;</pre></div></div>
             
         </li>
         
@@ -146,14 +142,17 @@ ProducerManager</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p><strong>constructor</strong> <br/>
-The constructor generates a unique id for the ViewModel that will be used to
-handle subscriptions in the ProducerManager</p>
+              <p>##ComponentViewModel
+This class is intended to be the base class for all view models in a component</p>
+<p>A ComponentViewModel handles communication with producers through the
+ProducerManager</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  constructor: <span class="hljs-function">-&gt;</span>
-    @id = <span class="hljs-string">"ComponentViewModel_<span class="hljs-subst">#{_.uniqueId()}</span>"</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ComponentViewModel</span> </span>{
+  <span class="hljs-keyword">static</span> get extend() {
+    <span class="hljs-keyword">return</span> Model.extend;
+  }</pre></div></div>
             
         </li>
         
@@ -164,13 +163,15 @@ handle subscriptions in the ProducerManager</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p><strong>dispose</strong> <br/>
-Remves all subscriptions</p>
+              <p><strong>constructor</strong> <br/>
+The constructor generates a unique id for the ViewModel that will be used to
+handle subscriptions in the ProducerManager</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  dispose: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">do</span> @unsubscribeAll</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">constructor</span>() {
+    <span class="hljs-keyword">this</span>.id = <span class="hljs-string">`ComponentViewModel_<span class="hljs-subst">${_.uniqueId()}</span>`</span>;
+  }</pre></div></div>
             
         </li>
         
@@ -180,6 +181,24 @@ Remves all subscriptions</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p><strong>dispose</strong> <br/>
+Remves all subscriptions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  dispose() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.unsubscribeAll();
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p><strong>subscribe</strong> <br/>
 @param [key]: Object <br/>
@@ -193,27 +212,9 @@ Whenever new data is produced the callback will be called with new data as param
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  subscribe: <span class="hljs-function"><span class="hljs-params">(key, callback, options)</span> -&gt;</span>
-    ProducerManager.subscribe @id, key, callback, options</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-5">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
-              </div>
-              <p><strong>unsubscribe</strong> <br/>
-@param [key]: Object <br/>
-A Vigor.SubscriptionKey containing a key and contract property<br/></p>
-<p>Removes a subscription on specific key</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  unsubscribe: <span class="hljs-function"><span class="hljs-params">(key)</span> -&gt;</span>
-    ProducerManager.unsubscribe @id, key</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  subscribe(key, callback, options) {
+    <span class="hljs-keyword">return</span> ProducerManager.subscribe(<span class="hljs-keyword">this</span>.id, key, callback, options);
+  }</pre></div></div>
             
         </li>
         
@@ -224,13 +225,16 @@ A Vigor.SubscriptionKey containing a key and contract property<br/></p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p><strong>unsubscribeAll</strong> <br/>
-Removes all subscriptions</p>
+              <p><strong>unsubscribe</strong> <br/>
+@param [key]: Object <br/>
+A Vigor.SubscriptionKey containing a key and contract property<br/></p>
+<p>Removes a subscription on specific key</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  unsubscribeAll: <span class="hljs-function">-&gt;</span>
-    ProducerManager.unsubscribeAll @id</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  unsubscribe(key) {
+    <span class="hljs-keyword">return</span> ProducerManager.unsubscribe(<span class="hljs-keyword">this</span>.id, key);
+  }</pre></div></div>
             
         </li>
         
@@ -240,6 +244,24 @@ Removes all subscriptions</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p><strong>unsubscribeAll</strong> <br/>
+Removes all subscriptions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  unsubscribeAll() {
+    <span class="hljs-keyword">return</span> ProducerManager.unsubscribeAll(<span class="hljs-keyword">this</span>.id);
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p><strong>validateContract</strong> <br/>
 @param [contract]: Object <br/>
@@ -252,11 +274,12 @@ validate incoming data</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  validateContract: <span class="hljs-function"><span class="hljs-params">(contract, incommingData)</span> -&gt;</span>
-    Vigor.helpers.validateContract(contract, incommingData, @id)
+            <div class="content"><div class='highlight'><pre>  validateContract(contract, incommingData) {
+    <span class="hljs-keyword">return</span> validateContract(contract, incommingData, <span class="hljs-keyword">this</span>.id);
+  }
+}
 
-ComponentViewModel.extend = Vigor.extend
-Vigor.ComponentViewModel = ComponentViewModel</pre></div></div>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> ComponentViewModel;</pre></div></div>
             
         </li>
         

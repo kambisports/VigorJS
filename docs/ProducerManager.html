@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>ProducerManager.coffee</title>
+  <title>ProducerManager.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -21,87 +21,87 @@
               
                 
                 <a class="source" href="bootstrap.html">
-                  bootstrap.coffee
+                  bootstrap.js
                 </a>
               
                 
                 <a class="source" href="EventBus.html">
-                  EventBus.coffee
+                  EventBus.js
                 </a>
               
                 
                 <a class="source" href="EventKeys.html">
-                  EventKeys.coffee
+                  EventKeys.js
                 </a>
               
                 
                 <a class="source" href="SubscriptionKeys.html">
-                  SubscriptionKeys.coffee
+                  SubscriptionKeys.js
                 </a>
               
                 
                 <a class="source" href="ComponentBase.html">
-                  ComponentBase.coffee
+                  ComponentBase.js
                 </a>
               
                 
                 <a class="source" href="ComponentView.html">
-                  ComponentView.coffee
+                  ComponentView.js
                 </a>
               
                 
                 <a class="source" href="ComponentViewModel.html">
-                  ComponentViewModel.coffee
+                  ComponentViewModel.js
                 </a>
               
                 
                 <a class="source" href="ProducerManager.html">
-                  ProducerManager.coffee
+                  ProducerManager.js
                 </a>
               
                 
                 <a class="source" href="ProducerMapper.html">
-                  ProducerMapper.coffee
+                  ProducerMapper.js
                 </a>
               
                 
                 <a class="source" href="Subscription.html">
-                  Subscription.coffee
+                  Subscription.js
                 </a>
               
                 
                 <a class="source" href="APIService.html">
-                  APIService.coffee
+                  APIService.js
                 </a>
               
                 
                 <a class="source" href="IdProducer.html">
-                  IdProducer.coffee
+                  IdProducer.js
                 </a>
               
                 
                 <a class="source" href="Producer.html">
-                  Producer.coffee
+                  Producer.js
                 </a>
               
                 
                 <a class="source" href="Repository.html">
-                  Repository.coffee
+                  Repository.js
                 </a>
               
                 
                 <a class="source" href="ServiceRepository.html">
-                  ServiceRepository.coffee
+                  ServiceRepository.js
+                </a>
+              
+                
+                <a class="source" href="settings.html">
+                  settings.js
                 </a>
               
                 
                 <a class="source" href="validateContract.html">
-                  validateContract.coffee
-                </a>
-              
-                
-                <a class="source" href="setup.html">
-                  setup.coffee
+                  validateContract.js
                 </a>
               
             </div>
@@ -113,7 +113,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>ProducerManager.coffee</h1>
+                  <h1>ProducerManager.js</h1>
               </div>
           </li>
         
@@ -125,12 +125,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h2 id="producermanager">ProducerManager</h2>
-<p>The ProducerManager utilizies the <a href="ProducerMapper.html">ProducerMapper</a> to (un)register components on subscriptions.</p>
-
+              
             </div>
             
-            <div class="content"><div class='highlight'><pre>producerManager =</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">import</span> ProducerMapper <span class="hljs-keyword">from</span> <span class="hljs-string">'datacommunication/ProducerMapper'</span>;
+<span class="hljs-keyword">import</span> Subscription <span class="hljs-keyword">from</span> <span class="hljs-string">'datacommunication/Subscription'</span>;</pre></div></div>
             
         </li>
         
@@ -141,15 +140,12 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p><strong>registerProducers:</strong> </br>
-@param [producers]: Array <br/></p>
-<p>Registers a one or more producers in mapper</p>
+              <h2 id="producermanager">ProducerManager</h2>
+<p>The ProducerManager utilizies the <a href="ProducerMapper.html">ProducerMapper</a> to (un)register components on subscriptions.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  registerProducers: <span class="hljs-function"><span class="hljs-params">(producers)</span> -&gt;</span>
-    producers.forEach (producer) -&gt;
-      producerMapper.register producer</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">const</span> ProducerManager = {</pre></div></div>
             
         </li>
         
@@ -160,15 +156,15 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p><strong>producerForKey:</strong> </br>
-@param [subscriptionKey]: String <br/>
-@returns [producer]: Producer </br></p>
-<p>Retrieves a registered producer for the given subscription</p>
+              <p><strong>registerProducers:</strong> </br>
+@param [producers]: Array <br/></p>
+<p>Registers a one or more producers in mapper</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  producerForKey: <span class="hljs-function"><span class="hljs-params">(subscriptionKey)</span> -&gt;</span>
-    producer = producerMapper.producerForKey subscriptionKey</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  registerProducers(producers) {
+    producers.forEach(<span class="hljs-function"><span class="hljs-params">producer</span> =&gt;</span> ProducerMapper.register(producer));
+  },</pre></div></div>
             
         </li>
         
@@ -179,19 +175,16 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p><strong>subscribe:</strong> </br>
-@param [componentId]: String <br/>
-@param [subscriptionKey]: Object <br/>
-@param [callback]: Function <br/>
-@param [subscriptionOptions]: Object (default empty object) <br/></p>
-<p>Registers a component with [componentId] to recieve data changes on given [subscriptionKey] through the component [callback]</p>
+              <p><strong>producerForKey:</strong> </br>
+@param [subscriptionKey]: String <br/>
+@returns [producer]: Producer </br></p>
+<p>Retrieves a registered producer for the given subscription</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  subscribe: <span class="hljs-function"><span class="hljs-params">(componentId, subscriptionKey, callback, subscriptionOptions = {})</span> -&gt;</span>
-    subscription = <span class="hljs-keyword">new</span> Subscription componentId, callback, subscriptionOptions
-    producer = @producerForKey subscriptionKey
-    producer.addComponent subscription</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  producerForKey(subscriptionKey) {
+    <span class="hljs-keyword">return</span> ProducerMapper.producerForKey(subscriptionKey);
+  },</pre></div></div>
             
         </li>
         
@@ -202,16 +195,20 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p><strong>unsubscribe:</strong> </br>
+              <p><strong>subscribe:</strong> </br>
 @param [componentId]: String <br/>
-@param [subscriptionKey]: String <br/></p>
-<p>Unsubscribes a component with [componentId] from the producer for the given [subscriptionKey]</p>
+@param [subscriptionKey]: Object <br/>
+@param [callback]: Function <br/>
+@param [subscriptionOptions]: Object (default empty object) <br/></p>
+<p>Registers a component with [componentId] to recieve data changes on given [subscriptionKey] through the component [callback]</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  unsubscribe: <span class="hljs-function"><span class="hljs-params">(componentId, subscriptionKey)</span> -&gt;</span>
-    producer = @producerForKey subscriptionKey
-    producer.removeComponent componentId</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  subscribe(componentId, subscriptionKey, callback, subscriptionOptions = {}) {
+    <span class="hljs-keyword">const</span> subscription = <span class="hljs-keyword">new</span> Subscription(componentId, callback, subscriptionOptions);
+    <span class="hljs-keyword">const</span> producer = <span class="hljs-keyword">this</span>.producerForKey(subscriptionKey);
+    producer.addComponent(subscription);
+  },</pre></div></div>
             
         </li>
         
@@ -222,17 +219,39 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
+              <p><strong>unsubscribe:</strong> </br>
+@param [componentId]: String <br/>
+@param [subscriptionKey]: String <br/></p>
+<p>Unsubscribes a component with [componentId] from the producer for the given [subscriptionKey]</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  unsubscribe(componentId, subscriptionKey) {
+    <span class="hljs-keyword">const</span> producer = <span class="hljs-keyword">this</span>.producerForKey(subscriptionKey);
+    producer.removeComponent(componentId);
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
               <p><strong>unsubscribeAll:</strong> </br>
 @param [componentId]: String <br/></p>
 <p>Unsubscribes a component with [componentId] from any producer that might have it in its subscription</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  unsubscribeAll: <span class="hljs-function"><span class="hljs-params">(componentId)</span> -&gt;</span>
-    producerMapper.producers.forEach (producer) -&gt;
-      producer::getInstance().removeComponent componentId
+            <div class="content"><div class='highlight'><pre>  unsubscribeAll(componentId) {
+    ProducerMapper.producers.forEach(<span class="hljs-function"><span class="hljs-params">producer</span> =&gt;</span> producer.prototype.getInstance().removeComponent(componentId));
+  }
+};
 
-Vigor.ProducerManager = producerManager</pre></div></div>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> ProducerManager;</pre></div></div>
             
         </li>
         

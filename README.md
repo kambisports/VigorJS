@@ -1,5 +1,4 @@
 # Vigorjs
-
 ## Introduction
 As applications grows they become harder and harder to maintain, Vigorjs is a small library built ontop of Backbone to address this issue.
 
@@ -7,29 +6,46 @@ The main goal of Vigorjs is to keep the application modular and separate gui com
 
 - Class documentation
 	- Component
-		- [ComponentBase.coffee](./docs/ComponentBase.html)
-		- [ComponentView.coffee](./docs/ComponentView.html)
-		- [ComponentViewModel.coffee](./docs/ComponentViewModel.html)
+		- [ComponentBase.js](./docs/ComponentBase.html)
+		- [ComponentView.js](./docs/ComponentView.html)
+		- [ComponentViewModel.js](./docs/ComponentViewModel.html)
 	- DataComms
-		- [Subscription.coffee](./docs/Subscription.html)
-		- [ProducerMapper.coffee](./docs/ProducerMapper.html)
-		- [ProducerManager.coffee](./docs/ProducerManager.html)
+		- [Subscription.js](./docs/Subscription.html)
+		- [ProducerMapper.js](./docs/ProducerMapper.html)
+		- [ProducerManager.js](./docs/ProducerManager.html)
 
 	- Producer
-		- [Producer.coffee](./docs/Producer.html)
-		- [IdProducer.coffee](./docs/IdProducer.html)
-		- [SubscriptionKeys.coffee](./docs/SubscriptionKeys.html)
+		- [Producer.js](./docs/Producer.html)
+		- [IdProducer.js](./docs/IdProducer.html)
+		- [SubscriptionKeys.js](./docs/SubscriptionKeys.html)
 
 	- Repository
-		- [Repository.coffee](./docs/Repository.html)
-		- [ServiceRepository.coffee](./docs/ServiceRepository.html)
+		- [Repository.js](./docs/Repository.html)
+		- [ServiceRepository.js](./docs/ServiceRepository.html)
 
 	- Services
-		- [APIService.coffee](./docs/APIService.html)
+		- [APIService.js](./docs/APIService.html)
 
 	- EventBus
-		- [EventBus.coffee](./docs/EventBus.html)
-		- [EventKeys.coffee](./docs/EventKeys.html)
+		- [EventBus.js](./docs/EventBus.html)
+		- [EventKeys.js](./docs/EventKeys.html)
+
+## Build
+Build lib:
+yarn build
+
+Build lib dev mode with watch:
+yarn dev
+
+Run tests:
+yarn test
+
+Run tests with coverage:
+yarn coverage
+
+Generate documentation:
+yarn docco
+
 
 ## Concept
 By introducing the concepts of ***Components***, ***Producers***, ***Repositories***, ***Services*** and an ***EventBus*** we want to clarify and simplify the responsibilities and actions of each layer within a large scale Backbone application.
@@ -40,9 +56,9 @@ A simplified description of the responsibilities for each concept is as follows:
 
 
 ### Components
-[ComponentBase.coffee](./docs/ComponentBase.html),
-[ComponentView.coffee](./docs/ComponentView.html),
-[ComponentViewModel.coffee](./docs/ComponentViewModel.html)
+[ComponentBase.js](./docs/ComponentBase.html),
+[ComponentView.js](./docs/ComponentView.html),
+[ComponentViewModel.js](./docs/ComponentViewModel.html)
 
 - A ***Component*** is the gui component presented to the end user in the form of a package containing one or multiple views, view-models, collections etc.
 
@@ -57,9 +73,9 @@ A simplified description of the responsibilities for each concept is as follows:
 
 
 ###Producers
-[Producer.coffee](./docs/Producer.html),
-[IdProducer.coffee](./docs/IdProducer.html),
-[SubscriptionKeys.coffee](./docs/SubscriptionKeys.html)
+[Producer.js](./docs/Producer.html),
+[IdProducer.js](./docs/IdProducer.html),
+[SubscriptionKeys.js](./docs/SubscriptionKeys.html)
 
 - A ***Producer*** is the link between a ***Component*** and a ***Repository***
 
@@ -80,8 +96,8 @@ A simplified description of the responsibilities for each concept is as follows:
 
 
 ###Repositories
-[Repository.coffee](./docs/Repository.html),
-[ServiceRepository.coffee](./docs/ServiceRepository.html)
+[Repository.js](./docs/Repository.html),
+[ServiceRepository.js](./docs/ServiceRepository.html)
 
 - A ***Repository*** is the link between a ***Producer*** and a ***Service***
 
@@ -94,7 +110,7 @@ A simplified description of the responsibilities for each concept is as follows:
 
 
 ###Services
-[APIService.coffee](./docs/APIService.html)
+[APIService.js](./docs/APIService.html)
 
 - A ***Service*** is the link between one or multiple ***Repositories*** and an external API
 
@@ -107,8 +123,8 @@ A simplified description of the responsibilities for each concept is as follows:
 
 
 ###EventBus
-[EventBus.coffee](./docs/EventBus.html),
-[EventKeys.coffee](./docs/EventKeys.html)
+[EventBus.js](./docs/EventBus.html),
+[EventKeys.js](./docs/EventKeys.html)
 
 - The ***EventBus*** is the communication link between components and other parts of a application
 
@@ -124,6 +140,6 @@ A simplified description of the responsibilities for each concept is as follows:
 
 - ***Vigorjs*** is dependent on ***jQuery***, ***Backbone*** and ***Underscore***
 
-- ***Vigorjs*** source files are written in Coffeescript
+- ***Vigorjs*** source files are written in ES6
 
 
