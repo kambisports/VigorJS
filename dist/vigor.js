@@ -1458,6 +1458,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'onPostError',
 	    value: function onPostError() {}
 	
+	    // **onPutSuccess**<br/>
+	    // Called when a Put request is successful.
+	
+	  }, {
+	    key: 'onPutSuccess',
+	    value: function onPutSuccess() {}
+	
+	    // **onPutError**<br/>
+	    // Called when a Put request is unsuccessful.
+	
+	  }, {
+	    key: 'onPutError',
+	    value: function onPutError() {}
+	
+	    // **onDeleteSuccess**<br/>
+	    // Called when a Destroy request is successful.
+	
+	  }, {
+	    key: 'onDeleteSuccess',
+	    value: function onDeleteSuccess() {}
+	
+	    // **onDeleteError**<br/>
+	    // Called when a Destroy request is unsuccessful.
+	
+	  }, {
+	    key: 'onDeleteError',
+	    value: function onDeleteError() {}
+	
 	    // **sync**<br/>
 	    // See [Backbone.Model.sync](http://backbonejs.org/#Model-sync)
 	
@@ -1515,9 +1543,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case 'POST':
 	          return this.post(subscriber.postParams);
 	        case 'PUT':
-	          throw 'PUT not yet implemented';
+	          return this.put(subscriber.putParams);
 	        case 'DELETE':
-	          throw 'DELETE not yet implemented';
+	          return this.delete(subscriber.deleteParams);
 	      }
 	    }
 	
@@ -1614,6 +1642,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return model.save(undefined, {
 	        success: this.onPostSuccess,
 	        error: this.onPostError
+	      });
+	    }
+	  }, {
+	    key: 'put',
+	    value: function put(params) {
+	      var model = this.getModelInstance(params);
+	      if (!model.get('id')) {
+	        throw 'PUT requests must have an id specified in putParams';
+	      }
+	
+	      return model.save(undefined, {
+	        success: this.onPutSuccess,
+	        error: this.onPutError
+	      });
+	    }
+	  }, {
+	    key: 'delete',
+	    value: function _delete(params) {
+	      var model = this.getModelInstance(params);
+	      return model.destroy({
+	        success: this.onDeleteSuccess,
+	        error: this.onDeleteError
 	      });
 	    }
 	  }]);
