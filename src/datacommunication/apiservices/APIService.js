@@ -41,8 +41,10 @@ class ServiceChannel {
   // This method can be called at any time, since it takes into account the time since the last request.
   restart() {
     let wait;
+    let hasLastPollTime = !(typeof this.lastPollTime === 'undefined' || this.lastPollTime === null);
     this.pollingInterval = this.getPollingInterval();
-    if (this.lastPollTime != null) {
+
+    if (hasLastPollTime) {
       const elapsedWait = this._window.Date.now() - this.lastPollTime;
       wait = Math.max(this.pollingInterval - elapsedWait, 0);
     } else {
@@ -239,7 +241,7 @@ class APIService {
   // a single params object. The default implementation just returns the first
   // params object in the array. This is fine when using the default implementation of
   // channelForParams because all the params are identical anyway.
-  consolidateParams(paramsArray, channelName) {
+  consolidateParams(paramsArray) {
     return paramsArray[0];
   }
 
@@ -273,7 +275,7 @@ class APIService {
   // Return true if the service should fetch immediately after the given params update, or
   // false if the service should wait until the next scheduled poll time.<br/>
   // The default implementation always returns true, forcing an immediate fetch.
-  shouldFetchOnParamsUpdate(newParams, oldParams, channelName) {
+  shouldFetchOnParamsUpdate() {
     return true;
   }
 

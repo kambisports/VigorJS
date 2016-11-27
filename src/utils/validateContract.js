@@ -24,22 +24,18 @@ const validateContract = function(contract, dataToCompare, comparatorId, verb = 
   if (!settings.shouldValidateContract) { return; }
   if (!contract) {
     throw new Error(`The ${comparatorId} does not have any contract specified`);
-    return false;
   }
 
   if (!dataToCompare) {
     throw new Error(`${comparatorId} is trying to validate the contract but does not recieve any data to compare against the contract`);
-    return false;
   }
 
   if (_.isArray(contract) && _.isArray(dataToCompare) === false) {
     throw new Error(`${comparatorId}'s compared data is supposed to be an array but is a ${typeof dataToCompare}`);
-    return false;
   }
 
   if (_.isObject(contract) && _.isArray(contract) === false && _.isArray(dataToCompare)) {
     throw new Error(`${comparatorId}'s compared data is supposed to be an object but is an array`);
-    return false;
   }
 
   if (_.isObject(contract) && _.isArray(contract) === false) {
@@ -48,29 +44,25 @@ const validateContract = function(contract, dataToCompare, comparatorId, verb = 
 
     if (dataKeyCount > contractKeyCount) {
       throw new Error(`${comparatorId} is ${verb} more data then what is specified in the contract`, contract,dataToCompare);
-      return false;
     } else if (dataKeyCount < contractKeyCount) {
       throw new Error(`${comparatorId} is ${verb} less data then what is specified in the contract`, contract,dataToCompare);
-      return false;
     }
   }
 
   for (let key in contract) {
+    if (contract.hasOwnProperty(key)) {
+      const val = contract[key];
+      if (!(key in dataToCompare)) {
+        throw new Error(`${comparatorId} has data but is missing the key: ${key}`);
+      }
 
-    const val = contract[key];
-    if (!(key in dataToCompare)) {
-      throw new Error(`${comparatorId} has data but is missing the key: ${key}`);
-      return false;
-    }
-
-    if (val != null) {
-      if (typeof dataToCompare[key] !== typeof val) {
-        throw new Error(`${comparatorId} is ${verb} data of the wrong type according to the contract, ${key}, expects ${typeof val} but gets ${typeof dataToCompare[key]}`);
-        return false;
+      if (val !== null || val !== undefined) {
+        if (typeof dataToCompare[key] !== typeof val) {
+          throw new Error(`${comparatorId} is ${verb} data of the wrong type according to the contract, ${key}, expects ${typeof val} but gets ${typeof dataToCompare[key]}`);
+        }
       }
     }
   }
-
 
   return true;
 };

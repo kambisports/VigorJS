@@ -16,23 +16,23 @@ import Repository from 'datacommunication/repositories/Repository';
 import ServiceRepository from 'datacommunication/repositories/ServiceRepository';
 
 const Vigor = {
-	EventBus,
-	EventKeys,
-	SubscriptionKeys,
-	ComponentBase,
-	ComponentView,
-	ComponentViewModel,
-	ProducerManager,
-	ProducerMapper,
-	Subscription,
-	settings,
-	setup,
-	validateContract,
-	APIService,
-	IdProducer,
-	Producer,
-	Repository,
-	ServiceRepository
+  EventBus,
+  EventKeys,
+  SubscriptionKeys,
+  ComponentBase,
+  ComponentView,
+  ComponentViewModel,
+  ProducerManager,
+  ProducerMapper,
+  Subscription,
+  settings,
+  setup,
+  validateContract,
+  APIService,
+  IdProducer,
+  Producer,
+  Repository,
+  ServiceRepository
 };
 
 export default Vigor;
@@ -40,21 +40,21 @@ export default Vigor;
 // In the long run this should be the only export needed, default
 // default above is
 export {
-	EventBus,
-	EventKeys,
-	SubscriptionKeys,
-	ComponentBase,
-	ComponentView,
-	ComponentViewModel,
-	ProducerManager,
-	ProducerMapper,
-	Subscription,
-	settings,
-	setup,
-	validateContract,
-	APIService,
-	IdProducer,
-	Producer,
-	Repository,
-	ServiceRepository
+  EventBus,
+  EventKeys,
+  SubscriptionKeys,
+  ComponentBase,
+  ComponentView,
+  ComponentViewModel,
+  ProducerManager,
+  ProducerMapper,
+  Subscription,
+  settings,
+  setup,
+  validateContract,
+  APIService,
+  IdProducer,
+  Producer,
+  Repository,
+  ServiceRepository
 }

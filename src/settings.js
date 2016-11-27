@@ -1,7 +1,7 @@
 import _ from 'underscore';
 
-const settings = {
-	shouldValidateContract: false
+const settings = {
+  shouldValidateContract: false
 }
 
 function setup (newSettings) {
@@ -9,6 +9,6 @@ function setup (newSettings) {
 }
 
 export {
-	settings,
-	setup
+  settings,
+  setup
 }

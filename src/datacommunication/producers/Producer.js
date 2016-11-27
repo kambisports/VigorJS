@@ -55,7 +55,7 @@ class Producer {
 
 
   getInstance() {
-    if (this.instance == null) {
+    if (this.instance === null || typeof(this.instance) === 'undefined') {
       this.instance = new this.constructor();
     }
     return this.instance;
@@ -69,7 +69,7 @@ class Producer {
   // Adds (subscribes) a component to the producer.
   addComponent(subscription) {
     const existingSubscription = this.registeredComponents[subscription.id];
-    if (existingSubscription == null) {
+    if (existingSubscription === null || typeof(existingSubscription) === 'undefined') {
       this.registeredComponents[subscription.id] = subscription;
       this.subscribe(subscription.options);
 
@@ -94,9 +94,11 @@ class Producer {
       delete this.registeredComponents[subscription.id];
 
       let shouldUnsubscribe = true;
-      for (let component in this.registeredComponents) {
-        shouldUnsubscribe = false;
-        break;
+      for (let componentId in this.registeredComponents) {
+        if (this.registeredComponents.hasOwnProperty(componentId)) {
+          shouldUnsubscribe = false;
+          break;
+        }
       }
 
       if (shouldUnsubscribe) {
@@ -194,8 +196,10 @@ class Producer {
     data = this.decorate(data);
     this._validateContract(data);
     for (let componentId in this.registeredComponents) {
-      const component = this.registeredComponents[componentId];
-      component.callback(data);
+      if (this.registeredComponents.hasOwnProperty(componentId)) {
+        const component = this.registeredComponents[componentId];
+        component.callback(data);
+      }
     }
   }
 
@@ -207,7 +211,7 @@ class Producer {
 
   // **unsubscribe** <br/>
   // Default implementation is a noop.
-  unsubscribe(options) {}
+  unsubscribe() {}
 
 
   // **decorate** <br/>
@@ -243,9 +247,9 @@ class Producer {
   //
   // Used to validate data against a predefined contract, if there is one.
   _validateContract(dataToProduce) {
-    const { contract } = this.PRODUCTION_KEY;
+    const { key, contract } = this.PRODUCTION_KEY;
     if (!contract) {
-      throw new Error(`The subscriptionKey ${subscriptionKey.key} doesn't have a contract specified`);
+      throw new Error(`The subscriptionKey ${key} doesn't have a contract specified`);
     }
 
     validateContract(contract, dataToProduce, this, 'producing');
@@ -254,8 +258,10 @@ class Producer {
 
   extend(obj, mixin) {
     for (let name in mixin) {
-      let method = mixin[name];
-      obj[name] = method;
+      if (mixin.hasOwnProperty(name)) {
+        let method = mixin[name];
+        obj[name] = method;
+      }
     }
     return obj;
   }
