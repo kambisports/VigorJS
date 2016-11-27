@@ -188,7 +188,7 @@ class IdProducer extends Producer {
   // @param [id]: The id to produce data for
   //
   // This is where the actual collection of the data is done. <br/>
-  currentData(id) {}
+  currentData() {}
     // default implementation is a noop
 
   // **hasId**<br/>
@@ -200,7 +200,10 @@ class IdProducer extends Producer {
   //
   // Returns true if there is a subscription for the given id, otherwise returns false.
   hasId(id) {
-    return (this.subscriptions[id] != null);
+    return !(
+      this.subscriptions[id] === null ||
+      typeof(this.subscriptions[id]) === 'undefined'
+    );
   }
 
 
@@ -212,7 +215,7 @@ class IdProducer extends Producer {
   // The repository which contains the model.<br/>
   //
   // Called when a model changes to determine whether to produce data for the model. If true, then data for the model will be produced for this change.
-  shouldPropagateModelChange(model, repository) {
+  shouldPropagateModelChange() {
     return true;
   }
 
@@ -227,7 +230,7 @@ class IdProducer extends Producer {
   // The internal id of the given model, or an array of internal ids which correspond to the given model.
   //
   // Translates a model to an id or array of ids of type idType which uniquely identifies the model internally to this producer.
-  idForModel(model, repository) {
+  idForModel(model) {
     return model.id;
   }
 

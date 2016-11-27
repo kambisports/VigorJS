@@ -8,7 +8,7 @@ import Repository from 'datacommunication/repositories/Repository';
 class ServiceRepository extends Repository {
 
   get services() {
-    return this._services || {};
+    return this._services || {};
   }
 
   set services(services) {

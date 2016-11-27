@@ -30,7 +30,7 @@
     "test": "test"
   },
   "scripts": {
-    "build": "webpack",
+    "build": "webpack --optimize-minimize",
     "dev": "webpack --progress --colors --watch --mode=dev",
     "test": "mocha --compilers js:babel-core/register --colors --require ./test/testsetup.js ./test/ --recursive",
     "docco": "find ./src/ -type f -name '*.js' | xargs docco",

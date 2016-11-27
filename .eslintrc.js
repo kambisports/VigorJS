@@ -8,7 +8,8 @@ module.exports = {
     browser: true,
     es6: true
   },
-  rulse: {
+  extends: 'eslint:recommended',
+  rules: {
     'no-bitwise': 'error',
     'curly': 'error',
     'guard-for-in': 'error',
