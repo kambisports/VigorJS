@@ -1,6 +1,2 @@
 node_modules
-.coverdata
-.coverrun
-coverage
-debug
-/.project
+dist

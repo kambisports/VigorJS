@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>Producer.coffee</title>
+  <title>Producer.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -21,87 +21,87 @@
               
                 
                 <a class="source" href="bootstrap.html">
-                  bootstrap.coffee
+                  bootstrap.js
                 </a>
               
                 
                 <a class="source" href="EventBus.html">
-                  EventBus.coffee
+                  EventBus.js
                 </a>
               
                 
                 <a class="source" href="EventKeys.html">
-                  EventKeys.coffee
+                  EventKeys.js
                 </a>
               
                 
                 <a class="source" href="SubscriptionKeys.html">
-                  SubscriptionKeys.coffee
+                  SubscriptionKeys.js
                 </a>
               
                 
                 <a class="source" href="ComponentBase.html">
-                  ComponentBase.coffee
+                  ComponentBase.js
                 </a>
               
                 
                 <a class="source" href="ComponentView.html">
-                  ComponentView.coffee
+                  ComponentView.js
                 </a>
               
                 
                 <a class="source" href="ComponentViewModel.html">
-                  ComponentViewModel.coffee
+                  ComponentViewModel.js
                 </a>
               
                 
                 <a class="source" href="ProducerManager.html">
-                  ProducerManager.coffee
+                  ProducerManager.js
                 </a>
               
                 
                 <a class="source" href="ProducerMapper.html">
-                  ProducerMapper.coffee
+                  ProducerMapper.js
                 </a>
               
                 
                 <a class="source" href="Subscription.html">
-                  Subscription.coffee
+                  Subscription.js
                 </a>
               
                 
                 <a class="source" href="APIService.html">
-                  APIService.coffee
+                  APIService.js
                 </a>
               
                 
                 <a class="source" href="IdProducer.html">
-                  IdProducer.coffee
+                  IdProducer.js
                 </a>
               
                 
                 <a class="source" href="Producer.html">
-                  Producer.coffee
+                  Producer.js
                 </a>
               
                 
                 <a class="source" href="Repository.html">
-                  Repository.coffee
+                  Repository.js
                 </a>
               
                 
                 <a class="source" href="ServiceRepository.html">
-                  ServiceRepository.coffee
+                  ServiceRepository.js
+                </a>
+              
+                
+                <a class="source" href="settings.html">
+                  settings.js
                 </a>
               
                 
                 <a class="source" href="validateContract.html">
-                  validateContract.coffee
-                </a>
-              
-                
-                <a class="source" href="setup.html">
-                  setup.coffee
+                  validateContract.js
                 </a>
               
             </div>
@@ -113,7 +113,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>Producer.coffee</h1>
+                  <h1>Producer.js</h1>
               </div>
           </li>
         
@@ -125,14 +125,13 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h2 id="producer">Producer</h2>
-<p>A Producer listens to data changes in one or several repositories
-and produces data on a certain Production Key.</p>
-
+              
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Producer</span></span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">import</span> _ <span class="hljs-keyword">from</span> <span class="hljs-string">'underscore'</span>;
+<span class="hljs-keyword">import</span> {Model, Events} <span class="hljs-keyword">from</span> <span class="hljs-string">'backbone'</span>;
+<span class="hljs-keyword">import</span> Repository <span class="hljs-keyword">from</span> <span class="hljs-string">'datacommunication/repositories/Repository'</span>;
+<span class="hljs-keyword">import</span> validateContract <span class="hljs-keyword">from</span> <span class="hljs-string">'utils/validateContract'</span>;</pre></div></div>
             
         </li>
         
@@ -143,12 +142,18 @@ and produces data on a certain Production Key.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>The production key that is used for subscribing to the producer. <br/>
-This key should be overridden in the subclass.</p>
+              <h2 id="producer">Producer</h2>
+<p>A Producer listens to data changes in one or several repositories
+and produces data on a certain Production Key.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  PRODUCTION_KEY: <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Producer</span> </span>{
+
+  <span class="hljs-keyword">static</span> get extend() {
+    <span class="hljs-keyword">return</span> Model.extend;
+  }</pre></div></div>
             
         </li>
         
@@ -159,11 +164,18 @@ This key should be overridden in the subclass.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>The repository (or repositories) that the producer listens to.</p>
+              <p>The production key that is used for subscribing to the producer. <br/>
+This key should be overridden in the subclass.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  repositories: []</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  get PRODUCTION_KEY() {
+   <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._productionKey;
+  }
+
+  set PRODUCTION_KEY(productionKey) {
+   <span class="hljs-keyword">this</span>._productionKey = productionKey;
+  }</pre></div></div>
             
         </li>
         
@@ -174,11 +186,17 @@ This key should be overridden in the subclass.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>The decorator(s) that is used for formatting the produced data.</p>
+              <p>The repository (or repositories) that the producer listens to.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  decorators: []</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  get repositories() {
+   <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._repositories || [];
+  }
+
+  set repositories(repositories) {
+    <span class="hljs-keyword">this</span>._repositories = repositories;
+  }</pre></div></div>
             
         </li>
         
@@ -189,22 +207,23 @@ This key should be overridden in the subclass.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>Keeps track of if the producer has subscribed to its repositories or not.</p>
+              <p>The decorator(s) that is used for formatting the produced data.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _isSubscribedToRepositories: <span class="hljs-literal">false</span>
+            <div class="content"><div class='highlight'><pre>  get decorators() {
+   <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._decorators || [];
+  }
+
+  set decorators(decorators) {
+    <span class="hljs-keyword">this</span>._decorators = decorators;
+  }
 
 
-  constructor: <span class="hljs-function">-&gt;</span>
-    @registeredComponents = {}
-    @produceData = _.throttle @produceDataSync, <span class="hljs-number">100</span>
-
-
-  getInstance: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">unless</span> @instance?
-      @instance = <span class="hljs-keyword">new</span> @constructor()
-    @instance</pre></div></div>
+  <span class="hljs-keyword">constructor</span>() {
+    <span class="hljs-keyword">this</span>.onDiffInRepository = <span class="hljs-keyword">this</span>.onDiffInRepository.bind(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>.registeredComponents = {};
+    <span class="hljs-keyword">this</span>.produceData = _.throttle(<span class="hljs-keyword">this</span>.produceDataSync, <span class="hljs-number">100</span>);</pre></div></div>
             
         </li>
         
@@ -215,22 +234,20 @@ This key should be overridden in the subclass.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p><strong>addComponent</strong> <br/>
-@param [subscription]: Object <br/>
-The subscription, which contains an id, a callback and options. <br/></p>
-<p>Adds (subscribes) a component to the producer.</p>
+              <p>Keeps track of if the producer has subscribed to its repositories or not.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  addComponent: <span class="hljs-function"><span class="hljs-params">(subscription)</span> -&gt;</span>
-    existingSubscription = @registeredComponents[subscription.id]
-    <span class="hljs-keyword">unless</span> existingSubscription?
-      @registeredComponents[subscription.id] = subscription
-      @subscribe subscription.options
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>._isSubscribedToRepositories = <span class="hljs-literal">false</span>;
+  }
 
-      <span class="hljs-keyword">unless</span> @_isSubscribedToRepositories
-        @subscribeToRepositories()
-        @_isSubscribedToRepositories = <span class="hljs-literal">true</span></pre></div></div>
+
+  getInstance() {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.instance == <span class="hljs-literal">null</span>) {
+      <span class="hljs-keyword">this</span>.instance = <span class="hljs-keyword">new</span> <span class="hljs-keyword">this</span>.constructor();
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.instance;
+  }</pre></div></div>
             
         </li>
         
@@ -241,28 +258,25 @@ The subscription, which contains an id, a callback and options. <br/></p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p><strong>removeComponent</strong> <br/>
-@param [componentId]: String <br/>
-The id of the component that should be removed. <br/></p>
-<p>Removes a component (its subscription) from the producer.</p>
+              <p><strong>addComponent</strong> <br/>
+@param [subscription]: Object <br/>
+The subscription, which contains an id, a callback and options. <br/></p>
+<p>Adds (subscribes) a component to the producer.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  removeComponent: <span class="hljs-function"><span class="hljs-params">(componentId)</span> -&gt;</span>
-    subscription = @registeredComponents[componentId]
+            <div class="content"><div class='highlight'><pre>  addComponent(subscription) {
+    <span class="hljs-keyword">const</span> existingSubscription = <span class="hljs-keyword">this</span>.registeredComponents[subscription.id];
+    <span class="hljs-keyword">if</span> (existingSubscription == <span class="hljs-literal">null</span>) {
+      <span class="hljs-keyword">this</span>.registeredComponents[subscription.id] = subscription;
+      <span class="hljs-keyword">this</span>.subscribe(subscription.options);
 
-    <span class="hljs-keyword">if</span> subscription?
-      @unsubscribe subscription.options
-      <span class="hljs-keyword">delete</span> @registeredComponents[subscription.id]
-
-      shouldUnsubscribe = <span class="hljs-literal">true</span>
-      <span class="hljs-keyword">for</span> component <span class="hljs-keyword">of</span> @registeredComponents
-        shouldUnsubscribe = <span class="hljs-literal">false</span>
-        <span class="hljs-keyword">break</span>
-
-      <span class="hljs-keyword">if</span> shouldUnsubscribe
-        @unsubscribeFromRepositories()
-        @_isSubscribedToRepositories = <span class="hljs-literal">false</span></pre></div></div>
+      <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>._isSubscribedToRepositories) {
+        <span class="hljs-keyword">this</span>.subscribeToRepositories();
+        <span class="hljs-keyword">this</span>._isSubscribedToRepositories = <span class="hljs-literal">true</span>;
+      }
+    }
+  }</pre></div></div>
             
         </li>
         
@@ -273,20 +287,32 @@ The id of the component that should be removed. <br/></p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p><strong>subscribeToRepositories</strong> <br/>
-Subscribes to all the repositories. <br/>
-Also registers the callback function if the repository has one.</p>
+              <p><strong>removeComponent</strong> <br/>
+@param [componentId]: String <br/>
+The id of the component that should be removed. <br/></p>
+<p>Removes a component (its subscription) from the producer.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  subscribeToRepositories: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">for</span> repository <span class="hljs-keyword">in</span> @repositories
-      <span class="hljs-keyword">if</span> repository <span class="hljs-keyword">instanceof</span> Vigor.Repository
-        @subscribeToRepository repository
-      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> repository.repository <span class="hljs-keyword">instanceof</span> Vigor.Repository <span class="hljs-keyword">and</span> <span class="hljs-keyword">typeof</span> repository.callback <span class="hljs-keyword">is</span> <span class="hljs-string">'string'</span>
-        @subscribeToRepository repository.repository, @[repository.callback]
-      <span class="hljs-keyword">else</span>
-        <span class="hljs-keyword">throw</span> <span class="hljs-string">'unexpected format of producer repositories definition'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  removeComponent(componentId) {
+    <span class="hljs-keyword">const</span> subscription = <span class="hljs-keyword">this</span>.registeredComponents[componentId];
+
+    <span class="hljs-keyword">if</span> (subscription) {
+      <span class="hljs-keyword">this</span>.unsubscribe(subscription.options);
+      <span class="hljs-keyword">delete</span> <span class="hljs-keyword">this</span>.registeredComponents[subscription.id];
+
+      <span class="hljs-keyword">let</span> shouldUnsubscribe = <span class="hljs-literal">true</span>;
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> component <span class="hljs-keyword">in</span> <span class="hljs-keyword">this</span>.registeredComponents) {
+        shouldUnsubscribe = <span class="hljs-literal">false</span>;
+        <span class="hljs-keyword">break</span>;
+      }
+
+      <span class="hljs-keyword">if</span> (shouldUnsubscribe) {
+        <span class="hljs-keyword">this</span>.unsubscribeFromRepositories();
+        <span class="hljs-keyword">this</span>._isSubscribedToRepositories = <span class="hljs-literal">false</span>;
+      }
+    }
+  }</pre></div></div>
             
         </li>
         
@@ -297,18 +323,23 @@ Also registers the callback function if the repository has one.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p><strong>unsubscribeFromRepositories</strong> <br/>
-Unsubscribes from all the repositories.</p>
+              <p><strong>subscribeToRepositories</strong> <br/>
+Subscribes to all the repositories. <br/>
+Also registers the callback function if the repository has one.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  unsubscribeFromRepositories: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">for</span> repository <span class="hljs-keyword">in</span> @repositories
-      <span class="hljs-keyword">if</span> repository <span class="hljs-keyword">instanceof</span> Vigor.Repository
-        @unsubscribeFromRepository repository
-      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> repository.repository <span class="hljs-keyword">instanceof</span> Vigor.Repository <span class="hljs-keyword">and</span> <span class="hljs-keyword">typeof</span> repository.callback <span class="hljs-keyword">is</span> <span class="hljs-string">'string'</span>
-        @unsubscribeFromRepository repository.repository
-    <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  subscribeToRepositories() {
+    <span class="hljs-keyword">this</span>.repositories.forEach(<span class="hljs-function">(<span class="hljs-params">repository</span>) =&gt;</span> {
+      <span class="hljs-keyword">if</span> (repository <span class="hljs-keyword">instanceof</span> Repository) {
+        <span class="hljs-keyword">this</span>.subscribeToRepository(repository);
+      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (repository.repository <span class="hljs-keyword">instanceof</span> Repository &amp;&amp; <span class="hljs-keyword">typeof</span> repository.callback === <span class="hljs-string">'string'</span>) {
+        <span class="hljs-keyword">this</span>.subscribeToRepository(repository.repository, <span class="hljs-keyword">this</span>[repository.callback]);
+      } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">throw</span> <span class="hljs-string">'unexpected format of producer repositories definition'</span>;
+      }
+    });
+  }</pre></div></div>
             
         </li>
         
@@ -319,20 +350,20 @@ Unsubscribes from all the repositories.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p><strong>subscribeToRepository</strong> <br/>
-@param [repository]: Object <br/>
-The repository to subscribe to. <br/>
-@param [callback]: String <br/>
-The method that should be executed on repository diff.</p>
-<p>Sets up a subscription to a repository with a custom or predefined callback.</p>
+              <p><strong>unsubscribeFromRepositories</strong> <br/>
+Unsubscribes from all the repositories.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  subscribeToRepository: <span class="hljs-function"><span class="hljs-params">(repository, callback)</span> -&gt;</span>
-    callback = callback <span class="hljs-keyword">or</span> (diff) =&gt;
-      @onDiffInRepository repository, diff
-
-    @listenTo repository, Vigor.Repository::REPOSITORY_DIFF, callback</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  unsubscribeFromRepositories() {
+    <span class="hljs-keyword">this</span>.repositories.forEach(<span class="hljs-function">(<span class="hljs-params">repository</span>) =&gt;</span> {
+      <span class="hljs-keyword">if</span> (repository <span class="hljs-keyword">instanceof</span> Repository) {
+        <span class="hljs-keyword">this</span>.unsubscribeFromRepository(repository);
+      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (repository.repository <span class="hljs-keyword">instanceof</span> Repository &amp;&amp; <span class="hljs-keyword">typeof</span> repository.callback === <span class="hljs-string">'string'</span>) {
+        <span class="hljs-keyword">this</span>.unsubscribeFromRepository(repository.repository);
+      }
+    });
+  }</pre></div></div>
             
         </li>
         
@@ -343,15 +374,24 @@ The method that should be executed on repository diff.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p><strong>unsubscribeFromRepository</strong> <br/>
+              <p><strong>subscribeToRepository</strong> <br/>
 @param [repository]: Object <br/>
-The repository to unsubscribe from.</p>
-<p>Unsubscribes from a repository.</p>
+The repository to subscribe to. <br/>
+@param [callback]: String <br/>
+The method that should be executed on repository diff.</p>
+<p>Sets up a subscription to a repository with a custom or predefined callback.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  unsubscribeFromRepository: <span class="hljs-function"><span class="hljs-params">(repository)</span> -&gt;</span>
-    @stopListening repository, Vigor.Repository::REPOSITORY_DIFF</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  subscribeToRepository(repository, callback) {
+    <span class="hljs-keyword">if</span> (!callback) {
+      callback = <span class="hljs-function"><span class="hljs-params">diff</span> =&gt;</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.onDiffInRepository(repository, diff);
+      };
+    }
+
+    <span class="hljs-keyword">this</span>.listenTo(repository, Repository.prototype.REPOSITORY_DIFF, callback);
+  }</pre></div></div>
             
         </li>
         
@@ -362,13 +402,16 @@ The repository to unsubscribe from.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p><strong>subscribe</strong> <br/>
-Called when a component is added.</p>
+              <p><strong>unsubscribeFromRepository</strong> <br/>
+@param [repository]: Object <br/>
+The repository to unsubscribe from.</p>
+<p>Unsubscribes from a repository.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  subscribe: <span class="hljs-function">-&gt;</span>
-    @produceDataSync()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  unsubscribeFromRepository(repository) {
+    <span class="hljs-keyword">this</span>.stopListening(repository, Repository.prototype.REPOSITORY_DIFF);
+  }</pre></div></div>
             
         </li>
         
@@ -379,17 +422,14 @@ Called when a component is added.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <p><strong>onDiffInRepository</strong> <br/>
-Used as default callback when subscribing to a repository.</p>
+              <p><strong>subscribe</strong> <br/>
+Called when a component is added.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  onDiffInRepository: <span class="hljs-function">=&gt;</span>
-    @produceData()
-
-
-  produceDataSync: <span class="hljs-function">-&gt;</span>
-    @produce @currentData()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  subscribe() {
+    <span class="hljs-keyword">this</span>.produceDataSync();
+  }</pre></div></div>
             
         </li>
         
@@ -400,19 +440,19 @@ Used as default callback when subscribing to a repository.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p><strong><em>produce</em></strong> <br/>
-@param [data]: Object <br/>
-The current data.</p>
-<p>This method is called by the produceDataSync method <br/>
-and in turn calls methods for decoration of the current data <br/>
-and validation of its contract.</p>
+              <p><strong>onDiffInRepository</strong> <br/>
+Used as default callback when subscribing to a repository.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  produce: <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span>
-    data = @decorate data
-    @_validateContract data
-    (component.callback data) <span class="hljs-keyword">for</span> componentId, component <span class="hljs-keyword">of</span> @registeredComponents</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  onDiffInRepository() {
+    <span class="hljs-keyword">this</span>.produceData();
+  }
+
+
+  produceDataSync() {
+    <span class="hljs-keyword">this</span>.produce(<span class="hljs-keyword">this</span>.currentData());
+  }</pre></div></div>
             
         </li>
         
@@ -423,13 +463,23 @@ and validation of its contract.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p><strong>currentData</strong> <br/>
-This is where the actual collection of the data is done. <br/>
-Default implementation is a noop.</p>
+              <p><strong><em>produce</em></strong> <br/>
+@param [data]: Object <br/>
+The current data.</p>
+<p>This method is called by the produceDataSync method <br/>
+and in turn calls methods for decoration of the current data <br/>
+and validation of its contract.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  currentData: <span class="hljs-function">-&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  produce(data) {
+    data = <span class="hljs-keyword">this</span>.decorate(data);
+    <span class="hljs-keyword">this</span>._validateContract(data);
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> componentId <span class="hljs-keyword">in</span> <span class="hljs-keyword">this</span>.registeredComponents) {
+      <span class="hljs-keyword">const</span> component = <span class="hljs-keyword">this</span>.registeredComponents[componentId];
+      component.callback(data);
+    }
+  }</pre></div></div>
             
         </li>
         
@@ -440,12 +490,13 @@ Default implementation is a noop.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p><strong>unsubscribe</strong> <br/>
+              <p><strong>currentData</strong> <br/>
+This is where the actual collection of the data is done. <br/>
 Default implementation is a noop.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  unsubscribe: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  currentData() {}</pre></div></div>
             
         </li>
         
@@ -456,27 +507,12 @@ Default implementation is a noop.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p><strong>decorate</strong> <br/>
-@param [data]: Object <br/>
-The data to decorate .<br/>
-@return data: Object <br/>
-The decorated data.</p>
-<p>Runs the assigned decorator(s) on the data.</p>
+              <p><strong>unsubscribe</strong> <br/>
+Default implementation is a noop.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  decorate: <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span>
-    <span class="hljs-keyword">for</span> decorator <span class="hljs-keyword">in</span> @decorators
-      decorator data
-    data
-
-
-  modelToJSON: <span class="hljs-function"><span class="hljs-params">(model)</span> -&gt;</span>
-    <span class="hljs-keyword">return</span> model.toJSON()
-
-
-  modelsToJSON: <span class="hljs-function"><span class="hljs-params">(models)</span> -&gt;</span>
-    _.map models, @modelToJSON</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  unsubscribe(options) {}</pre></div></div>
             
         </li>
         
@@ -487,6 +523,42 @@ The decorated data.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
+              <p><strong>decorate</strong> <br/>
+@param [data]: Object <br/>
+The data to decorate .<br/>
+@return data: Object <br/>
+The decorated data.</p>
+<p>Runs the assigned decorator(s) on the data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  decorate(data) {
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-keyword">this</span>.decorators.length; i++) {
+      <span class="hljs-keyword">const</span> decorator = <span class="hljs-keyword">this</span>.decorators[i];
+      decorator(data);
+    }
+    <span class="hljs-keyword">return</span> data;
+  }
+
+
+  modelToJSON(model) {
+    <span class="hljs-keyword">return</span> model.toJSON();
+  }
+
+
+  modelsToJSON(models) {
+    <span class="hljs-keyword">return</span> _.map(models, <span class="hljs-keyword">this</span>.modelToJSON);
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
               <p><strong>_validateContract</strong> <br/>
 @param [dataToProduce]: Object <br/>
 The data to validate. <br/>
@@ -495,26 +567,33 @@ The data to validate. <br/>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _validateContract: <span class="hljs-function"><span class="hljs-params">(dataToProduce)</span> -&gt;</span>
-    contract = @PRODUCTION_KEY.contract
-    <span class="hljs-keyword">unless</span> contract
-      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error <span class="hljs-string">"The subscriptionKey <span class="hljs-subst">#{subscriptionKey.key}</span> doesn't have a contract specified"</span>
+            <div class="content"><div class='highlight'><pre>  _validateContract(dataToProduce) {
+    <span class="hljs-keyword">const</span> { contract } = <span class="hljs-keyword">this</span>.PRODUCTION_KEY;
+    <span class="hljs-keyword">if</span> (!contract) {
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">`The subscriptionKey <span class="hljs-subst">${subscriptionKey.key}</span> doesn't have a contract specified`</span>);
+    }
 
-    <span class="hljs-keyword">return</span> Vigor.helpers.validateContract(contract, dataToProduce, @, <span class="hljs-string">'producing'</span>)
-
-
-  extend: <span class="hljs-function"><span class="hljs-params">(obj, mixin)</span> -&gt;</span>
-    obj[name] = method <span class="hljs-keyword">for</span> name, method <span class="hljs-keyword">of</span> mixin
-    <span class="hljs-keyword">return</span> obj
+    validateContract(contract, dataToProduce, <span class="hljs-keyword">this</span>, <span class="hljs-string">'producing'</span>);
+  }
 
 
-  mixin: <span class="hljs-function"><span class="hljs-params">(instance, mixin)</span> -&gt;</span>
-    @extend instance, mixin
+  extend(obj, mixin) {
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> name <span class="hljs-keyword">in</span> mixin) {
+      <span class="hljs-keyword">let</span> method = mixin[name];
+      obj[name] = method;
+    }
+    <span class="hljs-keyword">return</span> obj;
+  }
 
 
-_.extend Producer.prototype, Backbone.Events
-Producer.extend = Vigor.extend
-Vigor.Producer = Producer</pre></div></div>
+  mixin(instance, mixin) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.extend(instance, mixin);
+  }
+}
+
+_.extend(Producer.prototype, Events);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> Producer;</pre></div></div>
             
         </li>
         

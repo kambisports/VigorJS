@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>IdProducer.coffee</title>
+  <title>IdProducer.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -21,87 +21,87 @@
               
                 
                 <a class="source" href="bootstrap.html">
-                  bootstrap.coffee
+                  bootstrap.js
                 </a>
               
                 
                 <a class="source" href="EventBus.html">
-                  EventBus.coffee
+                  EventBus.js
                 </a>
               
                 
                 <a class="source" href="EventKeys.html">
-                  EventKeys.coffee
+                  EventKeys.js
                 </a>
               
                 
                 <a class="source" href="SubscriptionKeys.html">
-                  SubscriptionKeys.coffee
+                  SubscriptionKeys.js
                 </a>
               
                 
                 <a class="source" href="ComponentBase.html">
-                  ComponentBase.coffee
+                  ComponentBase.js
                 </a>
               
                 
                 <a class="source" href="ComponentView.html">
-                  ComponentView.coffee
+                  ComponentView.js
                 </a>
               
                 
                 <a class="source" href="ComponentViewModel.html">
-                  ComponentViewModel.coffee
+                  ComponentViewModel.js
                 </a>
               
                 
                 <a class="source" href="ProducerManager.html">
-                  ProducerManager.coffee
+                  ProducerManager.js
                 </a>
               
                 
                 <a class="source" href="ProducerMapper.html">
-                  ProducerMapper.coffee
+                  ProducerMapper.js
                 </a>
               
                 
                 <a class="source" href="Subscription.html">
-                  Subscription.coffee
+                  Subscription.js
                 </a>
               
                 
                 <a class="source" href="APIService.html">
-                  APIService.coffee
+                  APIService.js
                 </a>
               
                 
                 <a class="source" href="IdProducer.html">
-                  IdProducer.coffee
+                  IdProducer.js
                 </a>
               
                 
                 <a class="source" href="Producer.html">
-                  Producer.coffee
+                  Producer.js
                 </a>
               
                 
                 <a class="source" href="Repository.html">
-                  Repository.coffee
+                  Repository.js
                 </a>
               
                 
                 <a class="source" href="ServiceRepository.html">
-                  ServiceRepository.coffee
+                  ServiceRepository.js
+                </a>
+              
+                
+                <a class="source" href="settings.html">
+                  settings.js
                 </a>
               
                 
                 <a class="source" href="validateContract.html">
-                  validateContract.coffee
-                </a>
-              
-                
-                <a class="source" href="setup.html">
-                  setup.coffee
+                  validateContract.js
                 </a>
               
             </div>
@@ -113,7 +113,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>IdProducer.coffee</h1>
+                  <h1>IdProducer.js</h1>
               </div>
           </li>
         
@@ -124,6 +124,21 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">import</span> _ <span class="hljs-keyword">from</span> <span class="hljs-string">'underscore'</span>;
+<span class="hljs-keyword">import</span> Producer <span class="hljs-keyword">from</span> <span class="hljs-string">'datacommunication/producers/Producer'</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
               <h2 id="idproducer">IdProducer</h2>
 <p>An IdProducer produces data for multiple models.</p>
@@ -137,23 +152,7 @@ are subscribed to that model’s id.</p>
             
             <div class="content"><div class='highlight'><pre>
 
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">IdProducer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Producer</span></span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-2">&#182;</a>
-              </div>
-              <p>An array containing the ids of the models that have been added, removed
-or updated since the last time data was produced</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  updatedIds: <span class="hljs-literal">undefined</span></pre></div></div>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">IdProducer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Producer</span> </span>{</pre></div></div>
             
         </li>
         
@@ -164,12 +163,22 @@ or updated since the last time data was produced</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>A map of the subscriptions to this producer. The keys of this map are model ids
-and the values are arrays of subscription options objects.</p>
+              <p>This is the type of the model ids.<br/>
+This should be value types, and are numbers by default.<br/>
+Trying to add a subscription with an invalid type throws an error.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  subscriptions: <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  get idType() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._idType || <span class="hljs-keyword">typeof</span> <span class="hljs-number">0</span>;
+  }
+
+  set idType(type) {
+    <span class="hljs-keyword">this</span>._idType = type;
+  }
+
+  <span class="hljs-keyword">constructor</span>() {
+    <span class="hljs-keyword">super</span>(...arguments);</pre></div></div>
             
         </li>
         
@@ -180,19 +189,12 @@ and the values are arrays of subscription options objects.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>This is the type of the model ids.<br/>
-This should be value types, and are numbers by default.<br/>
-Trying to add a subscription with an invalid type throws an error.</p>
+              <p>An array containing the ids of the models that have been added, removed
+or updated since the last time data was produced</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  idType: <span class="hljs-keyword">typeof</span> <span class="hljs-number">0</span>
-
-
-  constructor: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">super</span>
-    @updatedIds = []
-    @subscriptions = {}</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.updatedIds = [];</pre></div></div>
             
         </li>
         
@@ -203,23 +205,13 @@ Trying to add a subscription with an invalid type throws an error.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p><strong>subscribe</strong><br/>
-@param [options]: Object<br/>
-Subsciption options. Can be used to get the id to unsubscribe from.</p>
-<p>Subscribe to the producer, if the id is of valid type.</p>
+              <p>A map of the subscriptions to this producer. The keys of this map are model ids
+and the values are arrays of subscription options objects.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  subscribe: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
-    id = @idForOptions options
-    <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> id <span class="hljs-keyword">isnt</span> @idType
-      <span class="hljs-keyword">throw</span> <span class="hljs-string">"expected the subscription key to be a <span class="hljs-subst">#{@idType}</span> but got a <span class="hljs-subst">#{<span class="hljs-keyword">typeof</span> subscriptionKey}</span>"</span>
-    <span class="hljs-keyword">if</span> @subscriptions[id]
-      @subscriptions[id].push options
-    <span class="hljs-keyword">else</span>
-      @subscriptions[id] = [options]
-
-    @produceDataSync id</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.subscriptions = {};
+  }</pre></div></div>
             
         </li>
         
@@ -229,6 +221,36 @@ Subsciption options. Can be used to get the id to unsubscribe from.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p><strong>subscribe</strong><br/>
+@param [options]: Object<br/>
+Subsciption options. Can be used to get the id to unsubscribe from.</p>
+<p>Subscribe to the producer, if the id is of valid type.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  subscribe(options) {
+    <span class="hljs-keyword">const</span> id = <span class="hljs-keyword">this</span>.idForOptions(options);
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> id !== <span class="hljs-keyword">this</span>.idType) {
+      <span class="hljs-keyword">throw</span> <span class="hljs-string">`expected the subscription key to be a <span class="hljs-subst">${<span class="hljs-keyword">this</span>.idType}</span> but got a <span class="hljs-subst">${<span class="hljs-keyword">typeof</span> subscriptionKey}</span>`</span>;
+    }
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.subscriptions[id]) {
+      <span class="hljs-keyword">this</span>.subscriptions[id].push(options);
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">this</span>.subscriptions[id] = [options];
+    }
+
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.produceDataSync(id);
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p><strong>onDiffInRepository</strong><br/>
 @param [repository]: <a href="Repository.html">Repository</a><br/>
@@ -240,49 +262,36 @@ and produces data for them.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  onDiffInRepository: <span class="hljs-function"><span class="hljs-params">(repository, diff)</span> -&gt;</span>
-    self = @
-<span class="hljs-function">
-    <span class="hljs-title">addRemoveMap</span> = <span class="hljs-params">(model)</span> -&gt;</span>
-      id = self.idForModel model, repository
-      <span class="hljs-keyword">if</span> _.isArray id
-        _.filter id, self.hasId.bind self
-      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> self.hasId id
-        id
-<span class="hljs-function">
-    <span class="hljs-title">changeMap</span> = <span class="hljs-params">(model)</span> -&gt;</span>
-      <span class="hljs-keyword">if</span> self.shouldPropagateModelChange model, repository
-        id = self.idForModel model, repository
-        <span class="hljs-keyword">if</span> _.isArray id
-          _.filter id, self.hasId.bind self
-        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> self.hasId id
-          id
+            <div class="content"><div class='highlight'><pre>  onDiffInRepository(repository, diff) {
+    <span class="hljs-keyword">const</span> addRemoveMap = <span class="hljs-function">(<span class="hljs-params">model</span>) =&gt;</span> {
+      <span class="hljs-keyword">const</span> id = <span class="hljs-keyword">this</span>.idForModel(model, repository);
+      <span class="hljs-keyword">if</span> (_.isArray(id)) {
+        <span class="hljs-keyword">return</span> _.filter(id, <span class="hljs-keyword">this</span>.hasId.bind(<span class="hljs-keyword">this</span>));
+      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.hasId(id)) {
+        <span class="hljs-keyword">return</span> id;
+      }
+    };
 
-    addedModelIds = _.map diff.added, addRemoveMap
-    removedModelIds = _.map diff.removed, addRemoveMap
-    updatedModelIds = _.map diff.changed, changeMap
+    <span class="hljs-keyword">const</span> changeMap = <span class="hljs-function">(<span class="hljs-params">model</span>) =&gt;</span> {
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.shouldPropagateModelChange(model, repository)) {
+        <span class="hljs-keyword">let</span> id = <span class="hljs-keyword">this</span>.idForModel(model, repository);
+        <span class="hljs-keyword">if</span> (_.isArray(id)) {
+          <span class="hljs-keyword">return</span> _.filter(id, <span class="hljs-keyword">this</span>.hasId.bind(<span class="hljs-keyword">this</span>));
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.hasId(id)) {
+          <span class="hljs-keyword">return</span> id;
+        }
+      }
+    };
 
-    @produceDataForIds _.filter _.flattenDepth [addedModelIds, removedModelIds, updatedModelIds], <span class="hljs-number">2</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-7">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
-              </div>
-              <p><strong>produceDataForIds</strong><br/>
-@param [ids]: Array of idTypes<br/>
-An array of model ids to produce data for. Defaults to all subscribed models.<br/></p>
-<p>Produces data for all given model ids.</p>
+    <span class="hljs-keyword">const</span> addedModelIds = _.map(diff.added, addRemoveMap);
+    <span class="hljs-keyword">const</span> removedModelIds = _.map(diff.removed, addRemoveMap);
+    <span class="hljs-keyword">const</span> updatedModelIds = _.map(diff.changed, changeMap);
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  produceDataForIds: <span class="hljs-function"><span class="hljs-params">(ids = @allIds())</span> -&gt;</span>
-    @updatedIds = _.uniq @updatedIds.concat ids
-    @produceData()</pre></div></div>
+    <span class="hljs-keyword">let</span> ids = _.flattenDepth([addedModelIds, removedModelIds, updatedModelIds], <span class="hljs-number">2</span>);
+    ids = _.compact(ids);
+
+    <span class="hljs-keyword">this</span>.produceDataForIds(ids);
+  }</pre></div></div>
             
         </li>
         
@@ -293,21 +302,17 @@ An array of model ids to produce data for. Defaults to all subscribed models.<br
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p><strong>allIds</strong><br/>
-@returns [ids]: Array of idTypes<br/>
-All subscribed ids.</p>
-<p>Returns an array of all subscribed ids.</p>
+              <p><strong>produceDataForIds</strong><br/>
+@param [ids]: Array of idTypes<br/>
+An array of model ids to produce data for. Defaults to all subscribed models.<br/></p>
+<p>Produces data for all given model ids.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  allIds: <span class="hljs-function">-&gt;</span>
-    ids = _.keys @subscriptions
-
-    <span class="hljs-keyword">if</span> @idType <span class="hljs-keyword">is</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-number">0</span>)
-      ids = _.map ids, <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span>
-        parseInt id, <span class="hljs-number">10</span>
-
-    ids</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  produceDataForIds(ids = <span class="hljs-keyword">this</span>.allIds()) {
+    <span class="hljs-keyword">this</span>.updatedIds = _.uniq(<span class="hljs-keyword">this</span>.updatedIds.concat(ids));
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.produceData();
+  }</pre></div></div>
             
         </li>
         
@@ -318,10 +323,22 @@ All subscribed ids.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p><strong>produceData</strong><br/>
-Aynchronously produces data for all models whose data has changed since the last time data was produced.</p>
+              <p><strong>allIds</strong><br/>
+@returns [ids]: Array of idTypes<br/>
+All subscribed ids.</p>
+<p>Returns an array of all subscribed ids.</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>  allIds() {
+    <span class="hljs-keyword">let</span> ids = _.keys(<span class="hljs-keyword">this</span>.subscriptions);
+
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.idType === (<span class="hljs-keyword">typeof</span> <span class="hljs-number">0</span>)) {
+      ids = _.map(ids, id =&gt; <span class="hljs-built_in">parseInt</span>(id, <span class="hljs-number">10</span>));
+    }
+
+    <span class="hljs-keyword">return</span> ids;
+  }</pre></div></div>
             
         </li>
         
@@ -332,22 +349,10 @@ Aynchronously produces data for all models whose data has changed since the last
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p><strong>produceDataSync</strong><br/>
-@param [id]: idType<br/>
-The id to produce data for. Defaults to all ids whose data has changed since the last time data was produced.</p>
-<p>Synchronously produces data for all models whose data has changed since the last time data was produced. If an id is supplied, only data for the model with that id is produced.</p>
+              <p><strong>produceData</strong><br/>
+Aynchronously produces data for all models whose data has changed since the last time data was produced.</p>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>  produceDataSync: <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span>
-    <span class="hljs-keyword">if</span> id?
-      @produce [id]
-
-    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> @updatedIds.length &gt; <span class="hljs-number">0</span>
-      ids = @updatedIds.slice()
-      @updatedIds.length = <span class="hljs-number">0</span>
-
-      @produce ids</pre></div></div>
             
         </li>
         
@@ -358,23 +363,24 @@ The id to produce data for. Defaults to all ids whose data has changed since the
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p><strong>unsubscribe</strong> <br/>
-@param [options]: Object <br/>
-Subsciption options. Can be used to get the id to unsubscribe from. This must be the same reference as the options used when subscribing (i.e. ===).</p>
-<p>Unsubscribe from the producer.</p>
+              <p><strong>produceDataSync</strong><br/>
+@param [id]: idType<br/>
+The id to produce data for. Defaults to all ids whose data has changed since the last time data was produced.</p>
+<p>Synchronously produces data for all models whose data has changed since the last time data was produced. If an id is supplied, only data for the model with that id is produced.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  unsubscribe: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
-    id = @idForOptions options
-    subscription = @subscriptions[id]
-    <span class="hljs-keyword">if</span> subscription?
-      index = subscription.indexOf options
-      <span class="hljs-keyword">unless</span> index <span class="hljs-keyword">is</span> <span class="hljs-number">-1</span>
-        subscription.splice index, <span class="hljs-number">1</span>
+            <div class="content"><div class='highlight'><pre>  produceDataSync(id) {
+    <span class="hljs-keyword">if</span> (id) {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.produce([id]);
 
-        <span class="hljs-keyword">if</span> subscription.length <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
-          <span class="hljs-keyword">delete</span> @subscriptions[id]</pre></div></div>
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.updatedIds.length &gt; <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">let</span> ids = <span class="hljs-keyword">this</span>.updatedIds.slice();
+      <span class="hljs-keyword">this</span>.updatedIds.length = <span class="hljs-number">0</span>;
+
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.produce(ids);
+    }
+  }</pre></div></div>
             
         </li>
         
@@ -385,27 +391,27 @@ Subsciption options. Can be used to get the id to unsubscribe from. This must be
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p><strong>produce</strong><br/>
-@param [ids]: Array of idTypes<br/>
-List of ids to produce data for.</p>
-<p>Produce (gathered, decorated and validated) data for the ids.</p>
+              <p><strong>unsubscribe</strong> <br/>
+@param [options]: Object <br/>
+Subsciption options. Can be used to get the id to unsubscribe from. This must be the same reference as the options used when subscribing (i.e. ===).</p>
+<p>Unsubscribe from the producer.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  produce: <span class="hljs-function"><span class="hljs-params">(ids)</span> -&gt;</span>
-    <span class="hljs-keyword">for</span> id <span class="hljs-keyword">in</span> ids
+            <div class="content"><div class='highlight'><pre>  unsubscribe(options) {
+    <span class="hljs-keyword">const</span> id = <span class="hljs-keyword">this</span>.idForOptions(options);
+    <span class="hljs-keyword">const</span> subscription = <span class="hljs-keyword">this</span>.subscriptions[id];
+    <span class="hljs-keyword">if</span> (subscription) {
+      <span class="hljs-keyword">const</span> index = subscription.indexOf(options);
+      <span class="hljs-keyword">if</span> (index !== <span class="hljs-number">-1</span>) {
+        subscription.splice(index, <span class="hljs-number">1</span>);
 
-      data = @currentData(id) <span class="hljs-keyword">or</span> {}
-      data.id = id
-      data = @decorate data
-
-      @_validateContract data
-
-      _.each @registeredComponents,
-        _.bind (component) -&gt;
-          <span class="hljs-keyword">if</span> id <span class="hljs-keyword">is</span> @idForOptions component.options
-            component.callback data
-        , @</pre></div></div>
+        <span class="hljs-keyword">if</span> (subscription.length === <span class="hljs-number">0</span>) {
+          <span class="hljs-keyword">delete</span> <span class="hljs-keyword">this</span>.subscriptions[id];
+        }
+      }
+    }
+  }</pre></div></div>
             
         </li>
         
@@ -416,13 +422,29 @@ List of ids to produce data for.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <p><strong>currentData</strong><br/>
-@param [id]: The id to produce data for</p>
-<p>This is where the actual collection of the data is done. <br/></p>
+              <p><strong>produce</strong><br/>
+@param [ids]: Array of idTypes<br/>
+List of ids to produce data for.</p>
+<p>Produce (gathered, decorated and validated) data for the ids.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  currentData: <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  produce(ids) {
+    <span class="hljs-keyword">let</span> data;
+    ids.forEach(<span class="hljs-function">(<span class="hljs-params">id</span>) =&gt;</span> {
+      data = <span class="hljs-keyword">this</span>.currentData(id) || {};
+      data.id = id;
+      data = <span class="hljs-keyword">this</span>.decorate(data);
+      <span class="hljs-keyword">this</span>._validateContract(data);
+
+      _.each(<span class="hljs-keyword">this</span>.registeredComponents, (component) =&gt; {
+        <span class="hljs-keyword">if</span> (id === <span class="hljs-keyword">this</span>.idForOptions(component.options)) {
+          <span class="hljs-keyword">return</span> component.callback(data);
+        }
+      });
+
+    });
+  }</pre></div></div>
             
         </li>
         
@@ -433,9 +455,13 @@ List of ids to produce data for.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>default implementation is a noop</p>
+              <p><strong>currentData</strong><br/>
+@param [id]: The id to produce data for</p>
+<p>This is where the actual collection of the data is done. <br/></p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>  currentData(id) {}</pre></div></div>
             
         </li>
         
@@ -446,17 +472,9 @@ List of ids to produce data for.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p><strong>hasId</strong><br/>
-@param [id]: idType<br/>
-The id to check for.</p>
-<p>@returns [hasId]: boolean<br/>
-True if there is a subscription for the given id, false otherwise.</p>
-<p>Returns true if there is a subscription for the given id, otherwise returns false.</p>
+              <p>default implementation is a noop</p>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>  hasId: <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span>
-    @subscriptions[id]?</pre></div></div>
             
         </li>
         
@@ -467,17 +485,18 @@ True if there is a subscription for the given id, false otherwise.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p><strong>shouldPropagateModelChange</strong><br/>
-@param [model]: Object<br/>
-A model</p>
-<p>@param [repository]: <a href="Repository.html">Repository</a><br/>
-The repository which contains the model.<br/></p>
-<p>Called when a model changes to determine whether to produce data for the model. If true, then data for the model will be produced for this change.</p>
+              <p><strong>hasId</strong><br/>
+@param [id]: idType<br/>
+The id to check for.</p>
+<p>@returns [hasId]: boolean<br/>
+True if there is a subscription for the given id, false otherwise.</p>
+<p>Returns true if there is a subscription for the given id, otherwise returns false.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  shouldPropagateModelChange: <span class="hljs-function"><span class="hljs-params">(model, repository)</span> -&gt;</span>
-    <span class="hljs-literal">true</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  hasId(id) {
+    <span class="hljs-keyword">return</span> (<span class="hljs-keyword">this</span>.subscriptions[id] != <span class="hljs-literal">null</span>);
+  }</pre></div></div>
             
         </li>
         
@@ -487,6 +506,28 @@ The repository which contains the model.<br/></p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p><strong>shouldPropagateModelChange</strong><br/>
+@param [model]: Object<br/>
+A model</p>
+<p>@param [repository]: <a href="Repository.html">Repository</a><br/>
+The repository which contains the model.<br/></p>
+<p>Called when a model changes to determine whether to produce data for the model. If true, then data for the model will be produced for this change.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  shouldPropagateModelChange(model, repository) {
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p><strong>idForModel</strong><br/>
 @param [model]: Object<br/>
@@ -499,17 +540,18 @@ The internal id of the given model, or an array of internal ids which correspond
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  idForModel: <span class="hljs-function"><span class="hljs-params">(model, repository)</span> -&gt;</span>
-    model.id</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  idForModel(model, repository) {
+    <span class="hljs-keyword">return</span> model.id;
+  }</pre></div></div>
             
         </li>
         
         
-        <li id="section-18">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p><strong>idForOptions</strong><br/>
 @param [options]: Object<br/>
@@ -520,11 +562,12 @@ The internal id of the model that the subscription options refer to.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  idForOptions: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
-    options.id
+            <div class="content"><div class='highlight'><pre>  idForOptions(options) {
+    <span class="hljs-keyword">return</span> options.id;
+  }
+}
 
-
-Vigor.IdProducer = IdProducer</pre></div></div>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> IdProducer;</pre></div></div>
             
         </li>
         

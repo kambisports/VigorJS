@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>ComponentView.coffee</title>
+  <title>ComponentView.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -21,87 +21,87 @@
               
                 
                 <a class="source" href="bootstrap.html">
-                  bootstrap.coffee
+                  bootstrap.js
                 </a>
               
                 
                 <a class="source" href="EventBus.html">
-                  EventBus.coffee
+                  EventBus.js
                 </a>
               
                 
                 <a class="source" href="EventKeys.html">
-                  EventKeys.coffee
+                  EventKeys.js
                 </a>
               
                 
                 <a class="source" href="SubscriptionKeys.html">
-                  SubscriptionKeys.coffee
+                  SubscriptionKeys.js
                 </a>
               
                 
                 <a class="source" href="ComponentBase.html">
-                  ComponentBase.coffee
+                  ComponentBase.js
                 </a>
               
                 
                 <a class="source" href="ComponentView.html">
-                  ComponentView.coffee
+                  ComponentView.js
                 </a>
               
                 
                 <a class="source" href="ComponentViewModel.html">
-                  ComponentViewModel.coffee
+                  ComponentViewModel.js
                 </a>
               
                 
                 <a class="source" href="ProducerManager.html">
-                  ProducerManager.coffee
+                  ProducerManager.js
                 </a>
               
                 
                 <a class="source" href="ProducerMapper.html">
-                  ProducerMapper.coffee
+                  ProducerMapper.js
                 </a>
               
                 
                 <a class="source" href="Subscription.html">
-                  Subscription.coffee
+                  Subscription.js
                 </a>
               
                 
                 <a class="source" href="APIService.html">
-                  APIService.coffee
+                  APIService.js
                 </a>
               
                 
                 <a class="source" href="IdProducer.html">
-                  IdProducer.coffee
+                  IdProducer.js
                 </a>
               
                 
                 <a class="source" href="Producer.html">
-                  Producer.coffee
+                  Producer.js
                 </a>
               
                 
                 <a class="source" href="Repository.html">
-                  Repository.coffee
+                  Repository.js
                 </a>
               
                 
                 <a class="source" href="ServiceRepository.html">
-                  ServiceRepository.coffee
+                  ServiceRepository.js
+                </a>
+              
+                
+                <a class="source" href="settings.html">
+                  settings.js
                 </a>
               
                 
                 <a class="source" href="validateContract.html">
-                  validateContract.coffee
-                </a>
-              
-                
-                <a class="source" href="setup.html">
-                  setup.coffee
+                  validateContract.js
                 </a>
               
             </div>
@@ -113,7 +113,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>ComponentView.coffee</h1>
+                  <h1>ComponentView.js</h1>
               </div>
           </li>
         
@@ -124,6 +124,20 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">import</span> {View} <span class="hljs-keyword">from</span> <span class="hljs-string">'backbone'</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
               <p>##ComponentView
 This class is intended to be used as a base class for all views within a component
@@ -139,22 +153,7 @@ It enforces five methods to unify the structure of ComponentViews accross a larg
             </div>
             
             <div class="content"><div class='highlight'><pre>
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ComponentView</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Backbone</span>.<span class="hljs-title">View</span></span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-2">&#182;</a>
-              </div>
-              <p>@property viewModel: ComponentViewModel</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  viewModel: <span class="hljs-literal">undefined</span></pre></div></div>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ComponentView</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">View</span> </span>{</pre></div></div>
             
         </li>
         
@@ -169,7 +168,8 @@ It enforces five methods to unify the structure of ComponentViews accross a larg
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  constructor: <span class="hljs-function">-&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">constructor</span>(options) {
+    <span class="hljs-keyword">super</span>(options);</pre></div></div>
             
         </li>
         
@@ -186,15 +186,15 @@ you don’t need them).</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    @_checkIfImplemented [
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>._checkIfImplemented([
       <span class="hljs-string">'renderStaticContent'</span>,
       <span class="hljs-string">'renderDynamicContent'</span>,
       <span class="hljs-string">'addSubscriptions'</span>,
       <span class="hljs-string">'removeSubscriptions'</span>,
       <span class="hljs-string">'dispose'</span>
-    ]
+    ]);
 
-    <span class="hljs-keyword">super</span></pre></div></div>
+  }</pre></div></div>
             
         </li>
         
@@ -212,11 +212,13 @@ view options, usually containing a viewModel instance <br/></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  initialize: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
-    <span class="hljs-keyword">super</span>
-    <span class="hljs-keyword">if</span> options?.viewModel
-      @viewModel = options.viewModel
-    <span class="hljs-keyword">return</span> @</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  initialize(options) {
+    <span class="hljs-keyword">if</span> (options &amp;&amp; options.viewModel) {
+      <span class="hljs-keyword">this</span>.viewModel = options.viewModel;
+    }
+    <span class="hljs-keyword">super</span>.initialize(...arguments);
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+  }</pre></div></div>
             
         </li>
         
@@ -233,10 +235,11 @@ the views render method, it will call @renderStaticContent and @addSubscriptions
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  render: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">do</span> @renderStaticContent
-    <span class="hljs-keyword">do</span> @addSubscriptions
-    <span class="hljs-keyword">return</span> @</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  render() {
+    <span class="hljs-keyword">this</span>.renderStaticContent();
+    <span class="hljs-keyword">this</span>.addSubscriptions();
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+  }</pre></div></div>
             
         </li>
         
@@ -254,8 +257,9 @@ Render parts of component that don’t rely on model. <br/></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  renderStaticContent: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">return</span> @</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  renderStaticContent() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+  }</pre></div></div>
             
         </li>
         
@@ -273,8 +277,9 @@ Render parts of component that relies on model. <br/></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  renderDynamicContent: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">return</span> @</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  renderDynamicContent() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+  }</pre></div></div>
             
         </li>
         
@@ -292,8 +297,9 @@ Add view model subscriptions if needed. <br/></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  addSubscriptions: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">return</span> @</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  addSubscriptions() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+  }</pre></div></div>
             
         </li>
         
@@ -311,8 +317,9 @@ Remove view model subscriptions.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  removeSubscriptions: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">return</span> @</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  removeSubscriptions() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+  }</pre></div></div>
             
         </li>
         
@@ -329,13 +336,16 @@ Override this, and call super.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  dispose: <span class="hljs-function">-&gt;</span>
-    <span class="hljs-keyword">do</span> @model?.unbind
-    <span class="hljs-keyword">do</span> @removeSubscriptions
-    <span class="hljs-keyword">do</span> @stopListening
-    <span class="hljs-keyword">do</span> @$el.<span class="hljs-literal">off</span>
-    <span class="hljs-keyword">do</span> @$el.remove
-    <span class="hljs-keyword">do</span> @off</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  dispose() {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.model) {
+      <span class="hljs-keyword">this</span>.model.unbind()
+    }
+    <span class="hljs-keyword">this</span>.removeSubscriptions();
+    <span class="hljs-keyword">this</span>.stopListening();
+    <span class="hljs-keyword">this</span>.$el.off();
+    <span class="hljs-keyword">this</span>.$el.remove();
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.off();
+  }</pre></div></div>
             
         </li>
         
@@ -352,25 +362,23 @@ Ensures that passed methods are implemented in the view</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _checkIfImplemented: <span class="hljs-function"><span class="hljs-params">(methodNames)</span> -&gt;</span>
-    <span class="hljs-keyword">for</span> methodName <span class="hljs-keyword">in</span> methodNames
-      <span class="hljs-keyword">unless</span> @constructor.prototype.hasOwnProperty(methodName)
-        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"<span class="hljs-subst">#{@constructor.name}</span> - <span class="hljs-subst">#{methodName}</span>() must be implemented in View."</span>)</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-13">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
-              </div>
-              <p>Expose ComponentView on the Vigor object</p>
+            <div class="content"><div class='highlight'><pre>  _checkIfImplemented(methodNames) {
+    <span class="hljs-keyword">return</span> <span class="hljs-function">(<span class="hljs-params">(</span>) =&gt;</span> {
+      <span class="hljs-keyword">let</span> result = [];
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; methodNames.length; i++) {
+        <span class="hljs-keyword">let</span> methodName = methodNames[i];
+        <span class="hljs-keyword">let</span> item;
+        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.constructor.prototype.hasOwnProperty(methodName)) {
+          <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">`<span class="hljs-subst">${<span class="hljs-keyword">this</span>.constructor.name}</span> - <span class="hljs-subst">${methodName}</span>() must be implemented in View.`</span>);
+        }
+        result.push(item);
+      }
+      <span class="hljs-keyword">return</span> result;
+    })();
+  }
+}
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>Vigor.ComponentView = ComponentView</pre></div></div>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> ComponentView;</pre></div></div>
             
         </li>
         
