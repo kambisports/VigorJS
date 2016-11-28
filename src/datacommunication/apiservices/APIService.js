@@ -296,6 +296,21 @@ class APIService {
   // Called when a post request is unsuccessful.
   onPostError() {}
 
+  // **onPutSuccess**<br/>
+  // Called when a Put request is successful.
+  onPutSuccess() {}
+
+  // **onPutError**<br/>
+  // Called when a Put request is unsuccessful.
+  onPutError() {}
+
+  // **onDeleteSuccess**<br/>
+  // Called when a Destroy request is successful.
+  onDeleteSuccess() {}
+
+  // **onDeleteError**<br/>
+  // Called when a Destroy request is unsuccessful.
+  onDeleteError() {}
 
   // **sync**<br/>
   // See [Backbone.Model.sync](http://backbonejs.org/#Model-sync)
@@ -339,9 +354,9 @@ class APIService {
       case 'POST':
         return this.post(subscriber.postParams);
       case 'PUT':
-        throw 'PUT not yet implemented';
+        return this.put(subscriber.putParams);
       case 'DELETE':
-        throw 'DELETE not yet implemented';
+        return this.delete(subscriber.deleteParams);
     }
   }
 
@@ -425,6 +440,26 @@ class APIService {
     return model.save(undefined, {
       success: this.onPostSuccess,
       error: this.onPostError
+    });
+  }
+
+  put(params) {
+    const model = this.getModelInstance(params);
+    if (!model.get('id')) {
+      throw 'PUT requests must have an id specified in putParams';
+    }
+
+    return model.save(undefined, {
+      success: this.onPutSuccess,
+      error: this.onPutError
+    });
+  }
+
+  delete(params) {
+    const model = this.getModelInstance(params);
+    return model.destroy({
+      success: this.onDeleteSuccess,
+      error: this.onDeleteError
     });
   }
 }
