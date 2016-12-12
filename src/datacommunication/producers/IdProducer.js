@@ -44,7 +44,7 @@ class IdProducer extends Producer {
   subscribe(options) {
     const id = this.idForOptions(options);
     if (typeof id !== this.idType) {
-      throw `expected the subscription key to be a ${this.idType} but got a ${typeof subscriptionKey}`;
+      throw `expected the subscription key to be a ${this.idType} but got a ${typeof id}`;
     }
     if (this.subscriptions[id]) {
       this.subscriptions[id].push(options);
