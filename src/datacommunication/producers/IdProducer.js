@@ -43,7 +43,7 @@ class IdProducer extends Producer {
   // Subscribe to the producer, if the id is of valid type.
   subscribe(options) {
     const id = this.idForOptions(options);
-    if (typeof id !== this.idType) {
+    if (!this.isIdOfValidType(id)) {
       throw `expected the subscription key to be a ${this.idType} but got a ${typeof id}`;
     }
     if (this.subscriptions[id]) {
@@ -53,6 +53,14 @@ class IdProducer extends Producer {
     }
 
     return this.produceDataSync(id);
+  }
+
+  // **isIdOfValidType**<br/>
+  // @param [id]: Anything<br/>
+  // Method to validate the type of the id that is passed with the subscription
+  // Override this if needed
+  isIdOfValidType(id) {
+    return typeof id === this.idType;
   }
 
   // **onDiffInRepository**<br/>

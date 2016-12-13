@@ -243,7 +243,7 @@ This key should be overridden in the subclass.</p>
 
 
   getInstance() {
-    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.instance == <span class="hljs-literal">null</span>) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.instance === <span class="hljs-literal">null</span> || <span class="hljs-keyword">typeof</span>(<span class="hljs-keyword">this</span>.instance) === <span class="hljs-string">'undefined'</span>) {
       <span class="hljs-keyword">this</span>.instance = <span class="hljs-keyword">new</span> <span class="hljs-keyword">this</span>.constructor();
     }
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.instance;
@@ -267,7 +267,7 @@ The subscription, which contains an id, a callback and options. <br/></p>
             
             <div class="content"><div class='highlight'><pre>  addComponent(subscription) {
     <span class="hljs-keyword">const</span> existingSubscription = <span class="hljs-keyword">this</span>.registeredComponents[subscription.id];
-    <span class="hljs-keyword">if</span> (existingSubscription == <span class="hljs-literal">null</span>) {
+    <span class="hljs-keyword">if</span> (existingSubscription === <span class="hljs-literal">null</span> || <span class="hljs-keyword">typeof</span>(existingSubscription) === <span class="hljs-string">'undefined'</span>) {
       <span class="hljs-keyword">this</span>.registeredComponents[subscription.id] = subscription;
       <span class="hljs-keyword">this</span>.subscribe(subscription.options);
 
@@ -302,9 +302,11 @@ The id of the component that should be removed. <br/></p>
       <span class="hljs-keyword">delete</span> <span class="hljs-keyword">this</span>.registeredComponents[subscription.id];
 
       <span class="hljs-keyword">let</span> shouldUnsubscribe = <span class="hljs-literal">true</span>;
-      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> component <span class="hljs-keyword">in</span> <span class="hljs-keyword">this</span>.registeredComponents) {
-        shouldUnsubscribe = <span class="hljs-literal">false</span>;
-        <span class="hljs-keyword">break</span>;
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> componentId <span class="hljs-keyword">in</span> <span class="hljs-keyword">this</span>.registeredComponents) {
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.registeredComponents.hasOwnProperty(componentId)) {
+          shouldUnsubscribe = <span class="hljs-literal">false</span>;
+          <span class="hljs-keyword">break</span>;
+        }
       }
 
       <span class="hljs-keyword">if</span> (shouldUnsubscribe) {
@@ -476,8 +478,10 @@ and validation of its contract.</p>
     data = <span class="hljs-keyword">this</span>.decorate(data);
     <span class="hljs-keyword">this</span>._validateContract(data);
     <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> componentId <span class="hljs-keyword">in</span> <span class="hljs-keyword">this</span>.registeredComponents) {
-      <span class="hljs-keyword">const</span> component = <span class="hljs-keyword">this</span>.registeredComponents[componentId];
-      component.callback(data);
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.registeredComponents.hasOwnProperty(componentId)) {
+        <span class="hljs-keyword">const</span> component = <span class="hljs-keyword">this</span>.registeredComponents[componentId];
+        component.callback(data);
+      }
     }
   }</pre></div></div>
             
@@ -512,7 +516,7 @@ Default implementation is a noop.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  unsubscribe(options) {}</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  unsubscribe() {}</pre></div></div>
             
         </li>
         
@@ -568,9 +572,9 @@ The data to validate. <br/>
             </div>
             
             <div class="content"><div class='highlight'><pre>  _validateContract(dataToProduce) {
-    <span class="hljs-keyword">const</span> { contract } = <span class="hljs-keyword">this</span>.PRODUCTION_KEY;
+    <span class="hljs-keyword">const</span> { key, contract } = <span class="hljs-keyword">this</span>.PRODUCTION_KEY;
     <span class="hljs-keyword">if</span> (!contract) {
-      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">`The subscriptionKey <span class="hljs-subst">${subscriptionKey.key}</span> doesn't have a contract specified`</span>);
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">`The subscriptionKey <span class="hljs-subst">${key}</span> doesn't have a contract specified`</span>);
     }
 
     validateContract(contract, dataToProduce, <span class="hljs-keyword">this</span>, <span class="hljs-string">'producing'</span>);
@@ -579,8 +583,10 @@ The data to validate. <br/>
 
   extend(obj, mixin) {
     <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> name <span class="hljs-keyword">in</span> mixin) {
-      <span class="hljs-keyword">let</span> method = mixin[name];
-      obj[name] = method;
+      <span class="hljs-keyword">if</span> (mixin.hasOwnProperty(name)) {
+        <span class="hljs-keyword">let</span> method = mixin[name];
+        obj[name] = method;
+      }
     }
     <span class="hljs-keyword">return</span> obj;
   }
