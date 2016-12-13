@@ -1,6 +1,6 @@
 /*!
  * vigorjs - A small framework for structuring large scale Backbone applications
- * @version 0.1.1
+ * @version 0.1.3
  * @link https://github.com/kambisports/VigorJS.git
  * @license ISC
  */
